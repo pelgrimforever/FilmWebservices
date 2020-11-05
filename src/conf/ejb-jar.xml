@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ejb-jar version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd">
+<display-name>FilmBI</display-name>
+
+  <enterprise-beans>
+    <session>
+      <ejb-name>Phototree7subjectBean</ejb-name>
+      <mapped-name>filmPhototree7subjectBean</mapped-name>
+      <remote>film.ejb.Phototree7subjectRemote</remote>
+      <ejb-class>film.ejb.Phototree7subjectBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>Tree7subjectBean</ejb-name>
+      <mapped-name>filmTree7subjectBean</mapped-name>
+      <remote>film.ejb.Tree7subjectRemote</remote>
+      <ejb-class>film.ejb.Tree7subjectBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>SecurityuserprofileBean</ejb-name>
+      <mapped-name>filmSecurityuserprofileBean</mapped-name>
+      <remote>film.ejb.SecurityuserprofileRemote</remote>
+      <ejb-class>film.ejb.SecurityuserprofileBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>SecurityprofileBean</ejb-name>
+      <mapped-name>filmSecurityprofileBean</mapped-name>
+      <remote>film.ejb.SecurityprofileRemote</remote>
+      <ejb-class>film.ejb.SecurityprofileBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>View_backupstatusBean</ejb-name>
+      <mapped-name>filmView_backupstatusBean</mapped-name>
+      <remote>film.ejb.View_backupstatusRemote</remote>
+      <ejb-class>film.ejb.View_backupstatusBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>View_subjects_for_photoBean</ejb-name>
+      <mapped-name>filmView_subjects_for_photoBean</mapped-name>
+      <remote>film.ejb.View_subjects_for_photoRemote</remote>
+      <ejb-class>film.ejb.View_subjects_for_photoBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>View_subjects_for_filmBean</ejb-name>
+      <mapped-name>filmView_subjects_for_filmBean</mapped-name>
+      <remote>film.ejb.View_subjects_for_filmRemote</remote>
+      <ejb-class>film.ejb.View_subjects_for_filmBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>Art_photoBean</ejb-name>
+      <mapped-name>filmArt_photoBean</mapped-name>
+      <remote>film.ejb.Art_photoRemote</remote>
+      <ejb-class>film.ejb.Art_photoBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>PhotosubjectsBean</ejb-name>
+      <mapped-name>filmPhotosubjectsBean</mapped-name>
+      <remote>film.ejb.PhotosubjectsRemote</remote>
+      <ejb-class>film.ejb.PhotosubjectsBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>Art_academyBean</ejb-name>
+      <mapped-name>filmArt_academyBean</mapped-name>
+      <remote>film.ejb.Art_academyRemote</remote>
+      <ejb-class>film.ejb.Art_academyBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>UploadsessionsettingsBean</ejb-name>
+      <mapped-name>filmUploadsessionsettingsBean</mapped-name>
+      <remote>film.ejb.UploadsessionsettingsRemote</remote>
+      <ejb-class>film.ejb.UploadsessionsettingsBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>MainmenuBean</ejb-name>
+      <mapped-name>filmMainmenuBean</mapped-name>
+      <remote>film.ejb.MainmenuRemote</remote>
+      <ejb-class>film.ejb.MainmenuBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>SubjectcatBean</ejb-name>
+      <mapped-name>filmSubjectcatBean</mapped-name>
+      <remote>film.ejb.SubjectcatRemote</remote>
+      <ejb-class>film.ejb.SubjectcatBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>Art_groupBean</ejb-name>
+      <mapped-name>filmArt_groupBean</mapped-name>
+      <remote>film.ejb.Art_groupRemote</remote>
+      <ejb-class>film.ejb.Art_groupBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>PhotoBean</ejb-name>
+      <mapped-name>filmPhotoBean</mapped-name>
+      <remote>film.ejb.PhotoRemote</remote>
+      <ejb-class>film.ejb.PhotoBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>Art_subgroupBean</ejb-name>
+      <mapped-name>filmArt_subgroupBean</mapped-name>
+      <remote>film.ejb.Art_subgroupRemote</remote>
+      <ejb-class>film.ejb.Art_subgroupBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>FilmtypeBean</ejb-name>
+      <mapped-name>filmFilmtypeBean</mapped-name>
+      <remote>film.ejb.FilmtypeRemote</remote>
+      <ejb-class>film.ejb.FilmtypeBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>MenuitemBean</ejb-name>
+      <mapped-name>filmMenuitemBean</mapped-name>
+      <remote>film.ejb.MenuitemRemote</remote>
+      <ejb-class>film.ejb.MenuitemBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>MenuBean</ejb-name>
+      <mapped-name>filmMenuBean</mapped-name>
+      <remote>film.ejb.MenuRemote</remote>
+      <ejb-class>film.ejb.MenuBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>UploadsessionBean</ejb-name>
+      <mapped-name>filmUploadsessionBean</mapped-name>
+      <remote>film.ejb.UploadsessionRemote</remote>
+      <ejb-class>film.ejb.UploadsessionBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>SubjectBean</ejb-name>
+      <mapped-name>filmSubjectBean</mapped-name>
+      <remote>film.ejb.SubjectRemote</remote>
+      <ejb-class>film.ejb.SubjectBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>FilmsubjectsBean</ejb-name>
+      <mapped-name>filmFilmsubjectsBean</mapped-name>
+      <remote>film.ejb.FilmsubjectsRemote</remote>
+      <ejb-class>film.ejb.FilmsubjectsBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>PhototagsBean</ejb-name>
+      <mapped-name>filmPhototagsBean</mapped-name>
+      <remote>film.ejb.PhototagsRemote</remote>
+      <ejb-class>film.ejb.PhototagsBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+    <session>
+      <ejb-name>FilmBean</ejb-name>
+      <mapped-name>filmFilmBean</mapped-name>
+      <remote>film.ejb.FilmRemote</remote>
+      <ejb-class>film.ejb.FilmBean</ejb-class>
+      <session-type>Stateless</session-type>
+      <transaction-type>Container</transaction-type>
+    </session>  
+
+  </enterprise-beans>
+	
+</ejb-jar>
