@@ -62,7 +62,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import data.google.geocode.Googlegeocodestatus;
+import data.interfaces.db.AFieldsearcher;
 import data.osm.geocode.OSMgeocode;
+import static film.logicentity.Photo.SQLWherePublic;
+import film.searchentity.Photosearch;
 
 /**
  * Business Logic Entity class BLphoto
@@ -165,9 +168,18 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * @return ArrayList of Photo objects
      * @throws DBException
      */
+    public ArrayList getPhotos() throws DBException {
+        return getPhotos(this.isAuthenticated());
+    }
+    
+    /**
+     * get all Photo objects from database
+     * @return ArrayList of Photo objects
+     * @throws DBException
+     */
     public ArrayList getPhotos(boolean privateaccess) throws DBException {
         if(privateaccess)
-            return getMapper().loadEntityVector(this, Photo.SQLSelectAll);
+            return getMapper().loadEntityVector(this, Photo.SQLSelect4photo_sorted);
         else {
             return getMapper().loadEntityVector(this, Photo.SQLSelectAll4Public, publiconly);
         }
@@ -216,7 +228,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * @throws DBException
      */
     public ArrayList search(IPhotosearch search) throws DBException {
-        return search(false, search);
+        return search(isAuthenticated(), search);
     }
     
     /**
@@ -234,7 +246,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
             if(!hasprivateaccess) searchsql += " and public";
             searchsql += sqlorderby;
             ArrayList photos = getMapper().loadEntityVector(this, searchsql, search.getParameters());
-            this.addSmallimage(photos, hasprivateaccess);
+            //this.addSmallimage(photos, hasprivateaccess);
             return photos;
         } else {
             return new ArrayList();
@@ -300,6 +312,40 @@ public class BLphoto extends Bphoto implements IBLphoto {
             photos = getMapper().loadEntityVector(this, Photo.SQLSelect4publiclocation, parameter);
         }
         return photos;
+    }
+    
+    /**
+     * search Photos for given locations
+     * @param locations: location points
+     * @return ArrayList of Photos
+     * @throws DBException 
+     */
+    public ArrayList getPhoto4Locations(ArrayList<piPoint> locations) throws DBException {
+        ArrayList photos;
+        Object[][] parameter = {};
+        Iterator<piPoint> locationsI = locations.iterator();
+        int l = 0;
+        StringBuilder sqlwhere = new StringBuilder("");
+        String parametername = "";
+        while(locationsI.hasNext()) {
+            parametername = "location" + l;
+            Object[][] p = {{ parametername, locationsI.next() }};
+            parameter = AbstractSQLMapper.addKeyArrays(parameter, p);
+            sqlwhere.append(Photo.fieldnames[Photo.LOCATION-1]).append(" = :").append(parametername).append(":");
+            if(locationsI.hasNext()) {
+                sqlwhere.append(" or ");
+            }
+            l++;
+        }
+        StringBuilder sql = new StringBuilder(Photo.SQLSelectAll).append(" where ");
+        if(this.isAuthenticated()) {
+            sql.append(sqlwhere);
+        } else {
+            parameter = AbstractSQLMapper.addKeyArrays(parameter, publiconly);
+            sql.append(Photo.SQLWherePublic).append(" and (").append(sqlwhere).append(")");
+        }
+        sql.append(Photo.OrderByDateTime);
+        return getMapper().loadEntityVector(this, sql.toString(), parameter);
     }
     
     /**
@@ -423,6 +469,40 @@ public class BLphoto extends Bphoto implements IBLphoto {
         return super.getFiledata(filepath, filename);
     }
 
+    /**
+     * returns the image file if authenticated or public
+     * @param photoPK
+     * @return image file, thumbnail size
+     * @throws DBException 
+     */
+    public File getThumbnail(IPhotoPK photoPK) throws DBException {
+        Photo photo = this.getPhoto(photoPK);
+        if(isAuthenticated() || photo.getPublic()) {
+            String filepath = getImagePath(photoPK, THUMBNAILPATH);
+            String filename = getFilename(photoPK);
+            return new File(GeneralObject.FILEROOT + filepath + filename);
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * returns the image file if authenticated or public
+     * @param photoPK
+     * @return image file, small size
+     * @throws DBException 
+     */
+    public File getSmall(IPhotoPK photoPK) throws DBException {
+        Photo photo = this.getPhoto(photoPK);
+        if(isAuthenticated() || photo.getPublic()) {
+            String filepath = getImagePath(photoPK, SMALLPATH);
+            String filename = getFilename(photoPK);
+            return new File(GeneralObject.FILEROOT + filepath + filename);
+        } else {
+            return null;
+        }
+    }
+    
     /**
      *
      * @param photoPK: Photo primary key
@@ -1157,11 +1237,78 @@ public class BLphoto extends Bphoto implements IBLphoto {
             dbphoto.setLocation(photo.getLocation());
             dbphoto.setReversegeocode(photo.getReversegeocode());
             dbphoto.setExactlocation(photo.getExactlocation());
-            processreversegeocode(dbphoto);
+            google_processreversegeocode(dbphoto);
+            //processreversegeocode(dbphoto);
             trans_updatePhoto(dbphoto);
             log.fine("trans_updatePhoto performed");
             super.Commit2DB();
         }
+    }
+    
+    /**
+     * copy previous used location in this photo series
+     * update location and dependent parameters
+     * @param photo
+     * @throws DBException
+     * @throws DataException 
+     */
+    public boolean updateCopyPrevGeolocation(IPhoto photo) throws DBException, DataException, CustomException {
+        boolean success = false;
+        ArrayList<Photo> photos = getPhotos4photo_film(this.isAuthenticated(), photo.getPrimaryKey().getFilmPK(), false);
+        int arraylength = photos.size();
+        int index = arraylength-1;
+        //find position of current photo
+        while(index>-1 && photos.get(index).getPrimaryKey().getId()>photo.getPrimaryKey().getId()) {
+            index--;
+        }
+        //if photo is found, search the nearest previous photo with a valid location
+        int previousindex = index-1;
+        while(previousindex>-1 && photos.get(previousindex).getReversegeocode()==null || photos.get(previousindex).getReversegeocode().length()==0) {
+            previousindex--;
+        }
+        //if found, copy the location parameters
+        if(previousindex>-1) {
+            Photo updphoto = photos.get(index);
+            Photo prevphoto = photos.get(previousindex);
+            updphoto.setLocation(prevphoto.getLocation());
+            updphoto.setLocationradius(prevphoto.getLocationradius());
+            updphoto.setReversegeocode(prevphoto.getReversegeocode());
+            updphoto.setExactlocation(prevphoto.getExactlocation());
+            updphoto.setFormattedaddress(prevphoto.getFormattedaddress());
+            updphoto.setRoutePK(prevphoto.getRoutePK());
+            updphoto.setStreetnumber(prevphoto.getStreetnumber());
+            trans_updatePhoto(updphoto);
+            super.Commit2DB();
+            success = true;
+        }
+        return success;
+    }
+    
+    /**
+     * copy given photo location in this photo
+     * update location and dependent parameters
+     * @param photo: photo to update
+     * @param photopk: photo primary key containing the location to use
+     * @throws DBException
+     * @throws DataException 
+     */
+    public boolean copyPhotoGeolocation(IPhoto photo, IPhotoPK photopk) throws DBException, DataException, CustomException {
+        boolean success = false;
+        Photo updphoto = this.getPhoto(photo.getPrimaryKey());
+        Photo source = this.getPhoto(photopk);
+        if(source!=null && source.getLocation()!=null && updphoto!=null) {
+            updphoto.setLocation(source.getLocation());
+            updphoto.setLocationradius(source.getLocationradius());
+            updphoto.setReversegeocode(source.getReversegeocode());
+            updphoto.setExactlocation(source.getExactlocation());
+            updphoto.setFormattedaddress(source.getFormattedaddress());
+            updphoto.setRoutePK(source.getRoutePK());
+            updphoto.setStreetnumber(source.getStreetnumber());
+            trans_updatePhoto(updphoto);
+            super.Commit2DB();
+            success = true;
+        }
+        return success;
     }
     
     /**

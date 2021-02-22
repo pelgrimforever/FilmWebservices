@@ -159,11 +159,22 @@ public class RSPhoto {
                             result = sjsoncount.toJSONString();
                             break;
                         case IPhotoOperation.SELECT_LOCATION:
-                            //add security
                             piPoint location = GISConversion.topiPoint((JSONObject)json.get("location"));
                             ArrayList photos = blphoto.getPhoto4Location(loggedin, location);
-                            blphoto.addSmallimage(photos, loggedin);
+                            //blphoto.addSmallimage(photos, loggedin);
                             result = JSONPhoto.toJSONArray(photos).toJSONString();
+                            break;
+                        case IPhotoOperation.SELECT_LOCATIONS:
+                            JSONArray jsonlocations = (JSONArray)json.get("locations");
+                            Iterator<JSONObject> jsonlocationsI = jsonlocations.iterator();
+                            ArrayList<piPoint> locations = new ArrayList<>();
+                            while(jsonlocationsI.hasNext()) {
+                                piPoint location1 = GISConversion.topiPoint(jsonlocationsI.next());
+                                locations.add(location1);
+                            }
+                            ArrayList photos1 = blphoto.getPhoto4Locations(locations);
+                            //blphoto.addSmallimage(photos, loggedin);
+                            result = JSONPhoto.toJSONArray(photos1).toJSONString();
                             break;
                         case IPhotoOperation.SECURESELECT_DATE:
                             //add security
@@ -238,6 +249,30 @@ public class RSPhoto {
                             break;
 //Custom code, do not change this line
 //add here custom operations
+                        case IPhotoOperation.UPDATE_GEOLOCATION:
+                            photo = (IPhoto)JSONPhoto.toPhoto((JSONObject)json.get("photo"));
+                            blphoto.updateGeolocation(photo);
+                            result = returnstatus("OK");
+                            break;
+                        case IPhotoOperation.UPDATE_COPYPREVGEOLOCATION:
+                            photo = (IPhoto)JSONPhoto.toPhoto((JSONObject)json.get("photo"));
+                            boolean success = blphoto.updateCopyPrevGeolocation(photo);
+                            if(success) {
+                                result = returnstatus("OK");
+                            } else {
+                                result = returnstatus("No location available");
+                            }
+                            break;
+                        case IPhotoOperation.UPDATE_COPYPHOTOGEOLOCATION:
+                            photo = (IPhoto)JSONPhoto.toPhoto((JSONObject)json.get("photo"));
+                            photoPK = JSONPhoto.toPhotoPK((JSONObject)json.get("photopk"));
+                            boolean copysuccess = blphoto.copyPhotoGeolocation(photo, photoPK);
+                            if(copysuccess) {
+                                result = returnstatus("OK");
+                            } else {
+                                result = returnstatus("No location available");
+                            }
+                            break;
 //Custom code, do not change this line   
                     }
                     break;
