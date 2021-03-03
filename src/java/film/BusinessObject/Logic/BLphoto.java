@@ -66,6 +66,10 @@ import data.interfaces.db.AFieldsearcher;
 import data.osm.geocode.OSMgeocode;
 import static film.logicentity.Photo.SQLWherePublic;
 import film.searchentity.Photosearch;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
+import javax.imageio.ImageIO;
 
 /**
  * Business Logic Entity class BLphoto
@@ -228,22 +232,11 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * @throws DBException
      */
     public ArrayList search(IPhotosearch search) throws DBException {
-        return search(isAuthenticated(), search);
-    }
-    
-    /**
-     * search photos with search parameters
-     * if no search is used, return empty list
-     * @param search: IPhotosearch object
-     * @return ArrayList of Photo entities
-     * @throws DBException
-     */
-    public ArrayList search(boolean hasprivateaccess, IPhotosearch search) throws DBException {
         if(search.used()) {
             String sqlorderby = Photo.OrderByDateTime;
             search.build("");
             String searchsql = "select distinct photo.* from photo" + search.getJoin() + " where (" + search.getSql() + ")";
-            if(!hasprivateaccess) searchsql += " and public";
+            if(this.isAuthenticated()) searchsql += " and public";
             searchsql += sqlorderby;
             ArrayList photos = getMapper().loadEntityVector(this, searchsql, search.getParameters());
             //this.addSmallimage(photos, hasprivateaccess);
@@ -252,25 +245,45 @@ public class BLphoto extends Bphoto implements IBLphoto {
             return new ArrayList();
         }
     }
+
+    public void addThumbnailsBase64(ArrayList photos) throws DBException, CustomException {
+        Photo photo;
+        try {
+            for(int i=0; i<photos.size(); i++) {
+                photo = (Photo)photos.get(i);
+                if(photo.getPublic() || this.isAuthenticated()) {
+                    BufferedImage bi = ImageIO.read(getThumbnail(photo.getPrimaryKey()));
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    ImageIO.write(bi, "jpg", baos);
+                    photo.setImagebase64("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(baos.toByteArray()));
+                }
+            }
+        }
+        catch(IOException e) {
+            throw new CustomException(e);
+        }
+    }
     
+//to be deleted    
     /**
      * add to each photo the path to the small image
      * @param photos 
      */
-    public void addSmallimage(ArrayList photos, boolean hasprivateaccess) throws DBException {
-            Photo photo;
-            for(int i=0; i<photos.size(); i++) {
-                photo = (Photo)photos.get(i);
-                String filepath = "";
-                try {
-                    filepath = publishSmall(hasprivateaccess, photo.getPrimaryKey(), TEMPdestinationpath + File.separator);
-                }
-                catch(IOException e) {
-                }
-                filepath = TEMPonlinepath + filepath;
-                photo.setSmallfilepath(filepath);
+/*    public void addSmallimage(ArrayList photos, boolean hasprivateaccess) throws DBException {
+        Photo photo;
+        for(int i=0; i<photos.size(); i++) {
+            photo = (Photo)photos.get(i);
+            String filepath = "";
+            try {
+                filepath = publishSmall(hasprivateaccess, photo.getPrimaryKey(), TEMPdestinationpath + File.separator);
             }
+            catch(IOException e) {
+            }
+            filepath = TEMPonlinepath + filepath;
+            photo.setSmallfilepath(filepath);
+        }
     }
+*/
     
     /**
      * perform photos search with search parameters
@@ -528,6 +541,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
         return FILEROOT + filepath + filename;
     }
 
+//to be deleted
     /**
      * copy the jpg file to the destinationpath in /docroot
      * @param photoPK: photo primary key
@@ -535,7 +549,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * @return new file name, not including destinationpath
      * @throws IOException 
      */
-    public String publishSmall(boolean hasprivateaccess, IPhotoPK photoPK, String destinationpath) throws IOException, DBException {
+/*    public String publishSmall(boolean hasprivateaccess, IPhotoPK photoPK, String destinationpath) throws IOException, DBException {
         Photo photo = this.getPhoto(hasprivateaccess, photoPK);
         String newfilename = "";
         if(photo!=null) {
@@ -559,7 +573,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
             }
         }
         return newfilename;
-    }
+    }*/
     
     /**
      *

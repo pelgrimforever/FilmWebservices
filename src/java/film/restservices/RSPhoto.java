@@ -1,28 +1,27 @@
 package film.restservices;
 
-import base.servlets.Securitycheck;
 import data.conversion.JSONConversion;
 import data.gis.shape.GISConversion;
 import data.gis.shape.piPoint;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
-import film.entity.pk.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IPhotosearch;
 import film.interfaces.servlet.IPhotoOperation;
-import film.logicentity.Photo;
-import film.searchentity.Photosearch;
 import film.servlets.DataServlet;
 import general.exception.CustomException;
-import general.exception.DataException;
 import general.exception.DBException;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.sql.Date;
-import java.sql.Time;
 import java.io.File;
 import java.io.IOException;
+import static java.lang.String.format;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Iterator;
+import javax.imageio.ImageIO;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -153,6 +152,12 @@ public class RSPhoto {
                             break;
 //Custom code, do not change this line
 //add here custom operations
+                        case IPhotoOperation.SELECT_FilmWITHIMAGESBASE64:
+                            IFilmPK filmPK2 = (IFilmPK)JSONFilm.toFilmPK((JSONObject)json.get("filmpk"));
+                            ArrayList photos = blphoto.getPhotos4film(filmPK2);
+                            blphoto.addThumbnailsBase64(photos);
+                            result = JSONPhoto.toJSONArray(photos).toJSONString();
+                            break;
                         case IPhotoOperation.SECURESELECT_COUNT:
                             JSONObject sjsoncount = new JSONObject();
                             sjsoncount.put("recordcount", blphoto.count(loggedin));
@@ -160,9 +165,9 @@ public class RSPhoto {
                             break;
                         case IPhotoOperation.SELECT_LOCATION:
                             piPoint location = GISConversion.topiPoint((JSONObject)json.get("location"));
-                            ArrayList photos = blphoto.getPhoto4Location(loggedin, location);
-                            //blphoto.addSmallimage(photos, loggedin);
-                            result = JSONPhoto.toJSONArray(photos).toJSONString();
+                            ArrayList photosl = blphoto.getPhoto4Location(loggedin, location);
+                            blphoto.addThumbnailsBase64(photosl);
+                            result = JSONPhoto.toJSONArray(photosl).toJSONString();
                             break;
                         case IPhotoOperation.SELECT_LOCATIONS:
                             JSONArray jsonlocations = (JSONArray)json.get("locations");
@@ -181,10 +186,10 @@ public class RSPhoto {
                             String datestring = json.get("date").toString();
                             Date date = new Date(Long.valueOf(datestring));
                             ArrayList photos4date = blphoto.getPhoto4Date(loggedin, date);
-                            blphoto.addSmallimage(photos4date, loggedin);
+                            //blphoto.addSmallimage(photos4date, loggedin);
                             result = JSONPhoto.toJSONArray(photos4date).toJSONString();
                             break;
-                        case IPhotoOperation.DOWNLOAD_SMALLIMAGE:
+                        /*case IPhotoOperation.DOWNLOAD_SMALLIMAGE:
                             photoPK = (IPhotoPK)JSONPhoto.toPhotoPK((JSONObject)json.get("photopk"));
                             try {
                                 String filepath = blphoto.publishSmall(loggedin, photoPK, BLphoto.TEMPdestinationpath + File.separator);
@@ -197,10 +202,11 @@ public class RSPhoto {
                             catch(IOException e) {
                                 result = returnstatus(e.getMessage());
                             }
-                            break;
-                        case IPhotoOperation.SECURESELECT_SEARCH:
+                            break;*/
+                        case IPhotoOperation.SELECT_SEARCHWITHIMAGESBASE64:
                             IPhotosearch secsearch = (IPhotosearch)JSONPhoto.toPhotosearch((JSONObject)json.get("search"));
-                            ArrayList secphotos = blphoto.search(loggedin, secsearch);
+                            ArrayList secphotos = blphoto.search(secsearch);
+                            blphoto.addThumbnailsBase64(secphotos);
                             result = JSONPhoto.toJSONArray(secphotos).toJSONString();
                             break;
                         case IPhotoOperation.SECURESELECT_SEARCHCOUNT:
