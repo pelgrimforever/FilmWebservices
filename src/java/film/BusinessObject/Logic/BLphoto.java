@@ -236,7 +236,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
             String sqlorderby = Photo.OrderByDateTime;
             search.build("");
             String searchsql = "select distinct photo.* from photo" + search.getJoin() + " where (" + search.getSql() + ")";
-            if(this.isAuthenticated()) searchsql += " and public";
+            if(!this.isAuthenticated()) searchsql += " and public";
             searchsql += sqlorderby;
             ArrayList photos = getMapper().loadEntityVector(this, searchsql, search.getParameters());
             //this.addSmallimage(photos, hasprivateaccess);

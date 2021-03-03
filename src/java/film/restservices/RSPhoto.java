@@ -178,7 +178,7 @@ public class RSPhoto {
                                 locations.add(location1);
                             }
                             ArrayList photos1 = blphoto.getPhoto4Locations(locations);
-                            //blphoto.addSmallimage(photos, loggedin);
+                            blphoto.addThumbnailsBase64(photos1);
                             result = JSONPhoto.toJSONArray(photos1).toJSONString();
                             break;
                         case IPhotoOperation.SECURESELECT_DATE:
