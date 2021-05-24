@@ -90,8 +90,9 @@ public class BLphoto extends Bphoto implements IBLphoto {
     public final static String FILEEXTENTION = "jpg";
 
     //path to store temporary photo files to work with the photo website
-    public final static String TEMPdestinationpath = "../docroot/photos/temp/";
-    public final static String TEMPonlinepath = "temp/";
+    //not used anymore
+    //public final static String TEMPdestinationpath = "../docroot/photos/temp/";
+    //public final static String TEMPonlinepath = "temp/";
 
     public final static int SMALL_WIDTH = 800;
     public final static int SMALL_HEIGHT = 600;
