@@ -1,3 +1,11 @@
+/*
+ * WSTree7subject.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSTree7subject implements WSITree7subject {
         Tree7subject tree7subject;
         try {
             ITree7subjectPK tree7subjectParentsubjectidPK = JSONTree7subject.toTree7subjectPK((JSONObject)parser.parse(json));
-            bltree7subject.delete4tree7subjectParentsubjectid(this.getClass().getName(), tree7subjectParentsubjectidPK);
+            bltree7subject.delete4tree7subjectParentsubjectid(tree7subjectParentsubjectidPK);
         }
         catch(ParseException e) {
         }

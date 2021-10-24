@@ -5,7 +5,7 @@
  */
 package film.servlets;
 
-import BusinessObject.GeneralObject;
+import BusinessObject.BusinessLogic;
 import film.BusinessObject.Logic.BLphoto;
 import static film.BusinessObject.Logic.BLphoto.THUMBNAILPATH;
 import film.entity.pk.PhotoPK;
@@ -46,7 +46,7 @@ public class ImageServlet extends HttpServlet {
         String filepath = blphoto.getImagePath(photoPK, THUMBNAILPATH);
         String filename = blphoto.getFilename(photoPK);
 
-        File f = new File(GeneralObject.FILEROOT + filepath + filename);
+        File f = new File(BusinessLogic.FILEROOT + filepath + filename);
         BufferedImage bi = ImageIO.read(f);
         OutputStream out = response.getOutputStream();
         ImageIO.write(bi, "jpg", out);

@@ -2,23 +2,25 @@
  * Bsubject.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONSubject;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMsubject;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bsubject
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bsubject extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bsubject extends BLtable {
 
     /**
      * Constructor, sets Subject as default Entity
      */
     public Bsubject() {
-        super(new SQLMapper_pgsql(connectionpool, "Subject"), new Subject());
+        super(new Subject(), new EMsubject());
     }
 
     /**
@@ -56,34 +60,8 @@ public abstract class Bsubject extends GeneralEntityObject implements ProjectCon
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bsubject(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Subject());
-    }
-
-    /**
-     * Map ResultSet Field values to Subject
-     * @param dbresult: Database ResultSet
-     */
-    public Subject mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        SubjectPK subjectPK = null;
-        Subject subject;
-        if(dbresult==null) {
-            subject = new Subject(subjectPK);
-        } else {
-            try {
-                subjectPK = new SubjectPK(dbresult.getString("cat1"), dbresult.getString("cat2"), dbresult.getInt("id"));
-                subject = new Subject(subjectPK);
-                subject.initTree7subjectPK(new Tree7subjectPK(dbresult.getLong("tree7subjectid")));
-                if(dbresult.wasNull()) subject.setTree7subjectPK(null);                
-                subject.initSubject(dbresult.getString("subject"));
-                subject.initDescription(dbresult.getString("description"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, subject);
-        return subject;
+    public Bsubject(BLtable transactionobject) {
+        super(transactionobject, new Subject(), new EMsubject());
     }
 
     /**
@@ -97,6 +75,9 @@ public abstract class Bsubject extends GeneralEntityObject implements ProjectCon
     /**
      * create new empty Subject object
      * create new primary key with given parameters
+     * @param cat1 primary key field
+     * @param cat2 primary key field
+     * @param id primary key field
      * @return ISubject with primary key
      */
     public ISubject newSubject(java.lang.String cat1, java.lang.String cat2, int id) {
@@ -122,6 +103,9 @@ public abstract class Bsubject extends GeneralEntityObject implements ProjectCon
 
     /**
      * create new primary key with given parameters
+     * @param cat1 primary key field
+     * @param cat2 primary key field
+     * @param id primary key field
      * @return new ISubjectPK
      */
     public ISubjectPK newSubjectPK(java.lang.String cat1, java.lang.String cat2, int id) {
@@ -133,10 +117,8 @@ public abstract class Bsubject extends GeneralEntityObject implements ProjectCon
      * @return ArrayList of Subject objects
      * @throws DBException
      */
-    public ArrayList getSubjects() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Subject.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Subject> getSubjects() throws DBException {
+        return (ArrayList<Subject>)super.getEntities(EMsubject.SQLSelectAll);
     }
 
     /**
@@ -146,21 +128,28 @@ public abstract class Bsubject extends GeneralEntityObject implements ProjectCon
      * @throws DBException
      */
     public Subject getSubject(ISubjectPK subjectPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Subject)super.getEntity((SubjectPK)subjectPK);
-        } else return null;
+        return (Subject)super.getEntity((SubjectPK)subjectPK);
     }
 
-    public ArrayList searchsubjects(ISubjectsearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search subject with ISubjectsearch parameters
+     * @param search ISubjectsearch
+     * @return ArrayList of Subject
+     * @throws DBException 
+     */
+    public ArrayList<Subject> searchsubjects(ISubjectsearch search) throws DBException {
+        return (ArrayList<Subject>)this.search(search);
     }
 
-    public ArrayList searchsubjects(ISubjectsearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search subject with ISubjectsearch parameters, order by orderby sql clause
+     * @param search ISubjectsearch
+     * @param orderby sql order by string
+     * @return ArrayList of Subject
+     * @throws DBException 
+     */
+    public ArrayList<Subject> searchsubjects(ISubjectsearch search, String orderby) throws DBException {
+        return (ArrayList<Subject>)this.search(search, orderby);
     }
 
     /**
@@ -170,28 +159,26 @@ public abstract class Bsubject extends GeneralEntityObject implements ProjectCon
      * @throws DBException
      */
     public boolean getSubjectExists(ISubjectPK subjectPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((SubjectPK)subjectPK);
-        } else return false;
+        return super.getEntityExists((SubjectPK)subjectPK);
     }
 
     /**
      * try to insert Subject in database
-     * @param film: Subject object
+     * @param subject Subject object
      * @throws DBException
+     * @throws DataException
      */
     public void insertSubject(ISubject subject) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(subject);
-        }
+        super.insertEntity(subject);
     }
 
     /**
      * check if SubjectPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Subject object
+     * @param subject Subject object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateSubject(ISubject subject) throws DBException, DataException {
         if(this.getSubjectExists(subject.getPrimaryKey())) {
@@ -203,30 +190,27 @@ public abstract class Bsubject extends GeneralEntityObject implements ProjectCon
 
     /**
      * try to update Subject in database
-     * @param film: Subject object
+     * @param subject Subject object
      * @throws DBException
+     * @throws DataException
      */
     public void updateSubject(ISubject subject) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(subject);
-        }
+        super.updateEntity(subject);
     }
 
     /**
      * try to delete Subject in database
-     * @param film: Subject object
+     * @param subject Subject object
      * @throws DBException
      */
     public void deleteSubject(ISubject subject) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteSubject(subject.getOwnerobject(), subject.getPrimaryKey());
-            super.deleteEntity(subject);
-        }
+        cascadedeleteSubject(subject.getPrimaryKey());
+        super.deleteEntity(subject);
     }
 
     /**
      * check data rules in Subject, throw DataException with customized message if rules do not apply
-     * @param film: Subject object
+     * @param subject Subject object
      * @throws DataException
      * @throws DBException
      */
@@ -235,15 +219,14 @@ public abstract class Bsubject extends GeneralEntityObject implements ProjectCon
         //foreign key Subject.Cat1 - Subjectcat.Cat
         //foreign key Subject.Cat2 - Subjectcat.Cat
         //Primary key
-
         if(subject.getSubject()!=null && subject.getSubject().length()>ISubject.SIZE_SUBJECT) {
-            message.append("Subject is langer dan toegestaan. Max aantal karakters: " + ISubject.SIZE_SUBJECT + "\n");
+            message.append("Subject is langer dan toegestaan. Max aantal karakters: ").append(ISubject.SIZE_SUBJECT).append("\n");
         }
         if(subject.getSubject()==null) {
             message.append("Subject mag niet leeg zijn.\n");
         }
         if(subject.getDescription()!=null && subject.getDescription().length()>ISubject.SIZE_DESCRIPTION) {
-            message.append("Description is langer dan toegestaan. Max aantal karakters: " + ISubject.SIZE_DESCRIPTION + "\n");
+            message.append("Description is langer dan toegestaan. Max aantal karakters: ").append(ISubject.SIZE_DESCRIPTION).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -254,137 +237,126 @@ public abstract class Bsubject extends GeneralEntityObject implements ProjectCon
      * delete all records in tables where subjectPK is used in a primary key
      * @param subjectPK: Subject primary key
      */
-    public void cascadedeleteSubject(String senderobject, ISubjectPK subjectPK) {
+    public void cascadedeleteSubject(ISubjectPK subjectPK) {
         BLfilmsubjects blfilmsubjects = new BLfilmsubjects(this);
-        blfilmsubjects.delete4subject(senderobject, subjectPK);
+        blfilmsubjects.delete4subject(subjectPK);
         BLphotosubjects blphotosubjects = new BLphotosubjects(this);
-        blphotosubjects.delete4subject(senderobject, subjectPK);
+        blphotosubjects.delete4subject(subjectPK);
     }
 
     /**
      * @param subjectcatPK: foreign key for Subjectcat
      * @delete all Subject Entity objects for Subjectcat in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4subjectcatCat1(String senderobject, ISubjectcatPK subjectcatPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Subject.SQLDelete4subjectcatCat1, subjectcatPK.getKeyFields());
-        }
+    public void delete4subjectcatCat1(ISubjectcatPK subjectcatPK) {
+        super.addStatement(EMsubject.SQLDelete4subjectcatCat1, subjectcatPK.getSQLprimarykey());
     }
 
     /**
      * @param subjectcatPK: foreign key for Subjectcat
      * @return all Subject Entity objects for Subjectcat
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getSubjects4subjectcatCat1(ISubjectcatPK subjectcatPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Subject.SQLSelect4subjectcatCat1, subjectcatPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Subject> getSubjects4subjectcatCat1(ISubjectcatPK subjectcatPK) throws CustomException {
+        return super.getEntities(EMsubject.SQLSelect4subjectcatCat1, subjectcatPK.getSQLprimarykey());
     }
     /**
      * @param tree7subjectPK: foreign key for Tree7subject
      * @delete all Subject Entity objects for Tree7subject in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4tree7subject(String senderobject, ITree7subjectPK tree7subjectPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Subject.SQLDelete4tree7subject, tree7subjectPK.getKeyFields());
-        }
+    public void delete4tree7subject(ITree7subjectPK tree7subjectPK) {
+        super.addStatement(EMsubject.SQLDelete4tree7subject, tree7subjectPK.getSQLprimarykey());
     }
 
     /**
      * @param tree7subjectPK: foreign key for Tree7subject
      * @return all Subject Entity objects for Tree7subject
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getSubjects4tree7subject(ITree7subjectPK tree7subjectPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Subject.SQLSelect4tree7subject, tree7subjectPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Subject> getSubjects4tree7subject(ITree7subjectPK tree7subjectPK) throws CustomException {
+        return super.getEntities(EMsubject.SQLSelect4tree7subject, tree7subjectPK.getSQLprimarykey());
     }
     /**
      * @param subjectcatPK: foreign key for Subjectcat
      * @delete all Subject Entity objects for Subjectcat in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4subjectcatCat2(String senderobject, ISubjectcatPK subjectcatPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Subject.SQLDelete4subjectcatCat2, subjectcatPK.getKeyFields());
-        }
+    public void delete4subjectcatCat2(ISubjectcatPK subjectcatPK) {
+        super.addStatement(EMsubject.SQLDelete4subjectcatCat2, subjectcatPK.getSQLprimarykey());
     }
 
     /**
      * @param subjectcatPK: foreign key for Subjectcat
      * @return all Subject Entity objects for Subjectcat
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getSubjects4subjectcatCat2(ISubjectcatPK subjectcatPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Subject.SQLSelect4subjectcatCat2, subjectcatPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Subject> getSubjects4subjectcatCat2(ISubjectcatPK subjectcatPK) throws CustomException {
+        return super.getEntities(EMsubject.SQLSelect4subjectcatCat2, subjectcatPK.getSQLprimarykey());
     }
     /**
      * @param filmsubjectsPK: parent Filmsubjects for child object Subject Entity
      * @return child Subject Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ISubject getFilmsubjects(IFilmsubjectsPK filmsubjectsPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            SubjectPK subjectPK = new SubjectPK(filmsubjectsPK.getCat1(), filmsubjectsPK.getCat2(), filmsubjectsPK.getSubject());
-            return this.getSubject(subjectPK);
-        } else return null;
+    public Subject getFilmsubjects(IFilmsubjectsPK filmsubjectsPK) throws CustomException {
+        SubjectPK subjectPK = new SubjectPK(filmsubjectsPK.getCat1(), filmsubjectsPK.getCat2(), filmsubjectsPK.getSubject());
+        return this.getSubject(subjectPK);
     }
 
     /**
      * @param photosubjectsPK: parent Photosubjects for child object Subject Entity
      * @return child Subject Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ISubject getPhotosubjects(IPhotosubjectsPK photosubjectsPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            SubjectPK subjectPK = new SubjectPK(photosubjectsPK.getCat1(), photosubjectsPK.getCat2(), photosubjectsPK.getSubject());
-            return this.getSubject(subjectPK);
-        } else return null;
+    public Subject getPhotosubjects(IPhotosubjectsPK photosubjectsPK) throws CustomException {
+        SubjectPK subjectPK = new SubjectPK(photosubjectsPK.getCat1(), photosubjectsPK.getCat2(), photosubjectsPK.getSubject());
+        return this.getSubject(subjectPK);
     }
 
 
     /**
      * get all Subject objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Subject objects
      * @throws DBException
      */
-    public ArrayList getSubjects(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Subject.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Subject> getSubjects(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMsubject.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Subject>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Subject objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delSubject(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Subject.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delSubject(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Subject.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

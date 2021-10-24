@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Phototree7subject.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -129,11 +129,11 @@ public class Phototree7subject extends SecurityDataServlet {
                             break;
                         case IPhototree7subjectOperation.DELETE_Tree7subject:
                             ITree7subjectPK tree7subjectPK = (ITree7subjectPK)parser.getJavaObject("tree7subjectpk");
-                            blphototree7subject.delete4tree7subject(this.getServletName(), tree7subjectPK);
+                            blphototree7subject.delete4tree7subject(tree7subjectPK);
                             break;
                         case IPhototree7subjectOperation.DELETE_Photo:
                             IPhotoPK photoPK = (IPhotoPK)parser.getJavaObject("photopk");
-                            blphototree7subject.delete4photo(this.getServletName(), photoPK);
+                            blphototree7subject.delete4photo(photoPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

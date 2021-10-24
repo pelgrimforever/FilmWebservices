@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Menu.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -114,7 +114,7 @@ public class Menu extends SecurityDataServlet {
                             break;
                         case IMenuOperation.DELETE_Mainmenu:
                             IMainmenuPK mainmenuPK = (IMainmenuPK)parser.getJavaObject("mainmenupk");
-                            blmenu.delete4mainmenu(this.getServletName(), mainmenuPK);
+                            blmenu.delete4mainmenu(mainmenuPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

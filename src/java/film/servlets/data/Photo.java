@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Photo.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -194,15 +194,15 @@ public class Photo extends SecurityDataServlet {
                             break;
                         case IPhotoOperation.DELETE_Route:
                             IRoutePK routePK = (IRoutePK)parser.getJavaObject("routepk");
-                            blphoto.delete4route(this.getServletName(), routePK);
+                            blphoto.delete4route(routePK);
                             break;
                         case IPhotoOperation.DELETE_Creator:
                             ICreatorPK creatorPK = (ICreatorPK)parser.getJavaObject("creatorpk");
-                            blphoto.delete4creator(this.getServletName(), creatorPK);
+                            blphoto.delete4creator(creatorPK);
                             break;
                         case IPhotoOperation.DELETE_Film:
                             IFilmPK filmPK = (IFilmPK)parser.getJavaObject("filmpk");
-                            blphoto.delete4film(this.getServletName(), filmPK);
+                            blphoto.delete4film(filmPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

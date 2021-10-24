@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Arealevel3.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -110,7 +110,7 @@ public class Arealevel3 extends SecurityDataServlet {
                             break;
                         case IArealevel3Operation.DELETE_Arealevel2:
                             IArealevel2PK arealevel2PK = (IArealevel2PK)parser.getJavaObject("arealevel2pk");
-                            blarealevel3.delete4arealevel2(this.getServletName(), arealevel2PK);
+                            blarealevel3.delete4arealevel2(arealevel2PK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

@@ -2,19 +2,17 @@
  * Bview_locationtree.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.view;
 
-import BusinessObject.GeneralViewObject;
+import BusinessObject.BLview;
+import db.SQLMapperFactory;
 import data.gis.shape.*;
 import db.SQLMapper_pgsql;
-import film.data.ProjectConstants;
-import db.ArchiveViewMapper;
-import db.ViewMapper;
-import db.ViewMapperInterface;
+import film.conversion.entity.EMview_locationtree;
 import general.exception.*;
 import java.util.ArrayList;
 import film.logicview.View_locationtree;
@@ -34,44 +32,13 @@ import org.postgis.PGgeometry;
  *
  * @author Franky Laseure
  */
-public abstract class Bview_locationtree extends GeneralViewObject implements ProjectConstants {
+public abstract class Bview_locationtree extends BLview {
 
     /**
      * Constructor, sets View_locationtree as default Entity
      */
     public Bview_locationtree() {
-        super(new SQLMapper_pgsql(connectionpool, "View_locationtree"), new View_locationtree());
-    }
-
-    /**
-     * Map ResultSet Field values to View_locationtree
-     * @param dbresult: Database ResultSet
-     */
-    public View_locationtree mapResultSet2View(ResultSet dbresult) throws SQLException {
-        View_locationtree view_locationtree = new View_locationtree();
-        if(dbresult!=null) {
-            try {
-                view_locationtree.setCountrycode(dbresult.getString("countrycode"));
-                view_locationtree.setCountryname(dbresult.getString("countryname"));
-                view_locationtree.setPostalcode(dbresult.getString("postalcode"));
-                view_locationtree.setAl1code(dbresult.getString("al1code"));
-                view_locationtree.setAl1name(dbresult.getString("al1name"));
-                view_locationtree.setAl2code(dbresult.getString("al2code"));
-                view_locationtree.setAl2name(dbresult.getString("al2name"));
-                view_locationtree.setAl3code(dbresult.getString("al3code"));
-                view_locationtree.setAl3name(dbresult.getString("al3name"));
-                view_locationtree.setLocality(dbresult.getString("locality"));
-                view_locationtree.setHassublocality(dbresult.getBoolean("hassublocality"));
-                view_locationtree.setSublocality(dbresult.getString("sublocality"));
-                view_locationtree.setRoutecode(dbresult.getString("routecode"));
-                view_locationtree.setRoutename(dbresult.getString("routename"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, view_locationtree);
-        return view_locationtree;
+        super(new View_locationtree(), new EMview_locationtree());
     }
 
     /**
@@ -79,7 +46,7 @@ public abstract class Bview_locationtree extends GeneralViewObject implements Pr
      * @return ArrayList of View_locationtree objects
      * @throws DBException
      */
-    public ArrayList getView_locationtrees() throws DBException {
-        return getMapper().loadViewVector(this, View_locationtree.SQLSelectAll);
+    public ArrayList<View_locationtree> getView_locationtrees() throws DBException {
+        return getEntities(EMview_locationtree.SQLSelectAll);
     }
 }

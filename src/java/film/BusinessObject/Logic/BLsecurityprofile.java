@@ -8,16 +8,14 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
-import data.interfaces.db.LogicEntity;
+import BusinessObject.BLtable;
+import db.SQLparameters;
 import film.interfaces.logicentity.ISecurityprofile;
 import film.logicentity.Securityprofile;
 import film.BusinessObject.table.Bsecurityprofile;
-import film.interfaces.BusinessObject.IBLsecurityprofile;
+import film.conversion.entity.EMsecurityprofile;
 import general.exception.DBException;
 import general.exception.DataException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -30,7 +28,7 @@ import java.util.ArrayList;
  *
  * @author Franky Laseure
  */
-public class BLsecurityprofile extends Bsecurityprofile implements IBLsecurityprofile {
+public class BLsecurityprofile extends Bsecurityprofile {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data
 	
@@ -47,28 +45,25 @@ public class BLsecurityprofile extends Bsecurityprofile implements IBLsecuritypr
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLsecurityprofile(GeneralEntityObject transactionobject) {
+    public BLsecurityprofile(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity securityprofile) throws SQLException {
-        
-    }
-    
     public ArrayList getSecurityprofiles(String username) throws DBException {
         Object[][] parameter = { { "siteusername", username } };
-        return getMapper().loadEntityVector(this, Securityprofile.SQLSelectAll, parameter);
+        SQLparameters parameters = new SQLparameters(parameter);
+        return this.getEntities(EMsecurityprofile.SQLSelectAll, parameters);
     }
 
     /**
      * try to insert Securityprofile object in database
      * commit transaction
      * @param securityprofile: Securityprofile Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
         trans_insertSecurityprofile(securityprofile);
         super.Commit2DB();
@@ -78,8 +73,8 @@ public class BLsecurityprofile extends Bsecurityprofile implements IBLsecuritypr
      * try to insert Securityprofile object in database
      * commit transaction
      * @param securityprofile: Securityprofile Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
         trans_insertSecurityprofile(securityprofile);
@@ -90,9 +85,10 @@ public class BLsecurityprofile extends Bsecurityprofile implements IBLsecuritypr
      * try to update Securityprofile object in database
      * commit transaction
      * @param securityprofile: Securityprofile Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
         trans_updateSecurityprofile(securityprofile);
         super.Commit2DB();
@@ -102,8 +98,8 @@ public class BLsecurityprofile extends Bsecurityprofile implements IBLsecuritypr
      * try to update Securityprofile object in database
      * commit transaction
      * @param securityprofile: Securityprofile Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
         trans_updateSecurityprofile(securityprofile);
@@ -114,8 +110,9 @@ public class BLsecurityprofile extends Bsecurityprofile implements IBLsecuritypr
      * try to delete Securityprofile object in database
      * commit transaction
      * @param securityprofile: Securityprofile Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteSecurityprofile(ISecurityprofile securityprofile) throws DBException {
         trans_deleteSecurityprofile(securityprofile);
         super.Commit2DB();
@@ -125,7 +122,7 @@ public class BLsecurityprofile extends Bsecurityprofile implements IBLsecuritypr
      * try to delete Securityprofile object in database
      * commit transaction
      * @param securityprofile: Securityprofile Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteSecurityprofile(ISecurityprofile securityprofile) throws DBException {
         trans_deleteSecurityprofile(securityprofile);
@@ -136,8 +133,8 @@ public class BLsecurityprofile extends Bsecurityprofile implements IBLsecuritypr
      * try to insert Securityprofile object in database
      * do not commit transaction
      * @param securityprofile: Securityprofile Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
         super.checkDATA(securityprofile);
@@ -148,8 +145,8 @@ public class BLsecurityprofile extends Bsecurityprofile implements IBLsecuritypr
      * try to update Securityprofile object in database
      * do not commit transaction
      * @param securityprofile: Securityprofile Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
         super.checkDATA(securityprofile);
@@ -160,7 +157,7 @@ public class BLsecurityprofile extends Bsecurityprofile implements IBLsecuritypr
      * try to delete Securityprofile object in database
      * do not commit transaction
      * @param securityprofile: Securityprofile Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteSecurityprofile(ISecurityprofile securityprofile) throws DBException {
         super.deleteSecurityprofile((Securityprofile)securityprofile);

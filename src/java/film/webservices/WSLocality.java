@@ -1,3 +1,11 @@
+/*
+ * WSLocality.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSLocality implements WSILocality {
         Locality locality;
         try {
             IPostalcodePK postalcodePK = JSONPostalcode.toPostalcodePK((JSONObject)parser.parse(json));
-            bllocality.delete4postalcode(this.getClass().getName(), postalcodePK);
+            bllocality.delete4postalcode(postalcodePK);
         }
         catch(ParseException e) {
         }

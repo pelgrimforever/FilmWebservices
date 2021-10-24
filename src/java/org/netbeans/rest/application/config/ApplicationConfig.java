@@ -1,7 +1,10 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * ApplicationConfig.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
  */
+
 package org.netbeans.rest.application.config;
 
 import java.util.Set;
@@ -24,6 +27,9 @@ public class ApplicationConfig extends Application {
      */
     private Set<Class<?>> getRestResourceClasses() {
         Set<Class<?>> resources = new java.util.HashSet<Class<?>>();
+//Custom code, do not change this line
+//add here custom operations
+//Custom code, do not change this line   
         resources.add(film.restservices.RSArealevel1.class);
         resources.add(film.restservices.RSArealevel2.class);
         resources.add(film.restservices.RSArealevel3.class);

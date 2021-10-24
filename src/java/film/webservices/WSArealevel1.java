@@ -1,3 +1,11 @@
+/*
+ * WSArealevel1.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSArealevel1 implements WSIArealevel1 {
         Arealevel1 arealevel1;
         try {
             ICountryPK countryPK = JSONCountry.toCountryPK((JSONObject)parser.parse(json));
-            blarealevel1.delete4country(this.getClass().getName(), countryPK);
+            blarealevel1.delete4country(countryPK);
         }
         catch(ParseException e) {
         }

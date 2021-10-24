@@ -2,23 +2,25 @@
  * Btree7subject.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONTree7subject;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMtree7subject;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Btree7subject
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Btree7subject extends GeneralEntityObject implements ProjectConstants {
+public abstract class Btree7subject extends BLtable {
 
     /**
      * Constructor, sets Tree7subject as default Entity
      */
     public Btree7subject() {
-        super(new SQLMapper_pgsql(connectionpool, "Tree7subject"), new Tree7subject());
+        super(new Tree7subject(), new EMtree7subject());
     }
 
     /**
@@ -56,35 +60,8 @@ public abstract class Btree7subject extends GeneralEntityObject implements Proje
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Btree7subject(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Tree7subject());
-    }
-
-    /**
-     * Map ResultSet Field values to Tree7subject
-     * @param dbresult: Database ResultSet
-     */
-    public Tree7subject mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        Tree7subjectPK tree7subjectPK = null;
-        Tree7subject tree7subject;
-        if(dbresult==null) {
-            tree7subject = new Tree7subject(tree7subjectPK);
-        } else {
-            try {
-                tree7subjectPK = new Tree7subjectPK(dbresult.getLong("subjectid"));
-                tree7subject = new Tree7subject(tree7subjectPK);
-                tree7subject.initTree7subjectparentsubjectidPK(new Tree7subjectPK(dbresult.getLong("parentsubjectid")));
-                if(dbresult.wasNull()) tree7subject.setTree7subjectparentsubjectidPK(null);                
-                tree7subject.initTree7id(dbresult.getString("tree7id"));
-                tree7subject.initSubject(dbresult.getString("subject"));
-                tree7subject.initTreestep(dbresult.getInt("treestep"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, tree7subject);
-        return tree7subject;
+    public Btree7subject(BLtable transactionobject) {
+        super(transactionobject, new Tree7subject(), new EMtree7subject());
     }
 
     /**
@@ -98,6 +75,7 @@ public abstract class Btree7subject extends GeneralEntityObject implements Proje
     /**
      * create new empty Tree7subject object
      * create new primary key with given parameters
+     * @param subjectid primary key field
      * @return ITree7subject with primary key
      */
     public ITree7subject newTree7subject(long subjectid) {
@@ -123,6 +101,7 @@ public abstract class Btree7subject extends GeneralEntityObject implements Proje
 
     /**
      * create new primary key with given parameters
+     * @param subjectid primary key field
      * @return new ITree7subjectPK
      */
     public ITree7subjectPK newTree7subjectPK(long subjectid) {
@@ -134,10 +113,8 @@ public abstract class Btree7subject extends GeneralEntityObject implements Proje
      * @return ArrayList of Tree7subject objects
      * @throws DBException
      */
-    public ArrayList getTree7subjects() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Tree7subject.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Tree7subject> getTree7subjects() throws DBException {
+        return (ArrayList<Tree7subject>)super.getEntities(EMtree7subject.SQLSelectAll);
     }
 
     /**
@@ -147,21 +124,28 @@ public abstract class Btree7subject extends GeneralEntityObject implements Proje
      * @throws DBException
      */
     public Tree7subject getTree7subject(ITree7subjectPK tree7subjectPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Tree7subject)super.getEntity((Tree7subjectPK)tree7subjectPK);
-        } else return null;
+        return (Tree7subject)super.getEntity((Tree7subjectPK)tree7subjectPK);
     }
 
-    public ArrayList searchtree7subjects(ITree7subjectsearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search tree7subject with ITree7subjectsearch parameters
+     * @param search ITree7subjectsearch
+     * @return ArrayList of Tree7subject
+     * @throws DBException 
+     */
+    public ArrayList<Tree7subject> searchtree7subjects(ITree7subjectsearch search) throws DBException {
+        return (ArrayList<Tree7subject>)this.search(search);
     }
 
-    public ArrayList searchtree7subjects(ITree7subjectsearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search tree7subject with ITree7subjectsearch parameters, order by orderby sql clause
+     * @param search ITree7subjectsearch
+     * @param orderby sql order by string
+     * @return ArrayList of Tree7subject
+     * @throws DBException 
+     */
+    public ArrayList<Tree7subject> searchtree7subjects(ITree7subjectsearch search, String orderby) throws DBException {
+        return (ArrayList<Tree7subject>)this.search(search, orderby);
     }
 
     /**
@@ -171,28 +155,26 @@ public abstract class Btree7subject extends GeneralEntityObject implements Proje
      * @throws DBException
      */
     public boolean getTree7subjectExists(ITree7subjectPK tree7subjectPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((Tree7subjectPK)tree7subjectPK);
-        } else return false;
+        return super.getEntityExists((Tree7subjectPK)tree7subjectPK);
     }
 
     /**
      * try to insert Tree7subject in database
-     * @param film: Tree7subject object
+     * @param tree7subject Tree7subject object
      * @throws DBException
+     * @throws DataException
      */
     public void insertTree7subject(ITree7subject tree7subject) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(tree7subject);
-        }
+        super.insertEntity(tree7subject);
     }
 
     /**
      * check if Tree7subjectPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Tree7subject object
+     * @param tree7subject Tree7subject object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateTree7subject(ITree7subject tree7subject) throws DBException, DataException {
         if(this.getTree7subjectExists(tree7subject.getPrimaryKey())) {
@@ -204,45 +186,41 @@ public abstract class Btree7subject extends GeneralEntityObject implements Proje
 
     /**
      * try to update Tree7subject in database
-     * @param film: Tree7subject object
+     * @param tree7subject Tree7subject object
      * @throws DBException
+     * @throws DataException
      */
     public void updateTree7subject(ITree7subject tree7subject) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(tree7subject);
-        }
+        super.updateEntity(tree7subject);
     }
 
     /**
      * try to delete Tree7subject in database
-     * @param film: Tree7subject object
+     * @param tree7subject Tree7subject object
      * @throws DBException
      */
     public void deleteTree7subject(ITree7subject tree7subject) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteTree7subject(tree7subject.getOwnerobject(), tree7subject.getPrimaryKey());
-            super.deleteEntity(tree7subject);
-        }
+        cascadedeleteTree7subject(tree7subject.getPrimaryKey());
+        super.deleteEntity(tree7subject);
     }
 
     /**
      * check data rules in Tree7subject, throw DataException with customized message if rules do not apply
-     * @param film: Tree7subject object
+     * @param tree7subject Tree7subject object
      * @throws DataException
      * @throws DBException
      */
     public void checkDATA(ITree7subject tree7subject) throws DataException, DBException {
         StringBuffer message = new StringBuffer();
         //Primary key
-
         if(tree7subject.getTree7id()!=null && tree7subject.getTree7id().length()>ITree7subject.SIZE_TREE7ID) {
-            message.append("Tree7id is langer dan toegestaan. Max aantal karakters: " + ITree7subject.SIZE_TREE7ID + "\n");
+            message.append("Tree7id is langer dan toegestaan. Max aantal karakters: ").append(ITree7subject.SIZE_TREE7ID).append("\n");
         }
         if(tree7subject.getTree7id()==null) {
             message.append("Tree7id mag niet leeg zijn.\n");
         }
         if(tree7subject.getSubject()!=null && tree7subject.getSubject().length()>ITree7subject.SIZE_SUBJECT) {
-            message.append("Subject is langer dan toegestaan. Max aantal karakters: " + ITree7subject.SIZE_SUBJECT + "\n");
+            message.append("Subject is langer dan toegestaan. Max aantal karakters: ").append(ITree7subject.SIZE_SUBJECT).append("\n");
         }
         if(tree7subject.getSubject()==null) {
             message.append("Subject mag niet leeg zijn.\n");
@@ -256,81 +234,82 @@ public abstract class Btree7subject extends GeneralEntityObject implements Proje
      * delete all records in tables where tree7subjectPK is used in a primary key
      * @param tree7subjectPK: Tree7subject primary key
      */
-    public void cascadedeleteTree7subject(String senderobject, ITree7subjectPK tree7subjectPK) {
+    public void cascadedeleteTree7subject(ITree7subjectPK tree7subjectPK) {
         BLphototree7subject blphototree7subject = new BLphototree7subject(this);
-        blphototree7subject.delete4tree7subject(senderobject, tree7subjectPK);
+        blphototree7subject.delete4tree7subject(tree7subjectPK);
     }
 
     /**
      * @param tree7subjectPK: foreign key for Tree7subject
      * @delete all Tree7subject Entity objects for Tree7subject in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4tree7subjectParentsubjectid(String senderobject, ITree7subjectPK tree7subjectPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Tree7subject.SQLDelete4tree7subjectParentsubjectid, tree7subjectPK.getKeyFields());
-        }
+    public void delete4tree7subjectParentsubjectid(ITree7subjectPK tree7subjectPK) {
+        super.addStatement(EMtree7subject.SQLDelete4tree7subjectParentsubjectid, tree7subjectPK.getSQLprimarykey());
     }
 
     /**
      * @param tree7subjectPK: foreign key for Tree7subject
      * @return all Tree7subject Entity objects for Tree7subject
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getTree7subjects4tree7subjectParentsubjectid(ITree7subjectPK tree7subjectPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Tree7subject.SQLSelect4tree7subjectParentsubjectid, tree7subjectPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Tree7subject> getTree7subjects4tree7subjectParentsubjectid(ITree7subjectPK tree7subjectPK) throws CustomException {
+        return super.getEntities(EMtree7subject.SQLSelect4tree7subjectParentsubjectid, tree7subjectPK.getSQLprimarykey());
     }
     /**
      * @param phototree7subjectPK: parent Phototree7subject for child object Tree7subject Entity
      * @return child Tree7subject Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ITree7subject getPhototree7subject(IPhototree7subjectPK phototree7subjectPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            Tree7subjectPK tree7subjectPK = new Tree7subjectPK(phototree7subjectPK.getSubjectid());
-            return this.getTree7subject(tree7subjectPK);
-        } else return null;
+    public Tree7subject getPhototree7subject(IPhototree7subjectPK phototree7subjectPK) throws CustomException {
+        Tree7subjectPK tree7subjectPK = new Tree7subjectPK(phototree7subjectPK.getSubjectid());
+        return this.getTree7subject(tree7subjectPK);
     }
 
 
     /**
      * get all Tree7subject objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Tree7subject objects
      * @throws DBException
      */
-    public ArrayList getTree7subjects(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Tree7subject.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Tree7subject> getTree7subjects(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMtree7subject.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Tree7subject>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Tree7subject objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delTree7subject(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Tree7subject.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delTree7subject(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Tree7subject.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

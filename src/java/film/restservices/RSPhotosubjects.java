@@ -1,3 +1,10 @@
+/*
+ * RSPhotosubjects.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -46,9 +53,6 @@ import org.json.simple.parser.ParseException;
 @Path("rsphotosubjects")
 public class RSPhotosubjects {
 
-    @Context
-    private UriInfo context;
-
     /**
      * Creates a new instance of HelloWorld
      */
@@ -57,6 +61,7 @@ public class RSPhotosubjects {
 
     /**
      * Retrieves representation of an instance of photosubjects.restservices.RSPhotosubjects
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @GET
@@ -76,6 +81,7 @@ public class RSPhotosubjects {
 
     /**
      * Retrieves representation of an instance of photosubjects.restservices.RSPhotosubjects
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @POST
@@ -271,7 +277,6 @@ public class RSPhotosubjects {
     /**
      * PUT method for updating or creating an instance of RSPhotosubjects
      * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("text/html")

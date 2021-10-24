@@ -9,16 +9,11 @@
 package film.BusinessObject.Logic;
 
 import general.exception.DBException;
-import general.exception.DataException;
-import data.interfaces.db.LogicEntity;
 import film.interfaces.logicentity.ICountry;
 import film.logicentity.Country;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import film.BusinessObject.table.Bcountry;
 import general.exception.DataException;
-import film.interfaces.BusinessObject.IBLcountry;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLcountry
@@ -30,7 +25,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLcountry extends Bcountry implements IBLcountry {
+public class BLcountry extends Bcountry {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -47,26 +42,19 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLcountry(GeneralEntityObject transactionobject) {
+    public BLcountry(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
     /**
-     * load extra fields from adjusted sql statement
-     */
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity country) throws SQLException {
-        
-    }
-    
-    /**
      * try to insert Country object in database
      * commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertCountry(ICountry country) throws DBException, DataException {
         trans_insertCountry(country);
         super.Commit2DB();
@@ -76,8 +64,8 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * try to insert Country object in database
      * commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertCountry(ICountry country) throws DBException, DataException {
         trans_insertCountry(country);
@@ -89,8 +77,8 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * if not, try to insert Country object in database
      * commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void insertcheckCountry(ICountry country) throws DBException, DataException {
         if(this.getCountry(country.getPrimaryKey())==null) {
@@ -102,9 +90,10 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * try to update Country object in database
      * commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateCountry(ICountry country) throws DBException, DataException {
         trans_updateCountry(country);
         super.Commit2DB();
@@ -114,8 +103,8 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * try to update Country object in database
      * commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateCountry(ICountry country) throws DBException, DataException {
         trans_updateCountry(country);
@@ -126,8 +115,9 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * try to delete Country object in database
      * commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteCountry(ICountry country) throws DBException {
         trans_deleteCountry(country);
         super.Commit2DB();
@@ -137,7 +127,7 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * try to delete Country object in database
      * commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteCountry(ICountry country) throws DBException {
         trans_deleteCountry(country);
@@ -148,8 +138,8 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * try to insert Country object in database
      * do not commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertCountry(ICountry country) throws DBException, DataException {
         super.checkDATA(country);
@@ -160,8 +150,8 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * try to update Country object in database
      * do not commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateCountry(ICountry country) throws DBException, DataException {
         super.checkDATA(country);
@@ -172,7 +162,7 @@ public class BLcountry extends Bcountry implements IBLcountry {
      * try to delete Country object in database
      * do not commit transaction
      * @param country: Country Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteCountry(ICountry country) throws DBException {
         super.deleteCountry((Country)country);

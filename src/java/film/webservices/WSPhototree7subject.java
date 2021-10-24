@@ -1,3 +1,11 @@
+/*
+ * WSPhototree7subject.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSPhototree7subject implements WSIPhototree7subject {
         Phototree7subject phototree7subject;
         try {
             ITree7subjectPK tree7subjectPK = JSONTree7subject.toTree7subjectPK((JSONObject)parser.parse(json));
-            blphototree7subject.delete4tree7subject(this.getClass().getName(), tree7subjectPK);
+            blphototree7subject.delete4tree7subject(tree7subjectPK);
         }
         catch(ParseException e) {
         }
@@ -213,7 +221,7 @@ public class WSPhototree7subject implements WSIPhototree7subject {
         Phototree7subject phototree7subject;
         try {
             IPhotoPK photoPK = JSONPhoto.toPhotoPK((JSONObject)parser.parse(json));
-            blphototree7subject.delete4photo(this.getClass().getName(), photoPK);
+            blphototree7subject.delete4photo(photoPK);
         }
         catch(ParseException e) {
         }

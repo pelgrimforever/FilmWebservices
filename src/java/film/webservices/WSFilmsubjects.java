@@ -1,3 +1,11 @@
+/*
+ * WSFilmsubjects.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSFilmsubjects implements WSIFilmsubjects {
         Filmsubjects filmsubjects;
         try {
             ISubjectPK subjectPK = JSONSubject.toSubjectPK((JSONObject)parser.parse(json));
-            blfilmsubjects.delete4subject(this.getClass().getName(), subjectPK);
+            blfilmsubjects.delete4subject(subjectPK);
         }
         catch(ParseException e) {
         }
@@ -213,7 +221,7 @@ public class WSFilmsubjects implements WSIFilmsubjects {
         Filmsubjects filmsubjects;
         try {
             IFilmPK filmPK = JSONFilm.toFilmPK((JSONObject)parser.parse(json));
-            blfilmsubjects.delete4film(this.getClass().getName(), filmPK);
+            blfilmsubjects.delete4film(filmPK);
         }
         catch(ParseException e) {
         }

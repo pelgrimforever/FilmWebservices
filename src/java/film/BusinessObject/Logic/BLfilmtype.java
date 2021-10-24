@@ -8,16 +8,12 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
-import data.interfaces.db.LogicEntity;
+import BusinessObject.BLtable;
 import film.interfaces.logicentity.IFilmtype;
 import film.logicentity.Filmtype;
 import film.BusinessObject.table.Bfilmtype;
-import film.interfaces.BusinessObject.IBLfilmtype;
 import general.exception.DBException;
 import general.exception.DataException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLfilmtype
@@ -29,7 +25,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
+public class BLfilmtype extends Bfilmtype {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -46,23 +42,19 @@ public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLfilmtype(GeneralEntityObject transactionobject) {
+    public BLfilmtype(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity filmtype) throws SQLException {
-        
-    }
-    
     /**
      * try to insert Filmtype object in database
      * commit transaction
      * @param filmtype: Filmtype Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertFilmtype(IFilmtype filmtype) throws DBException, DataException {
         trans_insertFilmtype(filmtype);
         super.Commit2DB();
@@ -72,8 +64,8 @@ public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
      * try to insert Filmtype object in database
      * commit transaction
      * @param filmtype: Filmtype Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertFilmtype(IFilmtype filmtype) throws DBException, DataException {
         trans_insertFilmtype(filmtype);
@@ -84,9 +76,10 @@ public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
      * try to update Filmtype object in database
      * commit transaction
      * @param filmtype: Filmtype Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateFilmtype(IFilmtype filmtype) throws DBException, DataException {
         trans_updateFilmtype(filmtype);
         super.Commit2DB();
@@ -96,8 +89,8 @@ public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
      * try to update Filmtype object in database
      * commit transaction
      * @param filmtype: Filmtype Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateFilmtype(IFilmtype filmtype) throws DBException, DataException {
         trans_updateFilmtype(filmtype);
@@ -108,8 +101,9 @@ public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
      * try to delete Filmtype object in database
      * commit transaction
      * @param filmtype: Filmtype Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteFilmtype(IFilmtype filmtype) throws DBException {
         trans_deleteFilmtype(filmtype);
         super.Commit2DB();
@@ -119,7 +113,7 @@ public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
      * try to delete Filmtype object in database
      * commit transaction
      * @param filmtype: Filmtype Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteFilmtype(IFilmtype filmtype) throws DBException {
         trans_deleteFilmtype(filmtype);
@@ -130,8 +124,8 @@ public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
      * try to insert Filmtype object in database
      * do not commit transaction
      * @param filmtype: Filmtype Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertFilmtype(IFilmtype filmtype) throws DBException, DataException {
         super.checkDATA(filmtype);
@@ -142,8 +136,8 @@ public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
      * try to update Filmtype object in database
      * do not commit transaction
      * @param filmtype: Filmtype Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateFilmtype(IFilmtype filmtype) throws DBException, DataException {
         super.checkDATA(filmtype);
@@ -154,7 +148,7 @@ public class BLfilmtype extends Bfilmtype implements IBLfilmtype {
      * try to delete Filmtype object in database
      * do not commit transaction
      * @param filmtype: Filmtype Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteFilmtype(IFilmtype filmtype) throws DBException {
         super.deleteFilmtype((Filmtype)filmtype);

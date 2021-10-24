@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Art_photo.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -122,19 +122,19 @@ public class Art_photo extends SecurityDataServlet {
                             break;
                         case IArt_photoOperation.DELETE_Photo:
                             IPhotoPK photoPK = (IPhotoPK)parser.getJavaObject("photopk");
-                            blart_photo.delete4photo(this.getServletName(), photoPK);
+                            blart_photo.delete4photo(photoPK);
                             break;
                         case IArt_photoOperation.DELETE_Art_subgroup:
                             IArt_subgroupPK art_subgroupPK = (IArt_subgroupPK)parser.getJavaObject("art_subgrouppk");
-                            blart_photo.delete4art_subgroup(this.getServletName(), art_subgroupPK);
+                            blart_photo.delete4art_subgroup(art_subgroupPK);
                             break;
                         case IArt_photoOperation.DELETE_Art_academy:
                             IArt_academyPK art_academyPK = (IArt_academyPK)parser.getJavaObject("art_academypk");
-                            blart_photo.delete4art_academy(this.getServletName(), art_academyPK);
+                            blart_photo.delete4art_academy(art_academyPK);
                             break;
                         case IArt_photoOperation.DELETE_Art_group:
                             IArt_groupPK art_groupPK = (IArt_groupPK)parser.getJavaObject("art_grouppk");
-                            blart_photo.delete4art_group(this.getServletName(), art_groupPK);
+                            blart_photo.delete4art_group(art_groupPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

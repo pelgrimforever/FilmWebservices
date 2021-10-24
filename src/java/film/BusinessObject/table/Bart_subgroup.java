@@ -2,23 +2,25 @@
  * Bart_subgroup.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONArt_subgroup;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMart_subgroup;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bart_subgroup
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bart_subgroup extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bart_subgroup extends BLtable {
 
     /**
      * Constructor, sets Art_subgroup as default Entity
      */
     public Bart_subgroup() {
-        super(new SQLMapper_pgsql(connectionpool, "Art_subgroup"), new Art_subgroup());
+        super(new Art_subgroup(), new EMart_subgroup());
     }
 
     /**
@@ -56,34 +60,8 @@ public abstract class Bart_subgroup extends GeneralEntityObject implements Proje
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bart_subgroup(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Art_subgroup());
-    }
-
-    /**
-     * Map ResultSet Field values to Art_subgroup
-     * @param dbresult: Database ResultSet
-     */
-    public Art_subgroup mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        Art_subgroupPK art_subgroupPK = null;
-        Art_subgroup art_subgroup;
-        if(dbresult==null) {
-            art_subgroup = new Art_subgroup(art_subgroupPK);
-        } else {
-            try {
-                art_subgroupPK = new Art_subgroupPK(dbresult.getInt("subgroupid"));
-                art_subgroup = new Art_subgroup(art_subgroupPK);
-                art_subgroup.initArt_groupPK(new Art_groupPK(dbresult.getInt("groupid")));
-                if(dbresult.wasNull()) art_subgroup.setArt_groupPK(null);                
-                art_subgroup.initSubgroupname(dbresult.getString("subgroupname"));
-                art_subgroup.initLastseqno(dbresult.getInt("lastseqno"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, art_subgroup);
-        return art_subgroup;
+    public Bart_subgroup(BLtable transactionobject) {
+        super(transactionobject, new Art_subgroup(), new EMart_subgroup());
     }
 
     /**
@@ -97,6 +75,7 @@ public abstract class Bart_subgroup extends GeneralEntityObject implements Proje
     /**
      * create new empty Art_subgroup object
      * create new primary key with given parameters
+     * @param subgroupid primary key field
      * @return IArt_subgroup with primary key
      */
     public IArt_subgroup newArt_subgroup(int subgroupid) {
@@ -122,6 +101,7 @@ public abstract class Bart_subgroup extends GeneralEntityObject implements Proje
 
     /**
      * create new primary key with given parameters
+     * @param subgroupid primary key field
      * @return new IArt_subgroupPK
      */
     public IArt_subgroupPK newArt_subgroupPK(int subgroupid) {
@@ -133,10 +113,8 @@ public abstract class Bart_subgroup extends GeneralEntityObject implements Proje
      * @return ArrayList of Art_subgroup objects
      * @throws DBException
      */
-    public ArrayList getArt_subgroups() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Art_subgroup.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Art_subgroup> getArt_subgroups() throws DBException {
+        return (ArrayList<Art_subgroup>)super.getEntities(EMart_subgroup.SQLSelectAll);
     }
 
     /**
@@ -146,21 +124,28 @@ public abstract class Bart_subgroup extends GeneralEntityObject implements Proje
      * @throws DBException
      */
     public Art_subgroup getArt_subgroup(IArt_subgroupPK art_subgroupPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Art_subgroup)super.getEntity((Art_subgroupPK)art_subgroupPK);
-        } else return null;
+        return (Art_subgroup)super.getEntity((Art_subgroupPK)art_subgroupPK);
     }
 
-    public ArrayList searchart_subgroups(IArt_subgroupsearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search art_subgroup with IArt_subgroupsearch parameters
+     * @param search IArt_subgroupsearch
+     * @return ArrayList of Art_subgroup
+     * @throws DBException 
+     */
+    public ArrayList<Art_subgroup> searchart_subgroups(IArt_subgroupsearch search) throws DBException {
+        return (ArrayList<Art_subgroup>)this.search(search);
     }
 
-    public ArrayList searchart_subgroups(IArt_subgroupsearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search art_subgroup with IArt_subgroupsearch parameters, order by orderby sql clause
+     * @param search IArt_subgroupsearch
+     * @param orderby sql order by string
+     * @return ArrayList of Art_subgroup
+     * @throws DBException 
+     */
+    public ArrayList<Art_subgroup> searchart_subgroups(IArt_subgroupsearch search, String orderby) throws DBException {
+        return (ArrayList<Art_subgroup>)this.search(search, orderby);
     }
 
     /**
@@ -170,28 +155,26 @@ public abstract class Bart_subgroup extends GeneralEntityObject implements Proje
      * @throws DBException
      */
     public boolean getArt_subgroupExists(IArt_subgroupPK art_subgroupPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((Art_subgroupPK)art_subgroupPK);
-        } else return false;
+        return super.getEntityExists((Art_subgroupPK)art_subgroupPK);
     }
 
     /**
      * try to insert Art_subgroup in database
-     * @param film: Art_subgroup object
+     * @param art_subgroup Art_subgroup object
      * @throws DBException
+     * @throws DataException
      */
     public void insertArt_subgroup(IArt_subgroup art_subgroup) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(art_subgroup);
-        }
+        super.insertEntity(art_subgroup);
     }
 
     /**
      * check if Art_subgroupPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Art_subgroup object
+     * @param art_subgroup Art_subgroup object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateArt_subgroup(IArt_subgroup art_subgroup) throws DBException, DataException {
         if(this.getArt_subgroupExists(art_subgroup.getPrimaryKey())) {
@@ -203,39 +186,35 @@ public abstract class Bart_subgroup extends GeneralEntityObject implements Proje
 
     /**
      * try to update Art_subgroup in database
-     * @param film: Art_subgroup object
+     * @param art_subgroup Art_subgroup object
      * @throws DBException
+     * @throws DataException
      */
     public void updateArt_subgroup(IArt_subgroup art_subgroup) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(art_subgroup);
-        }
+        super.updateEntity(art_subgroup);
     }
 
     /**
      * try to delete Art_subgroup in database
-     * @param film: Art_subgroup object
+     * @param art_subgroup Art_subgroup object
      * @throws DBException
      */
     public void deleteArt_subgroup(IArt_subgroup art_subgroup) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteArt_subgroup(art_subgroup.getOwnerobject(), art_subgroup.getPrimaryKey());
-            super.deleteEntity(art_subgroup);
-        }
+        cascadedeleteArt_subgroup(art_subgroup.getPrimaryKey());
+        super.deleteEntity(art_subgroup);
     }
 
     /**
      * check data rules in Art_subgroup, throw DataException with customized message if rules do not apply
-     * @param film: Art_subgroup object
+     * @param art_subgroup Art_subgroup object
      * @throws DataException
      * @throws DBException
      */
     public void checkDATA(IArt_subgroup art_subgroup) throws DataException, DBException {
         StringBuffer message = new StringBuffer();
         //Primary key
-
         if(art_subgroup.getSubgroupname()!=null && art_subgroup.getSubgroupname().length()>IArt_subgroup.SIZE_SUBGROUPNAME) {
-            message.append("Subgroupname is langer dan toegestaan. Max aantal karakters: " + IArt_subgroup.SIZE_SUBGROUPNAME + "\n");
+            message.append("Subgroupname is langer dan toegestaan. Max aantal karakters: ").append(IArt_subgroup.SIZE_SUBGROUPNAME).append("\n");
         }
         if(art_subgroup.getSubgroupname()==null) {
             message.append("Subgroupname mag niet leeg zijn.\n");
@@ -249,67 +228,70 @@ public abstract class Bart_subgroup extends GeneralEntityObject implements Proje
      * delete all records in tables where art_subgroupPK is used in a primary key
      * @param art_subgroupPK: Art_subgroup primary key
      */
-    public void cascadedeleteArt_subgroup(String senderobject, IArt_subgroupPK art_subgroupPK) {
+    public void cascadedeleteArt_subgroup(IArt_subgroupPK art_subgroupPK) {
     }
 
     /**
      * @param art_groupPK: foreign key for Art_group
      * @delete all Art_subgroup Entity objects for Art_group in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4art_group(String senderobject, IArt_groupPK art_groupPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Art_subgroup.SQLDelete4art_group, art_groupPK.getKeyFields());
-        }
+    public void delete4art_group(IArt_groupPK art_groupPK) {
+        super.addStatement(EMart_subgroup.SQLDelete4art_group, art_groupPK.getSQLprimarykey());
     }
 
     /**
      * @param art_groupPK: foreign key for Art_group
      * @return all Art_subgroup Entity objects for Art_group
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getArt_subgroups4art_group(IArt_groupPK art_groupPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Art_subgroup.SQLSelect4art_group, art_groupPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Art_subgroup> getArt_subgroups4art_group(IArt_groupPK art_groupPK) throws CustomException {
+        return super.getEntities(EMart_subgroup.SQLSelect4art_group, art_groupPK.getSQLprimarykey());
     }
 
     /**
      * get all Art_subgroup objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Art_subgroup objects
      * @throws DBException
      */
-    public ArrayList getArt_subgroups(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Art_subgroup.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Art_subgroup> getArt_subgroups(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMart_subgroup.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Art_subgroup>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Art_subgroup objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delArt_subgroup(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Art_subgroup.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delArt_subgroup(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Art_subgroup.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

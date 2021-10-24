@@ -8,20 +8,20 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import XML.XMLElement;
 import XML.XMLfile;
 import data.interfaces.db.Filedata;
-import data.interfaces.db.LogicEntity;
+import db.SQLparameters;
 import film.interfaces.logicentity.IFilm;
 import film.logicentity.Film;
 import film.BusinessObject.table.Bfilm;
+import film.conversion.entity.EMfilm;
 import film.conversion.xml.XMLFilm;
 import film.conversion.xml.XMLPhoto;
 import film.conversion.xml.XMLSubject;
 import film.conversion.xml.XMLTree7subject;
 import film.entity.pk.FilmPK;
-import film.interfaces.BusinessObject.IBLfilm;
 import film.interfaces.entity.pk.IFilmPK;
 import film.logic.Userprofile;
 import film.logicentity.GPSTrackpoint;
@@ -43,8 +43,6 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,7 +59,7 @@ import text.Conversion;
  *
  * @author Franky Laseure
  */
-public class BLfilm extends Bfilm implements IBLfilm {
+public class BLfilm extends Bfilm {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 
@@ -87,31 +85,29 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLfilm(GeneralEntityObject transactionobject) {
+    public BLfilm(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity film) throws SQLException {
-        
-    }
-    
     /**
      * get all Film objects from database
+     * @param userprofile
      * @return ArrayList of Film objects
      * @throws DBException
      */
     public ArrayList getFilms(Userprofile userprofile) throws DBException {
         if(userprofile!=null && userprofile.privateaccess())
-            return getMapper().loadEntityVector(this, Film.SQLSelectAll);
+            return this.getEntities(EMfilm.SQLSelectAll);
         else {
-            return getMapper().loadEntityVector(this, Film.SQLSelectAll4Public, publiconly);
+            SQLparameters parameters = new SQLparameters(publiconly);
+            return this.getEntities(EMfilm.SQLSelectAll4Public, parameters);
         }
     }
 
     /**
      * get all Film objects from database
+     * @param userprofile
      * @return ArrayList of Film objects
      * @throws DBException
      */
@@ -125,6 +121,7 @@ public class BLfilm extends Bfilm implements IBLfilm {
 
     /**
      * search Film for primary key
+     * @param userprofile
      * @param filmPK: Film primary key
      * @return Film object
      * @throws DBException
@@ -137,7 +134,7 @@ public class BLfilm extends Bfilm implements IBLfilm {
 
     /**
      *
-     * @param photoPK: Photo Primary Key
+     * @param filmPK: Film Primary Key
      * @return Root Image Path of a foto folder
      */
     public static StringBuffer getRootImagePath(IFilmPK filmPK) {
@@ -149,7 +146,7 @@ public class BLfilm extends Bfilm implements IBLfilm {
 
     public ArrayList getGroups() throws DBException {
         //get all filmgroups
-        ArrayList filmgroups = getMapper().loadEntityVector(this, Film.SQLSelectGroups);
+        ArrayList filmgroups = this.getEntities(EMfilm.SQLSelectGroups);
         //filter first 3 characters and put them in hashmap
         HashMap groupshashmap = new HashMap();
         ArrayList groups = new ArrayList();
@@ -171,9 +168,10 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * try to insert Film object in database
      * commit transaction
      * @param film: Film Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertFilm(IFilm film) throws DBException, DataException {
         if(this.getFilm(film.getPrimaryKey())==null) {
             trans_insertFilm(film);
@@ -185,8 +183,8 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * try to insert Film object in database
      * commit transaction
      * @param film: Film Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertFilm(IFilm film) throws DBException, DataException {
         if(this.getFilm(film.getPrimaryKey())==null) {
@@ -199,9 +197,10 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * try to update Film object in database
      * commit transaction
      * @param film: Film Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateFilm(IFilm film) throws DBException, DataException {
         trans_updateFilm(film);
         super.Commit2DB();
@@ -211,8 +210,8 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * try to update Film object in database
      * commit transaction
      * @param film: Film Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateFilm(IFilm film) throws DBException, DataException {
         trans_updateFilm(film);
@@ -222,18 +221,20 @@ public class BLfilm extends Bfilm implements IBLfilm {
     /**
      * try to update Photo object in database
      * commit transaction
-     * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @param userprofile
+     * @param film
+     * @param subjects
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
-    public void updateFilm(String senderobject, Userprofile userprofile, IFilm film, ArrayList subjects) throws DBException, DataException {
+    public void updateFilm(Userprofile userprofile, IFilm film, ArrayList subjects) throws DBException, DataException {
         //check if user is allowed to edit
         if(userprofile.isEditor()) {
             //check if user is allowed to manage this film (privateaccess check)
             if(getFilm(userprofile, film.getPrimaryKey())!=null) {
                 trans_updateFilm(film);
                 BLfilmsubjects blfilmsubjects = new BLfilmsubjects(this);
-                blfilmsubjects.linkFilm_with_Subjects(senderobject, film.getPrimaryKey(), subjects);
+                blfilmsubjects.linkFilm_with_Subjects(film.getPrimaryKey(), subjects);
                 super.Commit2DB();
             }
         }
@@ -245,7 +246,6 @@ public class BLfilm extends Bfilm implements IBLfilm {
             //check if user is allowed to manage this film (privateaccess check)
             if(getFilm(userprofile, film.getPrimaryKey())!=null) {
                 trans_updateFilm(film);
-                BLfilmsubjects blfilmsubjects = new BLfilmsubjects(this);
                 super.Commit2DB();
             }
         }
@@ -348,8 +348,8 @@ public class BLfilm extends Bfilm implements IBLfilm {
 
     public String reversegeocode(double lat, double lng) {        
         String url = urlreversegeocode;
-        url = Conversion.filterA2B(url, ":lat:", String.valueOf(lat));
-        url = Conversion.filterA2B(url, ":lng:", String.valueOf(lng));
+        url = Conversion.replaceAll(url, ":lat:", String.valueOf(lat));
+        url = Conversion.replaceAll(url, ":lng:", String.valueOf(lng));
         return request(url);
     }
     
@@ -398,8 +398,9 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * try to delete Film object in database
      * commit transaction
      * @param film: Film Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteFilm(IFilm film) throws DBException {
         trans_deleteFilm(film);
         super.Commit2DB();
@@ -409,7 +410,7 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * try to delete Film object in database
      * commit transaction
      * @param film: Film Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteFilm(IFilm film) throws DBException {
         trans_deleteFilm(film);
@@ -420,8 +421,8 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * try to insert Film object in database
      * do not commit transaction
      * @param film: Film Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertFilm(IFilm film) throws DBException, DataException {
         super.checkDATA(film);
@@ -432,8 +433,8 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * try to update Film object in database
      * do not commit transaction
      * @param film: Film Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateFilm(IFilm film) throws DBException, DataException {
         super.checkDATA(film);
@@ -445,7 +446,7 @@ public class BLfilm extends Bfilm implements IBLfilm {
      * try to delete Film object in database
      * do not commit transaction
      * @param film: Film Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteFilm(IFilm film) throws DBException {
         super.deleteFilm((Film)film);

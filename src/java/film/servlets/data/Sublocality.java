@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Sublocality.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -114,7 +114,7 @@ public class Sublocality extends SecurityDataServlet {
                             break;
                         case ISublocalityOperation.DELETE_Locality:
                             ILocalityPK localityPK = (ILocalityPK)parser.getJavaObject("localitypk");
-                            blsublocality.delete4locality(this.getServletName(), localityPK);
+                            blsublocality.delete4locality(localityPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

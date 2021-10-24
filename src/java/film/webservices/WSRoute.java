@@ -1,3 +1,11 @@
+/*
+ * WSRoute.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSRoute implements WSIRoute {
         Route route;
         try {
             ISublocalityPK sublocalityPK = JSONSublocality.toSublocalityPK((JSONObject)parser.parse(json));
-            blroute.delete4sublocality(this.getClass().getName(), sublocalityPK);
+            blroute.delete4sublocality(sublocalityPK);
         }
         catch(ParseException e) {
         }

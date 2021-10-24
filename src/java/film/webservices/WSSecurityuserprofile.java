@@ -1,3 +1,11 @@
+/*
+ * WSSecurityuserprofile.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSSecurityuserprofile implements WSISecurityuserprofile {
         Securityuserprofile securityuserprofile;
         try {
             ISecurityprofilePK securityprofilePK = JSONSecurityprofile.toSecurityprofilePK((JSONObject)parser.parse(json));
-            blsecurityuserprofile.delete4securityprofile(this.getClass().getName(), securityprofilePK);
+            blsecurityuserprofile.delete4securityprofile(securityprofilePK);
         }
         catch(ParseException e) {
         }

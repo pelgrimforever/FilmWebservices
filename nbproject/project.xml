@@ -27,15 +27,15 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${reference.ProjectServices.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="200">
                     <file>${reference.ProjectInterfaces.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${reference.ProjectPostgreSQL.jar}</file>
+                    <file>${reference.ProjectPostgreSQL2.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${reference.ProjectServices2.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
@@ -52,10 +52,6 @@
                 </library>
                 <library dirs="200">
                     <file>${file.reference.json-simple-1.1.1.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="100">
-                    <file>${reference.SitesecurityBL.dist}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
@@ -109,7 +105,7 @@
                 <id>jar</id>
             </reference>
             <reference>
-                <foreign-project>ProjectPostgreSQL</foreign-project>
+                <foreign-project>ProjectPostgreSQL2</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>
@@ -117,20 +113,12 @@
                 <id>jar</id>
             </reference>
             <reference>
-                <foreign-project>ProjectServices</foreign-project>
+                <foreign-project>ProjectServices2</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>
                 <clean-target>clean</clean-target>
                 <id>jar</id>
-            </reference>
-            <reference>
-                <foreign-project>SitesecurityBL</foreign-project>
-                <artifact-type>jar</artifact-type>
-                <script>build.xml</script>
-                <target>dist</target>
-                <clean-target>clean</clean-target>
-                <id>dist</id>
             </reference>
             <reference>
                 <foreign-project>SitesecurityInterfaces</foreign-project>

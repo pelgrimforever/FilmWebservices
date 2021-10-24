@@ -9,17 +9,11 @@
 package film.BusinessObject.Logic;
 
 import general.exception.DBException;
-import general.exception.DataException;
-import data.interfaces.db.LogicEntity;
 import film.interfaces.logicentity.IPostalcode;
 import film.logicentity.Postalcode;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import film.BusinessObject.table.Bpostalcode;
 import general.exception.DataException;
-import film.interfaces.BusinessObject.IBLpostalcode;
-import film.interfaces.logicentity.IArealevel3;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLpostalcode
@@ -31,7 +25,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
+public class BLpostalcode extends Bpostalcode {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -48,26 +42,19 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLpostalcode(GeneralEntityObject transactionobject) {
+    public BLpostalcode(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
     /**
-     * load extra fields from adjusted sql statement
-     */
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity postalcode) throws SQLException {
-        
-    }
-    
-    /**
      * try to insert Postalcode object in database
      * commit transaction
      * @param postalcode: Postalcode Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertPostalcode(IPostalcode postalcode) throws DBException, DataException {
         trans_insertPostalcode(postalcode);
         super.Commit2DB();
@@ -77,8 +64,8 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * try to insert Postalcode object in database
      * commit transaction
      * @param postalcode: Postalcode Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertPostalcode(IPostalcode postalcode) throws DBException, DataException {
         trans_insertPostalcode(postalcode);
@@ -90,6 +77,7 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * if not, try to insert Postalcode in database
      * @param postalcode: Postalcode object
      * @throws DBException
+     * @throws general.exception.DataException
      */
     public void insertcheckPostalcode(IPostalcode postalcode) throws DBException, DataException {
         if(this.getPostalcode(postalcode.getPrimaryKey())==null) {
@@ -101,9 +89,10 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * try to update Postalcode object in database
      * commit transaction
      * @param postalcode: Postalcode Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updatePostalcode(IPostalcode postalcode) throws DBException, DataException {
         trans_updatePostalcode(postalcode);
         super.Commit2DB();
@@ -113,8 +102,8 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * try to update Postalcode object in database
      * commit transaction
      * @param postalcode: Postalcode Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdatePostalcode(IPostalcode postalcode) throws DBException, DataException {
         trans_updatePostalcode(postalcode);
@@ -125,8 +114,9 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * try to delete Postalcode object in database
      * commit transaction
      * @param postalcode: Postalcode Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deletePostalcode(IPostalcode postalcode) throws DBException {
         trans_deletePostalcode(postalcode);
         super.Commit2DB();
@@ -136,7 +126,7 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * try to delete Postalcode object in database
      * commit transaction
      * @param postalcode: Postalcode Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeletePostalcode(IPostalcode postalcode) throws DBException {
         trans_deletePostalcode(postalcode);
@@ -147,8 +137,8 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * try to insert Postalcode object in database
      * do not commit transaction
      * @param postalcode: Postalcode Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertPostalcode(IPostalcode postalcode) throws DBException, DataException {
         super.checkDATA(postalcode);
@@ -159,8 +149,8 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * try to update Postalcode object in database
      * do not commit transaction
      * @param postalcode: Postalcode Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updatePostalcode(IPostalcode postalcode) throws DBException, DataException {
         super.checkDATA(postalcode);
@@ -171,7 +161,7 @@ public class BLpostalcode extends Bpostalcode implements IBLpostalcode {
      * try to delete Postalcode object in database
      * do not commit transaction
      * @param postalcode: Postalcode Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deletePostalcode(IPostalcode postalcode) throws DBException {
         super.deletePostalcode((Postalcode)postalcode);

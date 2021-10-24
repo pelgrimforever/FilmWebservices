@@ -8,14 +8,7 @@
 
 package film.BusinessObject.Logic;
 
-import general.exception.DBException;
-import data.interfaces.db.View;
-import film.interfaces.logicview.IView_publicphotolocations;
-import film.logicview.View_publicphotolocations;
 import film.BusinessObject.view.Bview_publicphotolocations;
-import film.interfaces.BusinessObject.IBLview_publicphotolocations;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLview_publicphotolocations
@@ -27,7 +20,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLview_publicphotolocations extends Bview_publicphotolocations implements IBLview_publicphotolocations {
+public class BLview_publicphotolocations extends Bview_publicphotolocations {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -36,9 +29,4 @@ public class BLview_publicphotolocations extends Bview_publicphotolocations impl
     public BLview_publicphotolocations() {
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, View view_publicphotolocations) throws SQLException {
-        
-    }
-    
 }

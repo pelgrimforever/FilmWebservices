@@ -1,3 +1,10 @@
+/*
+ * RSView_photodates.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -6,6 +13,7 @@ import data.gis.shape.GISConversion;
 import data.gis.shape.piPoint;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
+import film.entity.pk.*;
 import film.interfaces.logicview.IView_photodates;
 import film.interfaces.servlet.IView_photodatesOperation;
 import film.logicview.View_photodates;

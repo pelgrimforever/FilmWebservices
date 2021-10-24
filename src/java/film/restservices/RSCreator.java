@@ -1,3 +1,10 @@
+/*
+ * RSCreator.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -46,9 +53,6 @@ import org.json.simple.parser.ParseException;
 @Path("rscreator")
 public class RSCreator {
 
-    @Context
-    private UriInfo context;
-
     /**
      * Creates a new instance of HelloWorld
      */
@@ -57,6 +61,7 @@ public class RSCreator {
 
     /**
      * Retrieves representation of an instance of creator.restservices.RSCreator
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @GET
@@ -76,6 +81,7 @@ public class RSCreator {
 
     /**
      * Retrieves representation of an instance of creator.restservices.RSCreator
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @POST
@@ -255,7 +261,6 @@ public class RSCreator {
     /**
      * PUT method for updating or creating an instance of RSCreator
      * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("text/html")

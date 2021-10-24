@@ -1,3 +1,10 @@
+/*
+ * RSTree7subject.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -46,9 +53,6 @@ import org.json.simple.parser.ParseException;
 @Path("rstree7subject")
 public class RSTree7subject {
 
-    @Context
-    private UriInfo context;
-
     /**
      * Creates a new instance of HelloWorld
      */
@@ -57,6 +61,7 @@ public class RSTree7subject {
 
     /**
      * Retrieves representation of an instance of tree7subject.restservices.RSTree7subject
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @GET
@@ -76,6 +81,7 @@ public class RSTree7subject {
 
     /**
      * Retrieves representation of an instance of tree7subject.restservices.RSTree7subject
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @POST
@@ -286,7 +292,6 @@ public class RSTree7subject {
     /**
      * PUT method for updating or creating an instance of RSTree7subject
      * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("text/html")

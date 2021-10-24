@@ -2,23 +2,25 @@
  * Bart_photo.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONArt_photo;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMart_photo;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bart_photo
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bart_photo extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bart_photo extends BLtable {
 
     /**
      * Constructor, sets Art_photo as default Entity
      */
     public Bart_photo() {
-        super(new SQLMapper_pgsql(connectionpool, "Art_photo"), new Art_photo());
+        super(new Art_photo(), new EMart_photo());
     }
 
     /**
@@ -56,44 +60,8 @@ public abstract class Bart_photo extends GeneralEntityObject implements ProjectC
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bart_photo(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Art_photo());
-    }
-
-    /**
-     * Map ResultSet Field values to Art_photo
-     * @param dbresult: Database ResultSet
-     */
-    public Art_photo mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        Art_photoPK art_photoPK = null;
-        Art_photo art_photo;
-        if(dbresult==null) {
-            art_photo = new Art_photo(art_photoPK);
-        } else {
-            try {
-                art_photoPK = new Art_photoPK(dbresult.getString("film"), dbresult.getInt("photo"));
-                art_photo = new Art_photo(art_photoPK);
-                art_photo.initArt_subgroupPK(new Art_subgroupPK(dbresult.getInt("photosubgroup")));
-                if(dbresult.wasNull()) art_photo.setArt_subgroupPK(null);                
-                art_photo.initArt_academyPK(new Art_academyPK(dbresult.getLong("academy")));
-                if(dbresult.wasNull()) art_photo.setArt_academyPK(null);                
-                art_photo.initArt_groupPK(new Art_groupPK(dbresult.getLong("photogroup")));
-                if(dbresult.wasNull()) art_photo.setArt_groupPK(null);                
-                art_photo.initSelection(dbresult.getBoolean("selection"));
-                art_photo.initWidth(dbresult.getInt("width"));
-                art_photo.initHeight(dbresult.getInt("height"));
-                art_photo.initComment(dbresult.getString("comment"));
-                art_photo.initSeqno(dbresult.getInt("seqno"));
-                art_photo.initArchive(dbresult.getBoolean("archive"));
-                art_photo.initSurround(dbresult.getBoolean("surround"));
-                art_photo.initSurrounddir(dbresult.getString("surrounddir"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, art_photo);
-        return art_photo;
+    public Bart_photo(BLtable transactionobject) {
+        super(transactionobject, new Art_photo(), new EMart_photo());
     }
 
     /**
@@ -107,6 +75,8 @@ public abstract class Bart_photo extends GeneralEntityObject implements ProjectC
     /**
      * create new empty Art_photo object
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param photo primary key field
      * @return IArt_photo with primary key
      */
     public IArt_photo newArt_photo(java.lang.String film, int photo) {
@@ -132,6 +102,8 @@ public abstract class Bart_photo extends GeneralEntityObject implements ProjectC
 
     /**
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param photo primary key field
      * @return new IArt_photoPK
      */
     public IArt_photoPK newArt_photoPK(java.lang.String film, int photo) {
@@ -143,10 +115,8 @@ public abstract class Bart_photo extends GeneralEntityObject implements ProjectC
      * @return ArrayList of Art_photo objects
      * @throws DBException
      */
-    public ArrayList getArt_photos() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Art_photo.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Art_photo> getArt_photos() throws DBException {
+        return (ArrayList<Art_photo>)super.getEntities(EMart_photo.SQLSelectAll);
     }
 
     /**
@@ -156,21 +126,28 @@ public abstract class Bart_photo extends GeneralEntityObject implements ProjectC
      * @throws DBException
      */
     public Art_photo getArt_photo(IArt_photoPK art_photoPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Art_photo)super.getEntity((Art_photoPK)art_photoPK);
-        } else return null;
+        return (Art_photo)super.getEntity((Art_photoPK)art_photoPK);
     }
 
-    public ArrayList searchart_photos(IArt_photosearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search art_photo with IArt_photosearch parameters
+     * @param search IArt_photosearch
+     * @return ArrayList of Art_photo
+     * @throws DBException 
+     */
+    public ArrayList<Art_photo> searchart_photos(IArt_photosearch search) throws DBException {
+        return (ArrayList<Art_photo>)this.search(search);
     }
 
-    public ArrayList searchart_photos(IArt_photosearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search art_photo with IArt_photosearch parameters, order by orderby sql clause
+     * @param search IArt_photosearch
+     * @param orderby sql order by string
+     * @return ArrayList of Art_photo
+     * @throws DBException 
+     */
+    public ArrayList<Art_photo> searchart_photos(IArt_photosearch search, String orderby) throws DBException {
+        return (ArrayList<Art_photo>)this.search(search, orderby);
     }
 
     /**
@@ -180,28 +157,26 @@ public abstract class Bart_photo extends GeneralEntityObject implements ProjectC
      * @throws DBException
      */
     public boolean getArt_photoExists(IArt_photoPK art_photoPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((Art_photoPK)art_photoPK);
-        } else return false;
+        return super.getEntityExists((Art_photoPK)art_photoPK);
     }
 
     /**
      * try to insert Art_photo in database
-     * @param film: Art_photo object
+     * @param art_photo Art_photo object
      * @throws DBException
+     * @throws DataException
      */
     public void insertArt_photo(IArt_photo art_photo) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(art_photo);
-        }
+        super.insertEntity(art_photo);
     }
 
     /**
      * check if Art_photoPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Art_photo object
+     * @param art_photo Art_photo object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateArt_photo(IArt_photo art_photo) throws DBException, DataException {
         if(this.getArt_photoExists(art_photo.getPrimaryKey())) {
@@ -213,30 +188,27 @@ public abstract class Bart_photo extends GeneralEntityObject implements ProjectC
 
     /**
      * try to update Art_photo in database
-     * @param film: Art_photo object
+     * @param art_photo Art_photo object
      * @throws DBException
+     * @throws DataException
      */
     public void updateArt_photo(IArt_photo art_photo) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(art_photo);
-        }
+        super.updateEntity(art_photo);
     }
 
     /**
      * try to delete Art_photo in database
-     * @param film: Art_photo object
+     * @param art_photo Art_photo object
      * @throws DBException
      */
     public void deleteArt_photo(IArt_photo art_photo) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteArt_photo(art_photo.getOwnerobject(), art_photo.getPrimaryKey());
-            super.deleteEntity(art_photo);
-        }
+        cascadedeleteArt_photo(art_photo.getPrimaryKey());
+        super.deleteEntity(art_photo);
     }
 
     /**
      * check data rules in Art_photo, throw DataException with customized message if rules do not apply
-     * @param film: Art_photo object
+     * @param art_photo Art_photo object
      * @throws DataException
      * @throws DBException
      */
@@ -244,14 +216,11 @@ public abstract class Bart_photo extends GeneralEntityObject implements ProjectC
         StringBuffer message = new StringBuffer();
         //foreign key Art_photo.Film - Photo.Film
         //foreign key Art_photo.Photo - Photo.Id
-
-
-
         if(art_photo.getComment()!=null && art_photo.getComment().length()>IArt_photo.SIZE_COMMENT) {
-            message.append("Comment is langer dan toegestaan. Max aantal karakters: " + IArt_photo.SIZE_COMMENT + "\n");
+            message.append("Comment is langer dan toegestaan. Max aantal karakters: ").append(IArt_photo.SIZE_COMMENT).append("\n");
         }
         if(art_photo.getSurrounddir()!=null && art_photo.getSurrounddir().length()>IArt_photo.SIZE_SURROUNDDIR) {
-            message.append("Surrounddir is langer dan toegestaan. Max aantal karakters: " + IArt_photo.SIZE_SURROUNDDIR + "\n");
+            message.append("Surrounddir is langer dan toegestaan. Max aantal karakters: ").append(IArt_photo.SIZE_SURROUNDDIR).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -262,130 +231,118 @@ public abstract class Bart_photo extends GeneralEntityObject implements ProjectC
      * delete all records in tables where art_photoPK is used in a primary key
      * @param art_photoPK: Art_photo primary key
      */
-    public void cascadedeleteArt_photo(String senderobject, IArt_photoPK art_photoPK) {
+    public void cascadedeleteArt_photo(IArt_photoPK art_photoPK) {
     }
 
     /**
      * @param photoPK: foreign key for Photo
      * @delete all Art_photo Entity objects for Photo in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4photo(String senderobject, IPhotoPK photoPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Art_photo.SQLDelete4photo, photoPK.getKeyFields());
-        }
+    public void delete4photo(IPhotoPK photoPK) {
+        super.addStatement(EMart_photo.SQLDelete4photo, photoPK.getSQLprimarykey());
     }
 
     /**
      * @param photoPK: foreign key for Photo
      * @return all Art_photo Entity objects for Photo
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getArt_photos4photo(IPhotoPK photoPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Art_photo.SQLSelect4photo, photoPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Art_photo> getArt_photos4photo(IPhotoPK photoPK) throws CustomException {
+        return super.getEntities(EMart_photo.SQLSelect4photo, photoPK.getSQLprimarykey());
     }
     /**
      * @param art_subgroupPK: foreign key for Art_subgroup
      * @delete all Art_photo Entity objects for Art_subgroup in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4art_subgroup(String senderobject, IArt_subgroupPK art_subgroupPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Art_photo.SQLDelete4art_subgroup, art_subgroupPK.getKeyFields());
-        }
+    public void delete4art_subgroup(IArt_subgroupPK art_subgroupPK) {
+        super.addStatement(EMart_photo.SQLDelete4art_subgroup, art_subgroupPK.getSQLprimarykey());
     }
 
     /**
      * @param art_subgroupPK: foreign key for Art_subgroup
      * @return all Art_photo Entity objects for Art_subgroup
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getArt_photos4art_subgroup(IArt_subgroupPK art_subgroupPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Art_photo.SQLSelect4art_subgroup, art_subgroupPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Art_photo> getArt_photos4art_subgroup(IArt_subgroupPK art_subgroupPK) throws CustomException {
+        return super.getEntities(EMart_photo.SQLSelect4art_subgroup, art_subgroupPK.getSQLprimarykey());
     }
     /**
      * @param art_academyPK: foreign key for Art_academy
      * @delete all Art_photo Entity objects for Art_academy in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4art_academy(String senderobject, IArt_academyPK art_academyPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Art_photo.SQLDelete4art_academy, art_academyPK.getKeyFields());
-        }
+    public void delete4art_academy(IArt_academyPK art_academyPK) {
+        super.addStatement(EMart_photo.SQLDelete4art_academy, art_academyPK.getSQLprimarykey());
     }
 
     /**
      * @param art_academyPK: foreign key for Art_academy
      * @return all Art_photo Entity objects for Art_academy
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getArt_photos4art_academy(IArt_academyPK art_academyPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Art_photo.SQLSelect4art_academy, art_academyPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Art_photo> getArt_photos4art_academy(IArt_academyPK art_academyPK) throws CustomException {
+        return super.getEntities(EMart_photo.SQLSelect4art_academy, art_academyPK.getSQLprimarykey());
     }
     /**
      * @param art_groupPK: foreign key for Art_group
      * @delete all Art_photo Entity objects for Art_group in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4art_group(String senderobject, IArt_groupPK art_groupPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Art_photo.SQLDelete4art_group, art_groupPK.getKeyFields());
-        }
+    public void delete4art_group(IArt_groupPK art_groupPK) {
+        super.addStatement(EMart_photo.SQLDelete4art_group, art_groupPK.getSQLprimarykey());
     }
 
     /**
      * @param art_groupPK: foreign key for Art_group
      * @return all Art_photo Entity objects for Art_group
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getArt_photos4art_group(IArt_groupPK art_groupPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Art_photo.SQLSelect4art_group, art_groupPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Art_photo> getArt_photos4art_group(IArt_groupPK art_groupPK) throws CustomException {
+        return super.getEntities(EMart_photo.SQLSelect4art_group, art_groupPK.getSQLprimarykey());
     }
 
     /**
      * get all Art_photo objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Art_photo objects
      * @throws DBException
      */
-    public ArrayList getArt_photos(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Art_photo.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Art_photo> getArt_photos(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMart_photo.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Art_photo>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Art_photo objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delArt_photo(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Art_photo.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delArt_photo(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Art_photo.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

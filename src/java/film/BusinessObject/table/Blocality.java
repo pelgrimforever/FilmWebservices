@@ -2,23 +2,25 @@
  * Blocality.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONLocality;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMlocality;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Blocality
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Blocality extends GeneralEntityObject implements ProjectConstants {
+public abstract class Blocality extends BLtable {
 
     /**
      * Constructor, sets Locality as default Entity
      */
     public Blocality() {
-        super(new SQLMapper_pgsql(connectionpool, "Locality"), new Locality());
+        super(new Locality(), new EMlocality());
     }
 
     /**
@@ -56,47 +60,8 @@ public abstract class Blocality extends GeneralEntityObject implements ProjectCo
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Blocality(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Locality());
-    }
-
-    /**
-     * Map ResultSet Field values to Locality
-     * @param dbresult: Database ResultSet
-     */
-    public Locality mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        LocalityPK localityPK = null;
-        Locality locality;
-        if(dbresult==null) {
-            locality = new Locality(localityPK);
-        } else {
-            try {
-                localityPK = new LocalityPK(dbresult.getString("countrycode"), dbresult.getString("postalcode"), dbresult.getString("locality"));
-                locality = new Locality(localityPK);
-                Object o_location = dbresult.getObject("location");
-                if(o_location!=null) {
-                    piShape c_location = new psqlGeometry((PGgeometry)o_location);
-                    locality.initLocation(c_location.abstractclone());
-                }
-                Object o_bounds = dbresult.getObject("bounds");
-                if(o_bounds!=null) {
-                    piShape c_bounds = new psqlGeometry((PGgeometry)o_bounds);
-                    locality.initBounds(c_bounds.abstractclone());
-                }
-                Object o_viewport = dbresult.getObject("viewport");
-                if(o_viewport!=null) {
-                    piShape c_viewport = new psqlGeometry((PGgeometry)o_viewport);
-                    locality.initViewport(c_viewport.abstractclone());
-                }
-                locality.initApproximate(dbresult.getBoolean("approximate"));
-                locality.initHassublocality(dbresult.getBoolean("hassublocality"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, locality);
-        return locality;
+    public Blocality(BLtable transactionobject) {
+        super(transactionobject, new Locality(), new EMlocality());
     }
 
     /**
@@ -110,6 +75,9 @@ public abstract class Blocality extends GeneralEntityObject implements ProjectCo
     /**
      * create new empty Locality object
      * create new primary key with given parameters
+     * @param countrycode primary key field
+     * @param postalcode primary key field
+     * @param locality primary key field
      * @return ILocality with primary key
      */
     public ILocality newLocality(java.lang.String countrycode, java.lang.String postalcode, java.lang.String locality) {
@@ -135,6 +103,9 @@ public abstract class Blocality extends GeneralEntityObject implements ProjectCo
 
     /**
      * create new primary key with given parameters
+     * @param countrycode primary key field
+     * @param postalcode primary key field
+     * @param locality primary key field
      * @return new ILocalityPK
      */
     public ILocalityPK newLocalityPK(java.lang.String countrycode, java.lang.String postalcode, java.lang.String locality) {
@@ -146,10 +117,8 @@ public abstract class Blocality extends GeneralEntityObject implements ProjectCo
      * @return ArrayList of Locality objects
      * @throws DBException
      */
-    public ArrayList getLocalitys() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Locality.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Locality> getLocalitys() throws DBException {
+        return (ArrayList<Locality>)super.getEntities(EMlocality.SQLSelectAll);
     }
 
     /**
@@ -159,21 +128,28 @@ public abstract class Blocality extends GeneralEntityObject implements ProjectCo
      * @throws DBException
      */
     public Locality getLocality(ILocalityPK localityPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Locality)super.getEntity((LocalityPK)localityPK);
-        } else return null;
+        return (Locality)super.getEntity((LocalityPK)localityPK);
     }
 
-    public ArrayList searchlocalitys(ILocalitysearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search locality with ILocalitysearch parameters
+     * @param search ILocalitysearch
+     * @return ArrayList of Locality
+     * @throws DBException 
+     */
+    public ArrayList<Locality> searchlocalitys(ILocalitysearch search) throws DBException {
+        return (ArrayList<Locality>)this.search(search);
     }
 
-    public ArrayList searchlocalitys(ILocalitysearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search locality with ILocalitysearch parameters, order by orderby sql clause
+     * @param search ILocalitysearch
+     * @param orderby sql order by string
+     * @return ArrayList of Locality
+     * @throws DBException 
+     */
+    public ArrayList<Locality> searchlocalitys(ILocalitysearch search, String orderby) throws DBException {
+        return (ArrayList<Locality>)this.search(search, orderby);
     }
 
     /**
@@ -183,28 +159,26 @@ public abstract class Blocality extends GeneralEntityObject implements ProjectCo
      * @throws DBException
      */
     public boolean getLocalityExists(ILocalityPK localityPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((LocalityPK)localityPK);
-        } else return false;
+        return super.getEntityExists((LocalityPK)localityPK);
     }
 
     /**
      * try to insert Locality in database
-     * @param film: Locality object
+     * @param locality Locality object
      * @throws DBException
+     * @throws DataException
      */
     public void insertLocality(ILocality locality) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(locality);
-        }
+        super.insertEntity(locality);
     }
 
     /**
      * check if LocalityPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Locality object
+     * @param locality Locality object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateLocality(ILocality locality) throws DBException, DataException {
         if(this.getLocalityExists(locality.getPrimaryKey())) {
@@ -216,30 +190,27 @@ public abstract class Blocality extends GeneralEntityObject implements ProjectCo
 
     /**
      * try to update Locality in database
-     * @param film: Locality object
+     * @param locality Locality object
      * @throws DBException
+     * @throws DataException
      */
     public void updateLocality(ILocality locality) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(locality);
-        }
+        super.updateEntity(locality);
     }
 
     /**
      * try to delete Locality in database
-     * @param film: Locality object
+     * @param locality Locality object
      * @throws DBException
      */
     public void deleteLocality(ILocality locality) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteLocality(locality.getOwnerobject(), locality.getPrimaryKey());
-            super.deleteEntity(locality);
-        }
+        cascadedeleteLocality(locality.getPrimaryKey());
+        super.deleteEntity(locality);
     }
 
     /**
      * check data rules in Locality, throw DataException with customized message if rules do not apply
-     * @param film: Locality object
+     * @param locality Locality object
      * @throws DataException
      * @throws DBException
      */
@@ -257,81 +228,82 @@ public abstract class Blocality extends GeneralEntityObject implements ProjectCo
      * delete all records in tables where localityPK is used in a primary key
      * @param localityPK: Locality primary key
      */
-    public void cascadedeleteLocality(String senderobject, ILocalityPK localityPK) {
+    public void cascadedeleteLocality(ILocalityPK localityPK) {
         BLsublocality blsublocality = new BLsublocality(this);
-        blsublocality.delete4locality(senderobject, localityPK);
+        blsublocality.delete4locality(localityPK);
     }
 
     /**
      * @param postalcodePK: foreign key for Postalcode
      * @delete all Locality Entity objects for Postalcode in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4postalcode(String senderobject, IPostalcodePK postalcodePK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Locality.SQLDelete4postalcode, postalcodePK.getKeyFields());
-        }
+    public void delete4postalcode(IPostalcodePK postalcodePK) {
+        super.addStatement(EMlocality.SQLDelete4postalcode, postalcodePK.getSQLprimarykey());
     }
 
     /**
      * @param postalcodePK: foreign key for Postalcode
      * @return all Locality Entity objects for Postalcode
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getLocalitys4postalcode(IPostalcodePK postalcodePK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Locality.SQLSelect4postalcode, postalcodePK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Locality> getLocalitys4postalcode(IPostalcodePK postalcodePK) throws CustomException {
+        return super.getEntities(EMlocality.SQLSelect4postalcode, postalcodePK.getSQLprimarykey());
     }
     /**
      * @param sublocalityPK: parent Sublocality for child object Locality Entity
      * @return child Locality Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ILocality getSublocality(ISublocalityPK sublocalityPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            LocalityPK localityPK = new LocalityPK(sublocalityPK.getCountrycode(), sublocalityPK.getPostalcode(), sublocalityPK.getLocality());
-            return this.getLocality(localityPK);
-        } else return null;
+    public Locality getSublocality(ISublocalityPK sublocalityPK) throws CustomException {
+        LocalityPK localityPK = new LocalityPK(sublocalityPK.getCountrycode(), sublocalityPK.getPostalcode(), sublocalityPK.getLocality());
+        return this.getLocality(localityPK);
     }
 
 
     /**
      * get all Locality objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Locality objects
      * @throws DBException
      */
-    public ArrayList getLocalitys(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Locality.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Locality> getLocalitys(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMlocality.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Locality>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Locality objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delLocality(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Locality.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delLocality(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Locality.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

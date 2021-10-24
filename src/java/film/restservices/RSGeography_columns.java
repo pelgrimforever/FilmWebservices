@@ -1,3 +1,10 @@
+/*
+ * RSGeography_columns.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -6,6 +13,7 @@ import data.gis.shape.GISConversion;
 import data.gis.shape.piPoint;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
+import film.entity.pk.*;
 import film.interfaces.logicview.IGeography_columns;
 import film.interfaces.servlet.IGeography_columnsOperation;
 import film.logicview.Geography_columns;

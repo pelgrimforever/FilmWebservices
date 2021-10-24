@@ -10,7 +10,6 @@ package film.BusinessObject.Logic;
 
 import data.interfaces.db.View;
 import film.BusinessObject.view.Braster_overviews;
-import film.interfaces.BusinessObject.IBLraster_overviews;
 import java.sql.ResultSet;
 
 /**
@@ -23,7 +22,7 @@ import java.sql.ResultSet;
  *
  * @author Franky Laseure
  */
-public class BLraster_overviews extends Braster_overviews implements IBLraster_overviews {
+public class BLraster_overviews extends Braster_overviews {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**

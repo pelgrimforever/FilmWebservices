@@ -1,3 +1,11 @@
+/*
+ * WSMenuitem.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSMenuitem implements WSIMenuitem {
         Menuitem menuitem;
         try {
             IMenuPK menuPK = JSONMenu.toMenuPK((JSONObject)parser.parse(json));
-            blmenuitem.delete4menu(this.getClass().getName(), menuPK);
+            blmenuitem.delete4menu(menuPK);
         }
         catch(ParseException e) {
         }

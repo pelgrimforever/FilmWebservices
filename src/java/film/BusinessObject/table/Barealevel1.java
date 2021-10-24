@@ -2,23 +2,25 @@
  * Barealevel1.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONArealevel1;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMarealevel1;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Barealevel1
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Barealevel1 extends GeneralEntityObject implements ProjectConstants {
+public abstract class Barealevel1 extends BLtable {
 
     /**
      * Constructor, sets Arealevel1 as default Entity
      */
     public Barealevel1() {
-        super(new SQLMapper_pgsql(connectionpool, "Arealevel1"), new Arealevel1());
+        super(new Arealevel1(), new EMarealevel1());
     }
 
     /**
@@ -56,47 +60,8 @@ public abstract class Barealevel1 extends GeneralEntityObject implements Project
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Barealevel1(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Arealevel1());
-    }
-
-    /**
-     * Map ResultSet Field values to Arealevel1
-     * @param dbresult: Database ResultSet
-     */
-    public Arealevel1 mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        Arealevel1PK arealevel1PK = null;
-        Arealevel1 arealevel1;
-        if(dbresult==null) {
-            arealevel1 = new Arealevel1(arealevel1PK);
-        } else {
-            try {
-                arealevel1PK = new Arealevel1PK(dbresult.getString("countrycode"), dbresult.getString("al1code"));
-                arealevel1 = new Arealevel1(arealevel1PK);
-                arealevel1.initName(dbresult.getString("name"));
-                Object o_location = dbresult.getObject("location");
-                if(o_location!=null) {
-                    piShape c_location = new psqlGeometry((PGgeometry)o_location);
-                    arealevel1.initLocation(c_location.abstractclone());
-                }
-                Object o_bounds = dbresult.getObject("bounds");
-                if(o_bounds!=null) {
-                    piShape c_bounds = new psqlGeometry((PGgeometry)o_bounds);
-                    arealevel1.initBounds(c_bounds.abstractclone());
-                }
-                Object o_viewport = dbresult.getObject("viewport");
-                if(o_viewport!=null) {
-                    piShape c_viewport = new psqlGeometry((PGgeometry)o_viewport);
-                    arealevel1.initViewport(c_viewport.abstractclone());
-                }
-                arealevel1.initApproximate(dbresult.getBoolean("approximate"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, arealevel1);
-        return arealevel1;
+    public Barealevel1(BLtable transactionobject) {
+        super(transactionobject, new Arealevel1(), new EMarealevel1());
     }
 
     /**
@@ -110,6 +75,8 @@ public abstract class Barealevel1 extends GeneralEntityObject implements Project
     /**
      * create new empty Arealevel1 object
      * create new primary key with given parameters
+     * @param countrycode primary key field
+     * @param al1code primary key field
      * @return IArealevel1 with primary key
      */
     public IArealevel1 newArealevel1(java.lang.String countrycode, java.lang.String al1code) {
@@ -135,6 +102,8 @@ public abstract class Barealevel1 extends GeneralEntityObject implements Project
 
     /**
      * create new primary key with given parameters
+     * @param countrycode primary key field
+     * @param al1code primary key field
      * @return new IArealevel1PK
      */
     public IArealevel1PK newArealevel1PK(java.lang.String countrycode, java.lang.String al1code) {
@@ -146,10 +115,8 @@ public abstract class Barealevel1 extends GeneralEntityObject implements Project
      * @return ArrayList of Arealevel1 objects
      * @throws DBException
      */
-    public ArrayList getArealevel1s() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Arealevel1.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Arealevel1> getArealevel1s() throws DBException {
+        return (ArrayList<Arealevel1>)super.getEntities(EMarealevel1.SQLSelectAll);
     }
 
     /**
@@ -159,21 +126,28 @@ public abstract class Barealevel1 extends GeneralEntityObject implements Project
      * @throws DBException
      */
     public Arealevel1 getArealevel1(IArealevel1PK arealevel1PK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Arealevel1)super.getEntity((Arealevel1PK)arealevel1PK);
-        } else return null;
+        return (Arealevel1)super.getEntity((Arealevel1PK)arealevel1PK);
     }
 
-    public ArrayList searcharealevel1s(IArealevel1search search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search arealevel1 with IArealevel1search parameters
+     * @param search IArealevel1search
+     * @return ArrayList of Arealevel1
+     * @throws DBException 
+     */
+    public ArrayList<Arealevel1> searcharealevel1s(IArealevel1search search) throws DBException {
+        return (ArrayList<Arealevel1>)this.search(search);
     }
 
-    public ArrayList searcharealevel1s(IArealevel1search search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search arealevel1 with IArealevel1search parameters, order by orderby sql clause
+     * @param search IArealevel1search
+     * @param orderby sql order by string
+     * @return ArrayList of Arealevel1
+     * @throws DBException 
+     */
+    public ArrayList<Arealevel1> searcharealevel1s(IArealevel1search search, String orderby) throws DBException {
+        return (ArrayList<Arealevel1>)this.search(search, orderby);
     }
 
     /**
@@ -183,28 +157,26 @@ public abstract class Barealevel1 extends GeneralEntityObject implements Project
      * @throws DBException
      */
     public boolean getArealevel1Exists(IArealevel1PK arealevel1PK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((Arealevel1PK)arealevel1PK);
-        } else return false;
+        return super.getEntityExists((Arealevel1PK)arealevel1PK);
     }
 
     /**
      * try to insert Arealevel1 in database
-     * @param film: Arealevel1 object
+     * @param arealevel1 Arealevel1 object
      * @throws DBException
+     * @throws DataException
      */
     public void insertArealevel1(IArealevel1 arealevel1) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(arealevel1);
-        }
+        super.insertEntity(arealevel1);
     }
 
     /**
      * check if Arealevel1PK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Arealevel1 object
+     * @param arealevel1 Arealevel1 object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateArealevel1(IArealevel1 arealevel1) throws DBException, DataException {
         if(this.getArealevel1Exists(arealevel1.getPrimaryKey())) {
@@ -216,30 +188,27 @@ public abstract class Barealevel1 extends GeneralEntityObject implements Project
 
     /**
      * try to update Arealevel1 in database
-     * @param film: Arealevel1 object
+     * @param arealevel1 Arealevel1 object
      * @throws DBException
+     * @throws DataException
      */
     public void updateArealevel1(IArealevel1 arealevel1) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(arealevel1);
-        }
+        super.updateEntity(arealevel1);
     }
 
     /**
      * try to delete Arealevel1 in database
-     * @param film: Arealevel1 object
+     * @param arealevel1 Arealevel1 object
      * @throws DBException
      */
     public void deleteArealevel1(IArealevel1 arealevel1) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteArealevel1(arealevel1.getOwnerobject(), arealevel1.getPrimaryKey());
-            super.deleteEntity(arealevel1);
-        }
+        cascadedeleteArealevel1(arealevel1.getPrimaryKey());
+        super.deleteEntity(arealevel1);
     }
 
     /**
      * check data rules in Arealevel1, throw DataException with customized message if rules do not apply
-     * @param film: Arealevel1 object
+     * @param arealevel1 Arealevel1 object
      * @throws DataException
      * @throws DBException
      */
@@ -248,7 +217,7 @@ public abstract class Barealevel1 extends GeneralEntityObject implements Project
         //foreign key Arealevel1.Countrycode - Country.Code
         //Primary key
         if(arealevel1.getName()!=null && arealevel1.getName().length()>IArealevel1.SIZE_NAME) {
-            message.append("Name is langer dan toegestaan. Max aantal karakters: " + IArealevel1.SIZE_NAME + "\n");
+            message.append("Name is langer dan toegestaan. Max aantal karakters: ").append(IArealevel1.SIZE_NAME).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -259,81 +228,82 @@ public abstract class Barealevel1 extends GeneralEntityObject implements Project
      * delete all records in tables where arealevel1PK is used in a primary key
      * @param arealevel1PK: Arealevel1 primary key
      */
-    public void cascadedeleteArealevel1(String senderobject, IArealevel1PK arealevel1PK) {
+    public void cascadedeleteArealevel1(IArealevel1PK arealevel1PK) {
         BLarealevel2 blarealevel2 = new BLarealevel2(this);
-        blarealevel2.delete4arealevel1(senderobject, arealevel1PK);
+        blarealevel2.delete4arealevel1(arealevel1PK);
     }
 
     /**
      * @param countryPK: foreign key for Country
      * @delete all Arealevel1 Entity objects for Country in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4country(String senderobject, ICountryPK countryPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Arealevel1.SQLDelete4country, countryPK.getKeyFields());
-        }
+    public void delete4country(ICountryPK countryPK) {
+        super.addStatement(EMarealevel1.SQLDelete4country, countryPK.getSQLprimarykey());
     }
 
     /**
      * @param countryPK: foreign key for Country
      * @return all Arealevel1 Entity objects for Country
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getArealevel1s4country(ICountryPK countryPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Arealevel1.SQLSelect4country, countryPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Arealevel1> getArealevel1s4country(ICountryPK countryPK) throws CustomException {
+        return super.getEntities(EMarealevel1.SQLSelect4country, countryPK.getSQLprimarykey());
     }
     /**
      * @param arealevel2PK: parent Arealevel2 for child object Arealevel1 Entity
      * @return child Arealevel1 Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public IArealevel1 getArealevel2(IArealevel2PK arealevel2PK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            Arealevel1PK arealevel1PK = new Arealevel1PK(arealevel2PK.getCountrycode(), arealevel2PK.getAl1code());
-            return this.getArealevel1(arealevel1PK);
-        } else return null;
+    public Arealevel1 getArealevel2(IArealevel2PK arealevel2PK) throws CustomException {
+        Arealevel1PK arealevel1PK = new Arealevel1PK(arealevel2PK.getCountrycode(), arealevel2PK.getAl1code());
+        return this.getArealevel1(arealevel1PK);
     }
 
 
     /**
      * get all Arealevel1 objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Arealevel1 objects
      * @throws DBException
      */
-    public ArrayList getArealevel1s(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Arealevel1.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Arealevel1> getArealevel1s(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMarealevel1.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Arealevel1>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Arealevel1 objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delArealevel1(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Arealevel1.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delArealevel1(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Arealevel1.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

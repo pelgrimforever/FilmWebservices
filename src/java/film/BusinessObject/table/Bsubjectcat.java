@@ -2,23 +2,25 @@
  * Bsubjectcat.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONSubjectcat;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMsubjectcat;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bsubjectcat
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bsubjectcat extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bsubjectcat extends BLtable {
 
     /**
      * Constructor, sets Subjectcat as default Entity
      */
     public Bsubjectcat() {
-        super(new SQLMapper_pgsql(connectionpool, "Subjectcat"), new Subjectcat());
+        super(new Subjectcat(), new EMsubjectcat());
     }
 
     /**
@@ -56,32 +60,8 @@ public abstract class Bsubjectcat extends GeneralEntityObject implements Project
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bsubjectcat(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Subjectcat());
-    }
-
-    /**
-     * Map ResultSet Field values to Subjectcat
-     * @param dbresult: Database ResultSet
-     */
-    public Subjectcat mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        SubjectcatPK subjectcatPK = null;
-        Subjectcat subjectcat;
-        if(dbresult==null) {
-            subjectcat = new Subjectcat(subjectcatPK);
-        } else {
-            try {
-                subjectcatPK = new SubjectcatPK(dbresult.getString("cat"));
-                subjectcat = new Subjectcat(subjectcatPK);
-                subjectcat.initCatno(dbresult.getInt("catno"));
-                subjectcat.initDescription(dbresult.getString("description"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, subjectcat);
-        return subjectcat;
+    public Bsubjectcat(BLtable transactionobject) {
+        super(transactionobject, new Subjectcat(), new EMsubjectcat());
     }
 
     /**
@@ -95,6 +75,7 @@ public abstract class Bsubjectcat extends GeneralEntityObject implements Project
     /**
      * create new empty Subjectcat object
      * create new primary key with given parameters
+     * @param cat primary key field
      * @return ISubjectcat with primary key
      */
     public ISubjectcat newSubjectcat(java.lang.String cat) {
@@ -120,6 +101,7 @@ public abstract class Bsubjectcat extends GeneralEntityObject implements Project
 
     /**
      * create new primary key with given parameters
+     * @param cat primary key field
      * @return new ISubjectcatPK
      */
     public ISubjectcatPK newSubjectcatPK(java.lang.String cat) {
@@ -131,10 +113,8 @@ public abstract class Bsubjectcat extends GeneralEntityObject implements Project
      * @return ArrayList of Subjectcat objects
      * @throws DBException
      */
-    public ArrayList getSubjectcats() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Subjectcat.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Subjectcat> getSubjectcats() throws DBException {
+        return (ArrayList<Subjectcat>)super.getEntities(EMsubjectcat.SQLSelectAll);
     }
 
     /**
@@ -144,21 +124,28 @@ public abstract class Bsubjectcat extends GeneralEntityObject implements Project
      * @throws DBException
      */
     public Subjectcat getSubjectcat(ISubjectcatPK subjectcatPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Subjectcat)super.getEntity((SubjectcatPK)subjectcatPK);
-        } else return null;
+        return (Subjectcat)super.getEntity((SubjectcatPK)subjectcatPK);
     }
 
-    public ArrayList searchsubjectcats(ISubjectcatsearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search subjectcat with ISubjectcatsearch parameters
+     * @param search ISubjectcatsearch
+     * @return ArrayList of Subjectcat
+     * @throws DBException 
+     */
+    public ArrayList<Subjectcat> searchsubjectcats(ISubjectcatsearch search) throws DBException {
+        return (ArrayList<Subjectcat>)this.search(search);
     }
 
-    public ArrayList searchsubjectcats(ISubjectcatsearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search subjectcat with ISubjectcatsearch parameters, order by orderby sql clause
+     * @param search ISubjectcatsearch
+     * @param orderby sql order by string
+     * @return ArrayList of Subjectcat
+     * @throws DBException 
+     */
+    public ArrayList<Subjectcat> searchsubjectcats(ISubjectcatsearch search, String orderby) throws DBException {
+        return (ArrayList<Subjectcat>)this.search(search, orderby);
     }
 
     /**
@@ -168,28 +155,26 @@ public abstract class Bsubjectcat extends GeneralEntityObject implements Project
      * @throws DBException
      */
     public boolean getSubjectcatExists(ISubjectcatPK subjectcatPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((SubjectcatPK)subjectcatPK);
-        } else return false;
+        return super.getEntityExists((SubjectcatPK)subjectcatPK);
     }
 
     /**
      * try to insert Subjectcat in database
-     * @param film: Subjectcat object
+     * @param subjectcat Subjectcat object
      * @throws DBException
+     * @throws DataException
      */
     public void insertSubjectcat(ISubjectcat subjectcat) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(subjectcat);
-        }
+        super.insertEntity(subjectcat);
     }
 
     /**
      * check if SubjectcatPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Subjectcat object
+     * @param subjectcat Subjectcat object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateSubjectcat(ISubjectcat subjectcat) throws DBException, DataException {
         if(this.getSubjectcatExists(subjectcat.getPrimaryKey())) {
@@ -201,30 +186,27 @@ public abstract class Bsubjectcat extends GeneralEntityObject implements Project
 
     /**
      * try to update Subjectcat in database
-     * @param film: Subjectcat object
+     * @param subjectcat Subjectcat object
      * @throws DBException
+     * @throws DataException
      */
     public void updateSubjectcat(ISubjectcat subjectcat) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(subjectcat);
-        }
+        super.updateEntity(subjectcat);
     }
 
     /**
      * try to delete Subjectcat in database
-     * @param film: Subjectcat object
+     * @param subjectcat Subjectcat object
      * @throws DBException
      */
     public void deleteSubjectcat(ISubjectcat subjectcat) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteSubjectcat(subjectcat.getOwnerobject(), subjectcat.getPrimaryKey());
-            super.deleteEntity(subjectcat);
-        }
+        cascadedeleteSubjectcat(subjectcat.getPrimaryKey());
+        super.deleteEntity(subjectcat);
     }
 
     /**
      * check data rules in Subjectcat, throw DataException with customized message if rules do not apply
-     * @param film: Subjectcat object
+     * @param subjectcat Subjectcat object
      * @throws DataException
      * @throws DBException
      */
@@ -232,7 +214,7 @@ public abstract class Bsubjectcat extends GeneralEntityObject implements Project
         StringBuffer message = new StringBuffer();
         //Primary key
         if(subjectcat.getDescription()!=null && subjectcat.getDescription().length()>ISubjectcat.SIZE_DESCRIPTION) {
-            message.append("Description is langer dan toegestaan. Max aantal karakters: " + ISubjectcat.SIZE_DESCRIPTION + "\n");
+            message.append("Description is langer dan toegestaan. Max aantal karakters: ").append(ISubjectcat.SIZE_DESCRIPTION).append("\n");
         }
         if(subjectcat.getDescription()==null) {
             message.append("Description mag niet leeg zijn.\n");
@@ -246,74 +228,78 @@ public abstract class Bsubjectcat extends GeneralEntityObject implements Project
      * delete all records in tables where subjectcatPK is used in a primary key
      * @param subjectcatPK: Subjectcat primary key
      */
-    public void cascadedeleteSubjectcat(String senderobject, ISubjectcatPK subjectcatPK) {
+    public void cascadedeleteSubjectcat(ISubjectcatPK subjectcatPK) {
         BLsubject blsubjectCat1 = new BLsubject(this);
-        blsubjectCat1.delete4subjectcatCat1(senderobject, subjectcatPK);
+        blsubjectCat1.delete4subjectcatCat1(subjectcatPK);
         BLsubject blsubjectCat2 = new BLsubject(this);
-        blsubjectCat2.delete4subjectcatCat2(senderobject, subjectcatPK);
+        blsubjectCat2.delete4subjectcatCat2(subjectcatPK);
     }
 
     /**
      * @param subjectPK: parent Subject for child object Subjectcat Entity
      * @return child Subjectcat Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ISubjectcat getSubjectcat1(ISubjectPK subjectPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            SubjectcatPK subjectcatPK = new SubjectcatPK(subjectPK.getCat1());
-            return this.getSubjectcat(subjectcatPK);
-        } else return null;
+    public Subjectcat getSubjectcat1(ISubjectPK subjectPK) throws CustomException {
+        SubjectcatPK subjectcatPK = new SubjectcatPK(subjectPK.getCat1());
+        return this.getSubjectcat(subjectcatPK);
     }
 
     /**
      * @param subjectPK: parent Subject for child object Subjectcat Entity
      * @return child Subjectcat Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ISubjectcat getSubjectcat2(ISubjectPK subjectPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            SubjectcatPK subjectcatPK = new SubjectcatPK(subjectPK.getCat2());
-            return this.getSubjectcat(subjectcatPK);
-        } else return null;
+    public Subjectcat getSubjectcat2(ISubjectPK subjectPK) throws CustomException {
+        SubjectcatPK subjectcatPK = new SubjectcatPK(subjectPK.getCat2());
+        return this.getSubjectcat(subjectcatPK);
     }
 
 
     /**
      * get all Subjectcat objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Subjectcat objects
      * @throws DBException
      */
-    public ArrayList getSubjectcats(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Subjectcat.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Subjectcat> getSubjectcats(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMsubjectcat.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Subjectcat>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Subjectcat objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delSubjectcat(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Subjectcat.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delSubjectcat(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Subjectcat.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

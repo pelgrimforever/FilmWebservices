@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Film.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -141,7 +141,7 @@ public class Film extends SecurityDataServlet {
                             break;
                         case IFilmOperation.DELETE_Filmtype:
                             IFilmtypePK filmtypePK = (IFilmtypePK)parser.getJavaObject("filmtypepk");
-                            blfilm.delete4filmtype(this.getServletName(), filmtypePK);
+                            blfilm.delete4filmtype(filmtypePK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

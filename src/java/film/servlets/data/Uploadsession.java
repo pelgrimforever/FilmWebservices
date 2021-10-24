@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Uploadsession.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -134,7 +134,7 @@ public class Uploadsession extends SecurityDataServlet {
                             break;
                         case IUploadsessionOperation.DELETE_Creator:
                             ICreatorPK creatorPK = (ICreatorPK)parser.getJavaObject("creatorpk");
-                            bluploadsession.delete4creator(this.getServletName(), creatorPK);
+                            bluploadsession.delete4creator(creatorPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

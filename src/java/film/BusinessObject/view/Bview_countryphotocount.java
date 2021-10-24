@@ -2,19 +2,17 @@
  * Bview_countryphotocount.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.view;
 
-import BusinessObject.GeneralViewObject;
+import BusinessObject.BLview;
+import db.SQLMapperFactory;
 import data.gis.shape.*;
 import db.SQLMapper_pgsql;
-import film.data.ProjectConstants;
-import db.ArchiveViewMapper;
-import db.ViewMapper;
-import db.ViewMapperInterface;
+import film.conversion.entity.EMview_countryphotocount;
 import general.exception.*;
 import java.util.ArrayList;
 import film.logicview.View_countryphotocount;
@@ -34,33 +32,13 @@ import org.postgis.PGgeometry;
  *
  * @author Franky Laseure
  */
-public abstract class Bview_countryphotocount extends GeneralViewObject implements ProjectConstants {
+public abstract class Bview_countryphotocount extends BLview {
 
     /**
      * Constructor, sets View_countryphotocount as default Entity
      */
     public Bview_countryphotocount() {
-        super(new SQLMapper_pgsql(connectionpool, "View_countryphotocount"), new View_countryphotocount());
-    }
-
-    /**
-     * Map ResultSet Field values to View_countryphotocount
-     * @param dbresult: Database ResultSet
-     */
-    public View_countryphotocount mapResultSet2View(ResultSet dbresult) throws SQLException {
-        View_countryphotocount view_countryphotocount = new View_countryphotocount();
-        if(dbresult!=null) {
-            try {
-                view_countryphotocount.setCode(dbresult.getString("code"));
-                view_countryphotocount.setName(dbresult.getString("name"));
-                view_countryphotocount.setPhotocount(dbresult.getLong("photocount"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, view_countryphotocount);
-        return view_countryphotocount;
+        super(new View_countryphotocount(), new EMview_countryphotocount());
     }
 
     /**
@@ -68,7 +46,7 @@ public abstract class Bview_countryphotocount extends GeneralViewObject implemen
      * @return ArrayList of View_countryphotocount objects
      * @throws DBException
      */
-    public ArrayList getView_countryphotocounts() throws DBException {
-        return getMapper().loadViewVector(this, View_countryphotocount.SQLSelectAll);
+    public ArrayList<View_countryphotocount> getView_countryphotocounts() throws DBException {
+        return getEntities(EMview_countryphotocount.SQLSelectAll);
     }
 }

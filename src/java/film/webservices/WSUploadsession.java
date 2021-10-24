@@ -1,3 +1,11 @@
+/*
+ * WSUploadsession.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSUploadsession implements WSIUploadsession {
         Uploadsession uploadsession;
         try {
             ICreatorPK creatorPK = JSONCreator.toCreatorPK((JSONObject)parser.parse(json));
-            bluploadsession.delete4creator(this.getClass().getName(), creatorPK);
+            bluploadsession.delete4creator(creatorPK);
         }
         catch(ParseException e) {
         }

@@ -9,13 +9,9 @@
 package film.BusinessObject.Logic;
 
 import general.exception.DBException;
-import data.interfaces.db.View;
 import film.BusinessObject.view.Bview_countryphotocount;
-import film.interfaces.BusinessObject.IBLview_countryphotocount;
-import film.logicview.View_countryphotocount;
-import film.logicview.View_publiccountryphotocount;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import film.conversion.entity.EMview_countryphotocount;
+import film.conversion.entity.EMview_publiccountryphotocount;
 import java.util.ArrayList;
 
 /**
@@ -28,7 +24,7 @@ import java.util.ArrayList;
  *
  * @author Franky Laseure
  */
-public class BLview_countryphotocount extends Bview_countryphotocount implements IBLview_countryphotocount {
+public class BLview_countryphotocount extends Bview_countryphotocount {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -37,11 +33,6 @@ public class BLview_countryphotocount extends Bview_countryphotocount implements
     public BLview_countryphotocount() {
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, View view_countryphotocount) throws SQLException {
-        
-    }
-    
     /**
      * get all View_publiccountryphotocount objects from database
      * Override normal getView_countryphotocounts to show only public records, no authentication is checked
@@ -50,7 +41,7 @@ public class BLview_countryphotocount extends Bview_countryphotocount implements
      */
     @Override
     public ArrayList getView_countryphotocounts() throws DBException {
-        return getMapper().loadViewVector(this, View_publiccountryphotocount.SQLSelectAll);
+        return this.getEntities(EMview_publiccountryphotocount.SQLSelectAll);
     }
 
     /**
@@ -59,6 +50,6 @@ public class BLview_countryphotocount extends Bview_countryphotocount implements
      * @throws DBException
      */
     public ArrayList getAllView_countryphotocounts() throws DBException {
-        return getMapper().loadViewVector(this, View_countryphotocount.SQLSelectAll);
+        return this.getEntities(EMview_countryphotocount.SQLSelectAll);
     }
 }

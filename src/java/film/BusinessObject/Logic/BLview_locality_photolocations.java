@@ -8,13 +8,10 @@
 
 package film.BusinessObject.Logic;
 
-import data.interfaces.db.View;
-import film.logicview.View_locality_photolocations;
+import db.SQLparameters;
 import film.BusinessObject.view.Bview_locality_photolocations;
-import film.interfaces.BusinessObject.IBLview_locality_photolocations;
+import film.conversion.entity.EMview_locality_photolocations;
 import general.exception.DBException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -27,7 +24,7 @@ import java.util.ArrayList;
  *
  * @author Franky Laseure
  */
-public class BLview_locality_photolocations extends Bview_locality_photolocations implements IBLview_locality_photolocations {
+public class BLview_locality_photolocations extends Bview_locality_photolocations {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -36,13 +33,9 @@ public class BLview_locality_photolocations extends Bview_locality_photolocation
     public BLview_locality_photolocations() {
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, View view_locality_photolocations) throws SQLException {
-        
-    }
-    
     public ArrayList get4Location(String countrycode, String locality) throws DBException {
         Object[][] parameter = { { "countrycode", countrycode }, { "locality", locality } };
-        return this.getMapper().loadViewVector(this, View_locality_photolocations.SQLSelect4location, parameter);
+        SQLparameters parameters = new SQLparameters(parameter);
+        return this.getEntities(EMview_locality_photolocations.SQLSelect4location, parameters);
     }
 }

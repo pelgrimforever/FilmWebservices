@@ -1,3 +1,10 @@
+/*
+ * RSArt_group.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -46,9 +53,6 @@ import org.json.simple.parser.ParseException;
 @Path("rsart_group")
 public class RSArt_group {
 
-    @Context
-    private UriInfo context;
-
     /**
      * Creates a new instance of HelloWorld
      */
@@ -57,6 +61,7 @@ public class RSArt_group {
 
     /**
      * Retrieves representation of an instance of art_group.restservices.RSArt_group
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @GET
@@ -76,6 +81,7 @@ public class RSArt_group {
 
     /**
      * Retrieves representation of an instance of art_group.restservices.RSArt_group
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @POST
@@ -255,7 +261,6 @@ public class RSArt_group {
     /**
      * PUT method for updating or creating an instance of RSArt_group
      * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("text/html")

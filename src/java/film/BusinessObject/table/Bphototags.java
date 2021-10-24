@@ -2,23 +2,25 @@
  * Bphototags.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONPhototags;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMphototags;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bphototags
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bphototags extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bphototags extends BLtable {
 
     /**
      * Constructor, sets Phototags as default Entity
      */
     public Bphototags() {
-        super(new SQLMapper_pgsql(connectionpool, "Phototags"), new Phototags());
+        super(new Phototags(), new EMphototags());
     }
 
     /**
@@ -56,32 +60,8 @@ public abstract class Bphototags extends GeneralEntityObject implements ProjectC
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bphototags(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Phototags());
-    }
-
-    /**
-     * Map ResultSet Field values to Phototags
-     * @param dbresult: Database ResultSet
-     */
-    public Phototags mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        PhototagsPK phototagsPK = null;
-        Phototags phototags;
-        if(dbresult==null) {
-            phototags = new Phototags(phototagsPK);
-        } else {
-            try {
-                phototagsPK = new PhototagsPK(dbresult.getString("film"), dbresult.getInt("id"), dbresult.getString("tag"));
-                phototags = new Phototags(phototagsPK);
-                phototags.initTagformat(dbresult.getString("tagformat"));
-                phototags.initTagvalue(dbresult.getString("tagvalue"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, phototags);
-        return phototags;
+    public Bphototags(BLtable transactionobject) {
+        super(transactionobject, new Phototags(), new EMphototags());
     }
 
     /**
@@ -95,6 +75,9 @@ public abstract class Bphototags extends GeneralEntityObject implements ProjectC
     /**
      * create new empty Phototags object
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param id primary key field
+     * @param tag primary key field
      * @return IPhototags with primary key
      */
     public IPhototags newPhototags(java.lang.String film, int id, java.lang.String tag) {
@@ -120,6 +103,9 @@ public abstract class Bphototags extends GeneralEntityObject implements ProjectC
 
     /**
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param id primary key field
+     * @param tag primary key field
      * @return new IPhototagsPK
      */
     public IPhototagsPK newPhototagsPK(java.lang.String film, int id, java.lang.String tag) {
@@ -131,10 +117,8 @@ public abstract class Bphototags extends GeneralEntityObject implements ProjectC
      * @return ArrayList of Phototags objects
      * @throws DBException
      */
-    public ArrayList getPhototagss() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Phototags.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Phototags> getPhototagss() throws DBException {
+        return (ArrayList<Phototags>)super.getEntities(EMphototags.SQLSelectAll);
     }
 
     /**
@@ -144,21 +128,28 @@ public abstract class Bphototags extends GeneralEntityObject implements ProjectC
      * @throws DBException
      */
     public Phototags getPhototags(IPhototagsPK phototagsPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Phototags)super.getEntity((PhototagsPK)phototagsPK);
-        } else return null;
+        return (Phototags)super.getEntity((PhototagsPK)phototagsPK);
     }
 
-    public ArrayList searchphototagss(IPhototagssearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search phototags with IPhototagssearch parameters
+     * @param search IPhototagssearch
+     * @return ArrayList of Phototags
+     * @throws DBException 
+     */
+    public ArrayList<Phototags> searchphototagss(IPhototagssearch search) throws DBException {
+        return (ArrayList<Phototags>)this.search(search);
     }
 
-    public ArrayList searchphototagss(IPhototagssearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search phototags with IPhototagssearch parameters, order by orderby sql clause
+     * @param search IPhototagssearch
+     * @param orderby sql order by string
+     * @return ArrayList of Phototags
+     * @throws DBException 
+     */
+    public ArrayList<Phototags> searchphototagss(IPhototagssearch search, String orderby) throws DBException {
+        return (ArrayList<Phototags>)this.search(search, orderby);
     }
 
     /**
@@ -168,28 +159,26 @@ public abstract class Bphototags extends GeneralEntityObject implements ProjectC
      * @throws DBException
      */
     public boolean getPhototagsExists(IPhototagsPK phototagsPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((PhototagsPK)phototagsPK);
-        } else return false;
+        return super.getEntityExists((PhototagsPK)phototagsPK);
     }
 
     /**
      * try to insert Phototags in database
-     * @param film: Phototags object
+     * @param phototags Phototags object
      * @throws DBException
+     * @throws DataException
      */
     public void insertPhototags(IPhototags phototags) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(phototags);
-        }
+        super.insertEntity(phototags);
     }
 
     /**
      * check if PhototagsPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Phototags object
+     * @param phototags Phototags object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdatePhototags(IPhototags phototags) throws DBException, DataException {
         if(this.getPhototagsExists(phototags.getPrimaryKey())) {
@@ -201,30 +190,27 @@ public abstract class Bphototags extends GeneralEntityObject implements ProjectC
 
     /**
      * try to update Phototags in database
-     * @param film: Phototags object
+     * @param phototags Phototags object
      * @throws DBException
+     * @throws DataException
      */
     public void updatePhototags(IPhototags phototags) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(phototags);
-        }
+        super.updateEntity(phototags);
     }
 
     /**
      * try to delete Phototags in database
-     * @param film: Phototags object
+     * @param phototags Phototags object
      * @throws DBException
      */
     public void deletePhototags(IPhototags phototags) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeletePhototags(phototags.getOwnerobject(), phototags.getPrimaryKey());
-            super.deleteEntity(phototags);
-        }
+        cascadedeletePhototags(phototags.getPrimaryKey());
+        super.deleteEntity(phototags);
     }
 
     /**
      * check data rules in Phototags, throw DataException with customized message if rules do not apply
-     * @param film: Phototags object
+     * @param phototags Phototags object
      * @throws DataException
      * @throws DBException
      */
@@ -234,13 +220,13 @@ public abstract class Bphototags extends GeneralEntityObject implements ProjectC
         //foreign key Phototags.Id - Photo.Id
         //Primary key
         if(phototags.getTagformat()!=null && phototags.getTagformat().length()>IPhototags.SIZE_TAGFORMAT) {
-            message.append("Tagformat is langer dan toegestaan. Max aantal karakters: " + IPhototags.SIZE_TAGFORMAT + "\n");
+            message.append("Tagformat is langer dan toegestaan. Max aantal karakters: ").append(IPhototags.SIZE_TAGFORMAT).append("\n");
         }
         if(phototags.getTagformat()==null) {
             message.append("Tagformat mag niet leeg zijn.\n");
         }
         if(phototags.getTagvalue()!=null && phototags.getTagvalue().length()>IPhototags.SIZE_TAGVALUE) {
-            message.append("Tagvalue is langer dan toegestaan. Max aantal karakters: " + IPhototags.SIZE_TAGVALUE + "\n");
+            message.append("Tagvalue is langer dan toegestaan. Max aantal karakters: ").append(IPhototags.SIZE_TAGVALUE).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -251,67 +237,70 @@ public abstract class Bphototags extends GeneralEntityObject implements ProjectC
      * delete all records in tables where phototagsPK is used in a primary key
      * @param phototagsPK: Phototags primary key
      */
-    public void cascadedeletePhototags(String senderobject, IPhototagsPK phototagsPK) {
+    public void cascadedeletePhototags(IPhototagsPK phototagsPK) {
     }
 
     /**
      * @param photoPK: foreign key for Photo
      * @delete all Phototags Entity objects for Photo in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4photo(String senderobject, IPhotoPK photoPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Phototags.SQLDelete4photo, photoPK.getKeyFields());
-        }
+    public void delete4photo(IPhotoPK photoPK) {
+        super.addStatement(EMphototags.SQLDelete4photo, photoPK.getSQLprimarykey());
     }
 
     /**
      * @param photoPK: foreign key for Photo
      * @return all Phototags Entity objects for Photo
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getPhototagss4photo(IPhotoPK photoPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Phototags.SQLSelect4photo, photoPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Phototags> getPhototagss4photo(IPhotoPK photoPK) throws CustomException {
+        return super.getEntities(EMphototags.SQLSelect4photo, photoPK.getSQLprimarykey());
     }
 
     /**
      * get all Phototags objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Phototags objects
      * @throws DBException
      */
-    public ArrayList getPhototagss(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Phototags.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Phototags> getPhototagss(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMphototags.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Phototags>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Phototags objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delPhototags(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Phototags.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delPhototags(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Phototags.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

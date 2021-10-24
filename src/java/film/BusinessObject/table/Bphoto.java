@@ -2,23 +2,25 @@
  * Bphoto.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONPhoto;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMphoto;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bphoto
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bphoto extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bphoto extends BLtable {
 
     /**
      * Constructor, sets Photo as default Entity
      */
     public Bphoto() {
-        super(new SQLMapper_pgsql(connectionpool, "Photo"), new Photo());
+        super(new Photo(), new EMphoto());
     }
 
     /**
@@ -56,53 +60,8 @@ public abstract class Bphoto extends GeneralEntityObject implements ProjectConst
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bphoto(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Photo());
-    }
-
-    /**
-     * Map ResultSet Field values to Photo
-     * @param dbresult: Database ResultSet
-     */
-    public Photo mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        PhotoPK photoPK = null;
-        Photo photo;
-        if(dbresult==null) {
-            photo = new Photo(photoPK);
-        } else {
-            try {
-                photoPK = new PhotoPK(dbresult.getString("film"), dbresult.getInt("id"));
-                photo = new Photo(photoPK);
-                photo.initRoutePK(new RoutePK(dbresult.getString("countrycode"), dbresult.getString("postalcode"), dbresult.getString("locality"), dbresult.getString("sublocality"), dbresult.getString("routecode")));
-                if(dbresult.wasNull()) photo.setRoutePK(null);                
-                photo.initCreatorPK(new CreatorPK(dbresult.getString("creator")));
-                if(dbresult.wasNull()) photo.setCreatorPK(null);                
-                photo.initFormat(dbresult.getString("format"));
-                photo.initDescription(dbresult.getString("description"));
-                photo.initPhotodate(dbresult.getDate("photodate"));
-                photo.initPhototime(dbresult.getString("phototime") == null ? null : Time.valueOf(dbresult.getString("phototime")));
-                photo.initPublic(dbresult.getBoolean("public"));
-                photo.initComposition(dbresult.getBoolean("composition"));
-                photo.initRotation(dbresult.getFloat("rotation"));
-                photo.initBackup(dbresult.getBoolean("backup"));
-                photo.initImagebackup(dbresult.getBoolean("imagebackup"));
-                Object o_location = dbresult.getObject("location");
-                if(o_location!=null) {
-                    piShape c_location = new psqlGeometry((PGgeometry)o_location);
-                    photo.initLocation(c_location.abstractclone());
-                }
-                photo.initExactlocation(dbresult.getBoolean("exactlocation"));
-                photo.initLocationradius(dbresult.getDouble("locationradius"));
-                photo.initReversegeocode(dbresult.getString("reversegeocode"));
-                photo.initStreetnumber(dbresult.getString("streetnumber"));
-                photo.initFormattedaddress(dbresult.getString("formattedaddress"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, photo);
-        return photo;
+    public Bphoto(BLtable transactionobject) {
+        super(transactionobject, new Photo(), new EMphoto());
     }
 
     /**
@@ -116,6 +75,8 @@ public abstract class Bphoto extends GeneralEntityObject implements ProjectConst
     /**
      * create new empty Photo object
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param id primary key field
      * @return IPhoto with primary key
      */
     public IPhoto newPhoto(java.lang.String film, int id) {
@@ -141,6 +102,8 @@ public abstract class Bphoto extends GeneralEntityObject implements ProjectConst
 
     /**
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param id primary key field
      * @return new IPhotoPK
      */
     public IPhotoPK newPhotoPK(java.lang.String film, int id) {
@@ -152,10 +115,8 @@ public abstract class Bphoto extends GeneralEntityObject implements ProjectConst
      * @return ArrayList of Photo objects
      * @throws DBException
      */
-    public ArrayList getPhotos() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Photo.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Photo> getPhotos() throws DBException {
+        return (ArrayList<Photo>)super.getEntities(EMphoto.SQLSelectAll);
     }
 
     /**
@@ -165,21 +126,28 @@ public abstract class Bphoto extends GeneralEntityObject implements ProjectConst
      * @throws DBException
      */
     public Photo getPhoto(IPhotoPK photoPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Photo)super.getEntity((PhotoPK)photoPK);
-        } else return null;
+        return (Photo)super.getEntity((PhotoPK)photoPK);
     }
 
-    public ArrayList searchphotos(IPhotosearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search photo with IPhotosearch parameters
+     * @param search IPhotosearch
+     * @return ArrayList of Photo
+     * @throws DBException 
+     */
+    public ArrayList<Photo> searchphotos(IPhotosearch search) throws DBException {
+        return (ArrayList<Photo>)this.search(search);
     }
 
-    public ArrayList searchphotos(IPhotosearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search photo with IPhotosearch parameters, order by orderby sql clause
+     * @param search IPhotosearch
+     * @param orderby sql order by string
+     * @return ArrayList of Photo
+     * @throws DBException 
+     */
+    public ArrayList<Photo> searchphotos(IPhotosearch search, String orderby) throws DBException {
+        return (ArrayList<Photo>)this.search(search, orderby);
     }
 
     /**
@@ -189,28 +157,26 @@ public abstract class Bphoto extends GeneralEntityObject implements ProjectConst
      * @throws DBException
      */
     public boolean getPhotoExists(IPhotoPK photoPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((PhotoPK)photoPK);
-        } else return false;
+        return super.getEntityExists((PhotoPK)photoPK);
     }
 
     /**
      * try to insert Photo in database
-     * @param film: Photo object
+     * @param photo Photo object
      * @throws DBException
+     * @throws DataException
      */
     public void insertPhoto(IPhoto photo) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(photo);
-        }
+        super.insertEntity(photo);
     }
 
     /**
      * check if PhotoPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Photo object
+     * @param photo Photo object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdatePhoto(IPhoto photo) throws DBException, DataException {
         if(this.getPhotoExists(photo.getPrimaryKey())) {
@@ -222,30 +188,27 @@ public abstract class Bphoto extends GeneralEntityObject implements ProjectConst
 
     /**
      * try to update Photo in database
-     * @param film: Photo object
+     * @param photo Photo object
      * @throws DBException
+     * @throws DataException
      */
     public void updatePhoto(IPhoto photo) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(photo);
-        }
+        super.updateEntity(photo);
     }
 
     /**
      * try to delete Photo in database
-     * @param film: Photo object
+     * @param photo Photo object
      * @throws DBException
      */
     public void deletePhoto(IPhoto photo) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeletePhoto(photo.getOwnerobject(), photo.getPrimaryKey());
-            super.deleteEntity(photo);
-        }
+        cascadedeletePhoto(photo.getPrimaryKey());
+        super.deleteEntity(photo);
     }
 
     /**
      * check data rules in Photo, throw DataException with customized message if rules do not apply
-     * @param film: Photo object
+     * @param photo Photo object
      * @throws DataException
      * @throws DBException
      */
@@ -253,49 +216,43 @@ public abstract class Bphoto extends GeneralEntityObject implements ProjectConst
         StringBuffer message = new StringBuffer();
         //foreign key Photo.Film - Film.Id
         //Primary key
-	//if(photo.getRoutePK()!=null && photo.getRoutePK().getCountrycode()!=null && photo.getRoutePK().getCountrycode().length()>IPhoto.SIZE_COUNTRYCODE) {
         if(photo.getRoutePK()!=null && photo.getRoutePK().getCountrycode()!=null && photo.getRoutePK().getCountrycode().length()>IPhoto.SIZE_COUNTRYCODE) {
             message.append("Countrycode is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_COUNTRYCODE + "\n");
         }
-	//if(photo.getRoutePK()!=null && photo.getRoutePK().getPostalcode()!=null && photo.getRoutePK().getPostalcode().length()>IPhoto.SIZE_POSTALCODE) {
         if(photo.getRoutePK()!=null && photo.getRoutePK().getPostalcode()!=null && photo.getRoutePK().getPostalcode().length()>IPhoto.SIZE_POSTALCODE) {
             message.append("Postalcode is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_POSTALCODE + "\n");
         }
-	//if(photo.getRoutePK()!=null && photo.getRoutePK().getLocality()!=null && photo.getRoutePK().getLocality().length()>IPhoto.SIZE_LOCALITY) {
         if(photo.getRoutePK()!=null && photo.getRoutePK().getLocality()!=null && photo.getRoutePK().getLocality().length()>IPhoto.SIZE_LOCALITY) {
             message.append("Locality is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_LOCALITY + "\n");
         }
-	//if(photo.getRoutePK()!=null && photo.getRoutePK().getSublocality()!=null && photo.getRoutePK().getSublocality().length()>IPhoto.SIZE_SUBLOCALITY) {
         if(photo.getRoutePK()!=null && photo.getRoutePK().getSublocality()!=null && photo.getRoutePK().getSublocality().length()>IPhoto.SIZE_SUBLOCALITY) {
             message.append("Sublocality is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_SUBLOCALITY + "\n");
         }
-	//if(photo.getRoutePK()!=null && photo.getRoutePK().getRoutecode()!=null && photo.getRoutePK().getRoutecode().length()>IPhoto.SIZE_ROUTECODE) {
         if(photo.getRoutePK()!=null && photo.getRoutePK().getRoutecode()!=null && photo.getRoutePK().getRoutecode().length()>IPhoto.SIZE_ROUTECODE) {
             message.append("Routecode is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_ROUTECODE + "\n");
         }
 
-	//if(photo.getCreatorPK()!=null && photo.getCreatorPK().getCreatorid()!=null && photo.getCreatorPK().getCreatorid().length()>IPhoto.SIZE_CREATOR) {
         if(photo.getCreatorPK()!=null && photo.getCreatorPK().getCreatorid()!=null && photo.getCreatorPK().getCreatorid().length()>IPhoto.SIZE_CREATOR) {
             message.append("Creator is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_CREATOR + "\n");
         }
 
         if(photo.getFormat()!=null && photo.getFormat().length()>IPhoto.SIZE_FORMAT) {
-            message.append("Format is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_FORMAT + "\n");
+            message.append("Format is langer dan toegestaan. Max aantal karakters: ").append(IPhoto.SIZE_FORMAT).append("\n");
         }
         if(photo.getFormat()==null) {
             message.append("Format mag niet leeg zijn.\n");
         }
         if(photo.getDescription()!=null && photo.getDescription().length()>IPhoto.SIZE_DESCRIPTION) {
-            message.append("Description is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_DESCRIPTION + "\n");
+            message.append("Description is langer dan toegestaan. Max aantal karakters: ").append(IPhoto.SIZE_DESCRIPTION).append("\n");
         }
         if(photo.getReversegeocode()!=null && photo.getReversegeocode().length()>IPhoto.SIZE_REVERSEGEOCODE) {
-            message.append("Reversegeocode is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_REVERSEGEOCODE + "\n");
+            message.append("Reversegeocode is langer dan toegestaan. Max aantal karakters: ").append(IPhoto.SIZE_REVERSEGEOCODE).append("\n");
         }
         if(photo.getStreetnumber()!=null && photo.getStreetnumber().length()>IPhoto.SIZE_STREETNUMBER) {
-            message.append("Streetnumber is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_STREETNUMBER + "\n");
+            message.append("Streetnumber is langer dan toegestaan. Max aantal karakters: ").append(IPhoto.SIZE_STREETNUMBER).append("\n");
         }
         if(photo.getFormattedaddress()!=null && photo.getFormattedaddress().length()>IPhoto.SIZE_FORMATTEDADDRESS) {
-            message.append("Formattedaddress is langer dan toegestaan. Max aantal karakters: " + IPhoto.SIZE_FORMATTEDADDRESS + "\n");
+            message.append("Formattedaddress is langer dan toegestaan. Max aantal karakters: ").append(IPhoto.SIZE_FORMATTEDADDRESS).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -306,165 +263,150 @@ public abstract class Bphoto extends GeneralEntityObject implements ProjectConst
      * delete all records in tables where photoPK is used in a primary key
      * @param photoPK: Photo primary key
      */
-    public void cascadedeletePhoto(String senderobject, IPhotoPK photoPK) {
+    public void cascadedeletePhoto(IPhotoPK photoPK) {
         BLphototree7subject blphototree7subject = new BLphototree7subject(this);
-        blphototree7subject.delete4photo(senderobject, photoPK);
+        blphototree7subject.delete4photo(photoPK);
         BLart_photo blart_photo = new BLart_photo(this);
-        blart_photo.delete4photo(senderobject, photoPK);
+        blart_photo.delete4photo(photoPK);
         BLphotosubjects blphotosubjects = new BLphotosubjects(this);
-        blphotosubjects.delete4photo(senderobject, photoPK);
+        blphotosubjects.delete4photo(photoPK);
         BLphototags blphototags = new BLphototags(this);
-        blphototags.delete4photo(senderobject, photoPK);
+        blphototags.delete4photo(photoPK);
     }
 
     /**
      * @param routePK: foreign key for Route
      * @delete all Photo Entity objects for Route in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4route(String senderobject, IRoutePK routePK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Photo.SQLDelete4route, routePK.getKeyFields());
-        }
+    public void delete4route(IRoutePK routePK) {
+        super.addStatement(EMphoto.SQLDelete4route, routePK.getSQLprimarykey());
     }
 
     /**
      * @param routePK: foreign key for Route
      * @return all Photo Entity objects for Route
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getPhotos4route(IRoutePK routePK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Photo.SQLSelect4route, routePK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Photo> getPhotos4route(IRoutePK routePK) throws CustomException {
+        return super.getEntities(EMphoto.SQLSelect4route, routePK.getSQLprimarykey());
     }
     /**
      * @param creatorPK: foreign key for Creator
      * @delete all Photo Entity objects for Creator in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4creator(String senderobject, ICreatorPK creatorPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Photo.SQLDelete4creator, creatorPK.getKeyFields());
-        }
+    public void delete4creator(ICreatorPK creatorPK) {
+        super.addStatement(EMphoto.SQLDelete4creator, creatorPK.getSQLprimarykey());
     }
 
     /**
      * @param creatorPK: foreign key for Creator
      * @return all Photo Entity objects for Creator
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getPhotos4creator(ICreatorPK creatorPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Photo.SQLSelect4creator, creatorPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Photo> getPhotos4creator(ICreatorPK creatorPK) throws CustomException {
+        return super.getEntities(EMphoto.SQLSelect4creator, creatorPK.getSQLprimarykey());
     }
     /**
      * @param filmPK: foreign key for Film
      * @delete all Photo Entity objects for Film in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4film(String senderobject, IFilmPK filmPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Photo.SQLDelete4film, filmPK.getKeyFields());
-        }
+    public void delete4film(IFilmPK filmPK) {
+        super.addStatement(EMphoto.SQLDelete4film, filmPK.getSQLprimarykey());
     }
 
     /**
      * @param filmPK: foreign key for Film
      * @return all Photo Entity objects for Film
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getPhotos4film(IFilmPK filmPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Photo.SQLSelect4film, filmPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Photo> getPhotos4film(IFilmPK filmPK) throws CustomException {
+        return super.getEntities(EMphoto.SQLSelect4film, filmPK.getSQLprimarykey());
     }
     /**
      * @param phototree7subjectPK: parent Phototree7subject for child object Photo Entity
      * @return child Photo Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public IPhoto getPhototree7subject(IPhototree7subjectPK phototree7subjectPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            PhotoPK photoPK = new PhotoPK(phototree7subjectPK.getFilm(), phototree7subjectPK.getId());
-            return this.getPhoto(photoPK);
-        } else return null;
+    public Photo getPhototree7subject(IPhototree7subjectPK phototree7subjectPK) throws CustomException {
+        PhotoPK photoPK = new PhotoPK(phototree7subjectPK.getFilm(), phototree7subjectPK.getId());
+        return this.getPhoto(photoPK);
     }
 
     /**
      * @param art_photoPK: parent Art_photo for child object Photo Entity
      * @return child Photo Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public IPhoto getArt_photo(IArt_photoPK art_photoPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            PhotoPK photoPK = new PhotoPK(art_photoPK.getFilm(), art_photoPK.getPhoto());
-            return this.getPhoto(photoPK);
-        } else return null;
+    public Photo getArt_photo(IArt_photoPK art_photoPK) throws CustomException {
+        PhotoPK photoPK = new PhotoPK(art_photoPK.getFilm(), art_photoPK.getPhoto());
+        return this.getPhoto(photoPK);
     }
 
     /**
      * @param photosubjectsPK: parent Photosubjects for child object Photo Entity
      * @return child Photo Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public IPhoto getPhotosubjects(IPhotosubjectsPK photosubjectsPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            PhotoPK photoPK = new PhotoPK(photosubjectsPK.getFilm(), photosubjectsPK.getId());
-            return this.getPhoto(photoPK);
-        } else return null;
+    public Photo getPhotosubjects(IPhotosubjectsPK photosubjectsPK) throws CustomException {
+        PhotoPK photoPK = new PhotoPK(photosubjectsPK.getFilm(), photosubjectsPK.getId());
+        return this.getPhoto(photoPK);
     }
 
     /**
      * @param phototagsPK: parent Phototags for child object Photo Entity
      * @return child Photo Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public IPhoto getPhototags(IPhototagsPK phototagsPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            PhotoPK photoPK = new PhotoPK(phototagsPK.getFilm(), phototagsPK.getId());
-            return this.getPhoto(photoPK);
-        } else return null;
+    public Photo getPhototags(IPhototagsPK phototagsPK) throws CustomException {
+        PhotoPK photoPK = new PhotoPK(phototagsPK.getFilm(), phototagsPK.getId());
+        return this.getPhoto(photoPK);
     }
 
 
     /**
      * get all Photo objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Photo objects
      * @throws DBException
      */
-    public ArrayList getPhotos(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Photo.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Photo> getPhotos(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMphoto.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Photo>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Photo objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delPhoto(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Photo.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delPhoto(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Photo.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

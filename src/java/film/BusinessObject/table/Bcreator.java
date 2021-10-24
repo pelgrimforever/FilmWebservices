@@ -2,23 +2,25 @@
  * Bcreator.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONCreator;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMcreator;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bcreator
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bcreator extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bcreator extends BLtable {
 
     /**
      * Constructor, sets Creator as default Entity
      */
     public Bcreator() {
-        super(new SQLMapper_pgsql(connectionpool, "Creator"), new Creator());
+        super(new Creator(), new EMcreator());
     }
 
     /**
@@ -56,32 +60,8 @@ public abstract class Bcreator extends GeneralEntityObject implements ProjectCon
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bcreator(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Creator());
-    }
-
-    /**
-     * Map ResultSet Field values to Creator
-     * @param dbresult: Database ResultSet
-     */
-    public Creator mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        CreatorPK creatorPK = null;
-        Creator creator;
-        if(dbresult==null) {
-            creator = new Creator(creatorPK);
-        } else {
-            try {
-                creatorPK = new CreatorPK(dbresult.getString("creatorid"));
-                creator = new Creator(creatorPK);
-                creator.initName(dbresult.getString("name"));
-                creator.initSurname(dbresult.getString("surname"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, creator);
-        return creator;
+    public Bcreator(BLtable transactionobject) {
+        super(transactionobject, new Creator(), new EMcreator());
     }
 
     /**
@@ -95,6 +75,7 @@ public abstract class Bcreator extends GeneralEntityObject implements ProjectCon
     /**
      * create new empty Creator object
      * create new primary key with given parameters
+     * @param creatorid primary key field
      * @return ICreator with primary key
      */
     public ICreator newCreator(java.lang.String creatorid) {
@@ -120,6 +101,7 @@ public abstract class Bcreator extends GeneralEntityObject implements ProjectCon
 
     /**
      * create new primary key with given parameters
+     * @param creatorid primary key field
      * @return new ICreatorPK
      */
     public ICreatorPK newCreatorPK(java.lang.String creatorid) {
@@ -131,10 +113,8 @@ public abstract class Bcreator extends GeneralEntityObject implements ProjectCon
      * @return ArrayList of Creator objects
      * @throws DBException
      */
-    public ArrayList getCreators() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Creator.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Creator> getCreators() throws DBException {
+        return (ArrayList<Creator>)super.getEntities(EMcreator.SQLSelectAll);
     }
 
     /**
@@ -144,21 +124,28 @@ public abstract class Bcreator extends GeneralEntityObject implements ProjectCon
      * @throws DBException
      */
     public Creator getCreator(ICreatorPK creatorPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Creator)super.getEntity((CreatorPK)creatorPK);
-        } else return null;
+        return (Creator)super.getEntity((CreatorPK)creatorPK);
     }
 
-    public ArrayList searchcreators(ICreatorsearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search creator with ICreatorsearch parameters
+     * @param search ICreatorsearch
+     * @return ArrayList of Creator
+     * @throws DBException 
+     */
+    public ArrayList<Creator> searchcreators(ICreatorsearch search) throws DBException {
+        return (ArrayList<Creator>)this.search(search);
     }
 
-    public ArrayList searchcreators(ICreatorsearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search creator with ICreatorsearch parameters, order by orderby sql clause
+     * @param search ICreatorsearch
+     * @param orderby sql order by string
+     * @return ArrayList of Creator
+     * @throws DBException 
+     */
+    public ArrayList<Creator> searchcreators(ICreatorsearch search, String orderby) throws DBException {
+        return (ArrayList<Creator>)this.search(search, orderby);
     }
 
     /**
@@ -168,28 +155,26 @@ public abstract class Bcreator extends GeneralEntityObject implements ProjectCon
      * @throws DBException
      */
     public boolean getCreatorExists(ICreatorPK creatorPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((CreatorPK)creatorPK);
-        } else return false;
+        return super.getEntityExists((CreatorPK)creatorPK);
     }
 
     /**
      * try to insert Creator in database
-     * @param film: Creator object
+     * @param creator Creator object
      * @throws DBException
+     * @throws DataException
      */
     public void insertCreator(ICreator creator) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(creator);
-        }
+        super.insertEntity(creator);
     }
 
     /**
      * check if CreatorPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Creator object
+     * @param creator Creator object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateCreator(ICreator creator) throws DBException, DataException {
         if(this.getCreatorExists(creator.getPrimaryKey())) {
@@ -201,30 +186,27 @@ public abstract class Bcreator extends GeneralEntityObject implements ProjectCon
 
     /**
      * try to update Creator in database
-     * @param film: Creator object
+     * @param creator Creator object
      * @throws DBException
+     * @throws DataException
      */
     public void updateCreator(ICreator creator) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(creator);
-        }
+        super.updateEntity(creator);
     }
 
     /**
      * try to delete Creator in database
-     * @param film: Creator object
+     * @param creator Creator object
      * @throws DBException
      */
     public void deleteCreator(ICreator creator) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteCreator(creator.getOwnerobject(), creator.getPrimaryKey());
-            super.deleteEntity(creator);
-        }
+        cascadedeleteCreator(creator.getPrimaryKey());
+        super.deleteEntity(creator);
     }
 
     /**
      * check data rules in Creator, throw DataException with customized message if rules do not apply
-     * @param film: Creator object
+     * @param creator Creator object
      * @throws DataException
      * @throws DBException
      */
@@ -232,10 +214,10 @@ public abstract class Bcreator extends GeneralEntityObject implements ProjectCon
         StringBuffer message = new StringBuffer();
         //Primary key
         if(creator.getName()!=null && creator.getName().length()>ICreator.SIZE_NAME) {
-            message.append("Name is langer dan toegestaan. Max aantal karakters: " + ICreator.SIZE_NAME + "\n");
+            message.append("Name is langer dan toegestaan. Max aantal karakters: ").append(ICreator.SIZE_NAME).append("\n");
         }
         if(creator.getSurname()!=null && creator.getSurname().length()>ICreator.SIZE_SURNAME) {
-            message.append("Surname is langer dan toegestaan. Max aantal karakters: " + ICreator.SIZE_SURNAME + "\n");
+            message.append("Surname is langer dan toegestaan. Max aantal karakters: ").append(ICreator.SIZE_SURNAME).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -246,46 +228,54 @@ public abstract class Bcreator extends GeneralEntityObject implements ProjectCon
      * delete all records in tables where creatorPK is used in a primary key
      * @param creatorPK: Creator primary key
      */
-    public void cascadedeleteCreator(String senderobject, ICreatorPK creatorPK) {
+    public void cascadedeleteCreator(ICreatorPK creatorPK) {
     }
 
 
     /**
      * get all Creator objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Creator objects
      * @throws DBException
      */
-    public ArrayList getCreators(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Creator.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Creator> getCreators(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMcreator.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Creator>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Creator objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delCreator(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Creator.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delCreator(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Creator.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

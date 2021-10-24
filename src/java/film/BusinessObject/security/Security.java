@@ -12,8 +12,6 @@ import film.BusinessObject.Logic.BLsecurityprofile;
 import general.exception.DBException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import sitesecurity.BusinessObject.Logic.BLsitegroup;
-import sitesecurity.BusinessObject.Logic.BLsiteuser;
 import sitesecurity.entity.pk.SiteuserPK;
 import sitesecurity.logicentity.Siteuser;
 
@@ -24,8 +22,6 @@ import sitesecurity.logicentity.Siteuser;
 public class Security {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 
-    private BLsiteuser blsiteuser = new BLsiteuser();
-    private BLsitegroup blgroup = new BLsitegroup();
     private BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
     
     public Security() {
@@ -33,28 +29,18 @@ public class Security {
 
     public boolean check(String siteusername, String password) throws DBException {
         boolean authenticated = false;
-        try {
-            if(siteusername!=null && siteusername.length()>0) {
-                Siteuser siteuser = blsiteuser.getSiteuser(new SiteuserPK(siteusername));
-                if(siteuser!=null && !siteuser.isEmpty()) {
-                    authenticated = siteuser.getUserpassword().equals(password);
-                }
+/*        if(siteusername!=null && siteusername.length()>0) {
+            Siteuser siteuser = blsiteuser.getSiteuser(new SiteuserPK(siteusername));
+            if(siteuser!=null && !siteuser.isEmpty()) {
+                authenticated = siteuser.getUserpassword().equals(password);
             }
-        }
-        catch(DBException sitesecurityDBException) {
-            throw new DBException(sitesecurityDBException);
-        }
+        }*/
         return authenticated;
     }
 
     public ArrayList getGroups(String siteusername) throws DBException {
         ArrayList groups = new ArrayList();
-        try {
-            groups = blgroup.getSitegroups(new SiteuserPK(siteusername));
-        }
-        catch(DBException sitesecurityDBException) {
-            throw new DBException(sitesecurityDBException);
-        }
+        //groups = blgroup.getSitegroups(new SiteuserPK(siteusername));
         return groups;
     }
 

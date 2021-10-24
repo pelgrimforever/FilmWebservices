@@ -2,23 +2,25 @@
  * Bphotosubjects.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONPhotosubjects;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMphotosubjects;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bphotosubjects
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bphotosubjects extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bphotosubjects extends BLtable {
 
     /**
      * Constructor, sets Photosubjects as default Entity
      */
     public Bphotosubjects() {
-        super(new SQLMapper_pgsql(connectionpool, "Photosubjects"), new Photosubjects());
+        super(new Photosubjects(), new EMphotosubjects());
     }
 
     /**
@@ -56,30 +60,8 @@ public abstract class Bphotosubjects extends GeneralEntityObject implements Proj
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bphotosubjects(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Photosubjects());
-    }
-
-    /**
-     * Map ResultSet Field values to Photosubjects
-     * @param dbresult: Database ResultSet
-     */
-    public Photosubjects mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        PhotosubjectsPK photosubjectsPK = null;
-        Photosubjects photosubjects;
-        if(dbresult==null) {
-            photosubjects = new Photosubjects(photosubjectsPK);
-        } else {
-            try {
-                photosubjectsPK = new PhotosubjectsPK(dbresult.getString("film"), dbresult.getInt("id"), dbresult.getString("cat1"), dbresult.getString("cat2"), dbresult.getInt("subject"));
-                photosubjects = new Photosubjects(photosubjectsPK);
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, photosubjects);
-        return photosubjects;
+    public Bphotosubjects(BLtable transactionobject) {
+        super(transactionobject, new Photosubjects(), new EMphotosubjects());
     }
 
     /**
@@ -93,6 +75,11 @@ public abstract class Bphotosubjects extends GeneralEntityObject implements Proj
     /**
      * create new empty Photosubjects object
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param id primary key field
+     * @param cat1 primary key field
+     * @param cat2 primary key field
+     * @param subject primary key field
      * @return IPhotosubjects with primary key
      */
     public IPhotosubjects newPhotosubjects(java.lang.String film, int id, java.lang.String cat1, java.lang.String cat2, int subject) {
@@ -118,6 +105,11 @@ public abstract class Bphotosubjects extends GeneralEntityObject implements Proj
 
     /**
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param id primary key field
+     * @param cat1 primary key field
+     * @param cat2 primary key field
+     * @param subject primary key field
      * @return new IPhotosubjectsPK
      */
     public IPhotosubjectsPK newPhotosubjectsPK(java.lang.String film, int id, java.lang.String cat1, java.lang.String cat2, int subject) {
@@ -129,10 +121,8 @@ public abstract class Bphotosubjects extends GeneralEntityObject implements Proj
      * @return ArrayList of Photosubjects objects
      * @throws DBException
      */
-    public ArrayList getPhotosubjectss() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Photosubjects.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Photosubjects> getPhotosubjectss() throws DBException {
+        return (ArrayList<Photosubjects>)super.getEntities(EMphotosubjects.SQLSelectAll);
     }
 
     /**
@@ -142,21 +132,28 @@ public abstract class Bphotosubjects extends GeneralEntityObject implements Proj
      * @throws DBException
      */
     public Photosubjects getPhotosubjects(IPhotosubjectsPK photosubjectsPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Photosubjects)super.getEntity((PhotosubjectsPK)photosubjectsPK);
-        } else return null;
+        return (Photosubjects)super.getEntity((PhotosubjectsPK)photosubjectsPK);
     }
 
-    public ArrayList searchphotosubjectss(IPhotosubjectssearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search photosubjects with IPhotosubjectssearch parameters
+     * @param search IPhotosubjectssearch
+     * @return ArrayList of Photosubjects
+     * @throws DBException 
+     */
+    public ArrayList<Photosubjects> searchphotosubjectss(IPhotosubjectssearch search) throws DBException {
+        return (ArrayList<Photosubjects>)this.search(search);
     }
 
-    public ArrayList searchphotosubjectss(IPhotosubjectssearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search photosubjects with IPhotosubjectssearch parameters, order by orderby sql clause
+     * @param search IPhotosubjectssearch
+     * @param orderby sql order by string
+     * @return ArrayList of Photosubjects
+     * @throws DBException 
+     */
+    public ArrayList<Photosubjects> searchphotosubjectss(IPhotosubjectssearch search, String orderby) throws DBException {
+        return (ArrayList<Photosubjects>)this.search(search, orderby);
     }
 
     /**
@@ -166,28 +163,26 @@ public abstract class Bphotosubjects extends GeneralEntityObject implements Proj
      * @throws DBException
      */
     public boolean getPhotosubjectsExists(IPhotosubjectsPK photosubjectsPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((PhotosubjectsPK)photosubjectsPK);
-        } else return false;
+        return super.getEntityExists((PhotosubjectsPK)photosubjectsPK);
     }
 
     /**
      * try to insert Photosubjects in database
-     * @param film: Photosubjects object
+     * @param photosubjects Photosubjects object
      * @throws DBException
+     * @throws DataException
      */
     public void insertPhotosubjects(IPhotosubjects photosubjects) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(photosubjects);
-        }
+        super.insertEntity(photosubjects);
     }
 
     /**
      * check if PhotosubjectsPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Photosubjects object
+     * @param photosubjects Photosubjects object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdatePhotosubjects(IPhotosubjects photosubjects) throws DBException, DataException {
         if(this.getPhotosubjectsExists(photosubjects.getPrimaryKey())) {
@@ -199,30 +194,27 @@ public abstract class Bphotosubjects extends GeneralEntityObject implements Proj
 
     /**
      * try to update Photosubjects in database
-     * @param film: Photosubjects object
+     * @param photosubjects Photosubjects object
      * @throws DBException
+     * @throws DataException
      */
     public void updatePhotosubjects(IPhotosubjects photosubjects) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(photosubjects);
-        }
+        super.updateEntity(photosubjects);
     }
 
     /**
      * try to delete Photosubjects in database
-     * @param film: Photosubjects object
+     * @param photosubjects Photosubjects object
      * @throws DBException
      */
     public void deletePhotosubjects(IPhotosubjects photosubjects) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeletePhotosubjects(photosubjects.getOwnerobject(), photosubjects.getPrimaryKey());
-            super.deleteEntity(photosubjects);
-        }
+        cascadedeletePhotosubjects(photosubjects.getPrimaryKey());
+        super.deleteEntity(photosubjects);
     }
 
     /**
      * check data rules in Photosubjects, throw DataException with customized message if rules do not apply
-     * @param film: Photosubjects object
+     * @param photosubjects Photosubjects object
      * @throws DataException
      * @throws DBException
      */
@@ -242,88 +234,86 @@ public abstract class Bphotosubjects extends GeneralEntityObject implements Proj
      * delete all records in tables where photosubjectsPK is used in a primary key
      * @param photosubjectsPK: Photosubjects primary key
      */
-    public void cascadedeletePhotosubjects(String senderobject, IPhotosubjectsPK photosubjectsPK) {
+    public void cascadedeletePhotosubjects(IPhotosubjectsPK photosubjectsPK) {
     }
 
     /**
      * @param photoPK: foreign key for Photo
      * @delete all Photosubjects Entity objects for Photo in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4photo(String senderobject, IPhotoPK photoPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Photosubjects.SQLDelete4photo, photoPK.getKeyFields());
-        }
+    public void delete4photo(IPhotoPK photoPK) {
+        super.addStatement(EMphotosubjects.SQLDelete4photo, photoPK.getSQLprimarykey());
     }
 
     /**
      * @param photoPK: foreign key for Photo
      * @return all Photosubjects Entity objects for Photo
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getPhotosubjectss4photo(IPhotoPK photoPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Photosubjects.SQLSelect4photo, photoPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Photosubjects> getPhotosubjectss4photo(IPhotoPK photoPK) throws CustomException {
+        return super.getEntities(EMphotosubjects.SQLSelect4photo, photoPK.getSQLprimarykey());
     }
     /**
      * @param subjectPK: foreign key for Subject
      * @delete all Photosubjects Entity objects for Subject in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4subject(String senderobject, ISubjectPK subjectPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Photosubjects.SQLDelete4subject, subjectPK.getKeyFields());
-        }
+    public void delete4subject(ISubjectPK subjectPK) {
+        super.addStatement(EMphotosubjects.SQLDelete4subject, subjectPK.getSQLprimarykey());
     }
 
     /**
      * @param subjectPK: foreign key for Subject
      * @return all Photosubjects Entity objects for Subject
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getPhotosubjectss4subject(ISubjectPK subjectPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Photosubjects.SQLSelect4subject, subjectPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Photosubjects> getPhotosubjectss4subject(ISubjectPK subjectPK) throws CustomException {
+        return super.getEntities(EMphotosubjects.SQLSelect4subject, subjectPK.getSQLprimarykey());
     }
 
     /**
      * get all Photosubjects objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Photosubjects objects
      * @throws DBException
      */
-    public ArrayList getPhotosubjectss(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Photosubjects.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Photosubjects> getPhotosubjectss(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMphotosubjects.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Photosubjects>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Photosubjects objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delPhotosubjects(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Photosubjects.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delPhotosubjects(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Photosubjects.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

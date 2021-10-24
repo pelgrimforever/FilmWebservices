@@ -2,19 +2,17 @@
  * Braster_overviews.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.view;
 
-import BusinessObject.GeneralViewObject;
+import BusinessObject.BLview;
+import db.SQLMapperFactory;
 import data.gis.shape.*;
 import db.SQLMapper_pgsql;
-import film.data.ProjectConstants;
-import db.ArchiveViewMapper;
-import db.ViewMapper;
-import db.ViewMapperInterface;
+import film.conversion.entity.EMraster_overviews;
 import general.exception.*;
 import java.util.ArrayList;
 import film.logicview.Raster_overviews;
@@ -34,39 +32,13 @@ import org.postgis.PGgeometry;
  *
  * @author Franky Laseure
  */
-public abstract class Braster_overviews extends GeneralViewObject implements ProjectConstants {
+public abstract class Braster_overviews extends BLview {
 
     /**
      * Constructor, sets Raster_overviews as default Entity
      */
     public Braster_overviews() {
-        super(new SQLMapper_pgsql(connectionpool, "Raster_overviews"), new Raster_overviews());
-    }
-
-    /**
-     * Map ResultSet Field values to Raster_overviews
-     * @param dbresult: Database ResultSet
-     */
-    public Raster_overviews mapResultSet2View(ResultSet dbresult) throws SQLException {
-        Raster_overviews raster_overviews = new Raster_overviews();
-        if(dbresult!=null) {
-            try {
-                raster_overviews.setO_table_catalog(dbresult.getString("o_table_catalog"));
-                raster_overviews.setO_table_schema(dbresult.getString("o_table_schema"));
-                raster_overviews.setO_table_name(dbresult.getString("o_table_name"));
-                raster_overviews.setO_raster_column(dbresult.getString("o_raster_column"));
-                raster_overviews.setR_table_catalog(dbresult.getString("r_table_catalog"));
-                raster_overviews.setR_table_schema(dbresult.getString("r_table_schema"));
-                raster_overviews.setR_table_name(dbresult.getString("r_table_name"));
-                raster_overviews.setR_raster_column(dbresult.getString("r_raster_column"));
-                raster_overviews.setOverview_factor(dbresult.getInt("overview_factor"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, raster_overviews);
-        return raster_overviews;
+        super(new Raster_overviews(), new EMraster_overviews());
     }
 
     /**
@@ -74,7 +46,7 @@ public abstract class Braster_overviews extends GeneralViewObject implements Pro
      * @return ArrayList of Raster_overviews objects
      * @throws DBException
      */
-    public ArrayList getRaster_overviewss() throws DBException {
-        return getMapper().loadViewVector(this, Raster_overviews.SQLSelectAll);
+    public ArrayList<Raster_overviews> getRaster_overviewss() throws DBException {
+        return getEntities(EMraster_overviews.SQLSelectAll);
     }
 }

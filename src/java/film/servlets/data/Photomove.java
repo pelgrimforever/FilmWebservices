@@ -5,7 +5,7 @@
  */
 package film.servlets.data;
 
-import static BusinessObject.GeneralObject.FILEROOT;
+import static BusinessObject.BusinessLogic.FILEROOT;
 import film.BusinessObject.Logic.BLfilm;
 import film.BusinessObject.Logic.BLphoto;
 import static film.BusinessObject.Logic.BLphoto.CROPPEDPATH;

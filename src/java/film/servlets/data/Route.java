@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Route.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -110,7 +110,7 @@ public class Route extends SecurityDataServlet {
                             break;
                         case IRouteOperation.DELETE_Sublocality:
                             ISublocalityPK sublocalityPK = (ISublocalityPK)parser.getJavaObject("sublocalitypk");
-                            blroute.delete4sublocality(this.getServletName(), sublocalityPK);
+                            blroute.delete4sublocality(sublocalityPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

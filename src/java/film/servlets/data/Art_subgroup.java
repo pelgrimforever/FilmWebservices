@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Art_subgroup.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -110,7 +110,7 @@ public class Art_subgroup extends SecurityDataServlet {
                             break;
                         case IArt_subgroupOperation.DELETE_Art_group:
                             IArt_groupPK art_groupPK = (IArt_groupPK)parser.getJavaObject("art_grouppk");
-                            blart_subgroup.delete4art_group(this.getServletName(), art_groupPK);
+                            blart_subgroup.delete4art_group(art_groupPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

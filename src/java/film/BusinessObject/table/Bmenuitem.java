@@ -2,23 +2,25 @@
  * Bmenuitem.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONMenuitem;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMmenuitem;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bmenuitem
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bmenuitem extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bmenuitem extends BLtable {
 
     /**
      * Constructor, sets Menuitem as default Entity
      */
     public Bmenuitem() {
-        super(new SQLMapper_pgsql(connectionpool, "Menuitem"), new Menuitem());
+        super(new Menuitem(), new EMmenuitem());
     }
 
     /**
@@ -56,33 +60,8 @@ public abstract class Bmenuitem extends GeneralEntityObject implements ProjectCo
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bmenuitem(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Menuitem());
-    }
-
-    /**
-     * Map ResultSet Field values to Menuitem
-     * @param dbresult: Database ResultSet
-     */
-    public Menuitem mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        MenuitemPK menuitemPK = null;
-        Menuitem menuitem;
-        if(dbresult==null) {
-            menuitem = new Menuitem(menuitemPK);
-        } else {
-            try {
-                menuitemPK = new MenuitemPK(dbresult.getString("mainmenu"), dbresult.getString("menu"), dbresult.getString("menuitem"));
-                menuitem = new Menuitem(menuitemPK);
-                menuitem.initTabpanel(dbresult.getString("tabpanel"));
-                menuitem.initEditpanel(dbresult.getString("editpanel"));
-                menuitem.initServlet(dbresult.getString("servlet"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, menuitem);
-        return menuitem;
+    public Bmenuitem(BLtable transactionobject) {
+        super(transactionobject, new Menuitem(), new EMmenuitem());
     }
 
     /**
@@ -96,6 +75,9 @@ public abstract class Bmenuitem extends GeneralEntityObject implements ProjectCo
     /**
      * create new empty Menuitem object
      * create new primary key with given parameters
+     * @param mainmenu primary key field
+     * @param menu primary key field
+     * @param menuitem primary key field
      * @return IMenuitem with primary key
      */
     public IMenuitem newMenuitem(java.lang.String mainmenu, java.lang.String menu, java.lang.String menuitem) {
@@ -121,6 +103,9 @@ public abstract class Bmenuitem extends GeneralEntityObject implements ProjectCo
 
     /**
      * create new primary key with given parameters
+     * @param mainmenu primary key field
+     * @param menu primary key field
+     * @param menuitem primary key field
      * @return new IMenuitemPK
      */
     public IMenuitemPK newMenuitemPK(java.lang.String mainmenu, java.lang.String menu, java.lang.String menuitem) {
@@ -132,10 +117,8 @@ public abstract class Bmenuitem extends GeneralEntityObject implements ProjectCo
      * @return ArrayList of Menuitem objects
      * @throws DBException
      */
-    public ArrayList getMenuitems() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Menuitem.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Menuitem> getMenuitems() throws DBException {
+        return (ArrayList<Menuitem>)super.getEntities(EMmenuitem.SQLSelectAll);
     }
 
     /**
@@ -145,21 +128,28 @@ public abstract class Bmenuitem extends GeneralEntityObject implements ProjectCo
      * @throws DBException
      */
     public Menuitem getMenuitem(IMenuitemPK menuitemPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Menuitem)super.getEntity((MenuitemPK)menuitemPK);
-        } else return null;
+        return (Menuitem)super.getEntity((MenuitemPK)menuitemPK);
     }
 
-    public ArrayList searchmenuitems(IMenuitemsearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search menuitem with IMenuitemsearch parameters
+     * @param search IMenuitemsearch
+     * @return ArrayList of Menuitem
+     * @throws DBException 
+     */
+    public ArrayList<Menuitem> searchmenuitems(IMenuitemsearch search) throws DBException {
+        return (ArrayList<Menuitem>)this.search(search);
     }
 
-    public ArrayList searchmenuitems(IMenuitemsearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search menuitem with IMenuitemsearch parameters, order by orderby sql clause
+     * @param search IMenuitemsearch
+     * @param orderby sql order by string
+     * @return ArrayList of Menuitem
+     * @throws DBException 
+     */
+    public ArrayList<Menuitem> searchmenuitems(IMenuitemsearch search, String orderby) throws DBException {
+        return (ArrayList<Menuitem>)this.search(search, orderby);
     }
 
     /**
@@ -169,28 +159,26 @@ public abstract class Bmenuitem extends GeneralEntityObject implements ProjectCo
      * @throws DBException
      */
     public boolean getMenuitemExists(IMenuitemPK menuitemPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((MenuitemPK)menuitemPK);
-        } else return false;
+        return super.getEntityExists((MenuitemPK)menuitemPK);
     }
 
     /**
      * try to insert Menuitem in database
-     * @param film: Menuitem object
+     * @param menuitem Menuitem object
      * @throws DBException
+     * @throws DataException
      */
     public void insertMenuitem(IMenuitem menuitem) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(menuitem);
-        }
+        super.insertEntity(menuitem);
     }
 
     /**
      * check if MenuitemPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Menuitem object
+     * @param menuitem Menuitem object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateMenuitem(IMenuitem menuitem) throws DBException, DataException {
         if(this.getMenuitemExists(menuitem.getPrimaryKey())) {
@@ -202,30 +190,27 @@ public abstract class Bmenuitem extends GeneralEntityObject implements ProjectCo
 
     /**
      * try to update Menuitem in database
-     * @param film: Menuitem object
+     * @param menuitem Menuitem object
      * @throws DBException
+     * @throws DataException
      */
     public void updateMenuitem(IMenuitem menuitem) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(menuitem);
-        }
+        super.updateEntity(menuitem);
     }
 
     /**
      * try to delete Menuitem in database
-     * @param film: Menuitem object
+     * @param menuitem Menuitem object
      * @throws DBException
      */
     public void deleteMenuitem(IMenuitem menuitem) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteMenuitem(menuitem.getOwnerobject(), menuitem.getPrimaryKey());
-            super.deleteEntity(menuitem);
-        }
+        cascadedeleteMenuitem(menuitem.getPrimaryKey());
+        super.deleteEntity(menuitem);
     }
 
     /**
      * check data rules in Menuitem, throw DataException with customized message if rules do not apply
-     * @param film: Menuitem object
+     * @param menuitem Menuitem object
      * @throws DataException
      * @throws DBException
      */
@@ -235,13 +220,13 @@ public abstract class Bmenuitem extends GeneralEntityObject implements ProjectCo
         //foreign key Menuitem.Menu - Menu.Menu
         //Primary key
         if(menuitem.getTabpanel()!=null && menuitem.getTabpanel().length()>IMenuitem.SIZE_TABPANEL) {
-            message.append("Tabpanel is langer dan toegestaan. Max aantal karakters: " + IMenuitem.SIZE_TABPANEL + "\n");
+            message.append("Tabpanel is langer dan toegestaan. Max aantal karakters: ").append(IMenuitem.SIZE_TABPANEL).append("\n");
         }
         if(menuitem.getEditpanel()!=null && menuitem.getEditpanel().length()>IMenuitem.SIZE_EDITPANEL) {
-            message.append("Editpanel is langer dan toegestaan. Max aantal karakters: " + IMenuitem.SIZE_EDITPANEL + "\n");
+            message.append("Editpanel is langer dan toegestaan. Max aantal karakters: ").append(IMenuitem.SIZE_EDITPANEL).append("\n");
         }
         if(menuitem.getServlet()!=null && menuitem.getServlet().length()>IMenuitem.SIZE_SERVLET) {
-            message.append("Servlet is langer dan toegestaan. Max aantal karakters: " + IMenuitem.SIZE_SERVLET + "\n");
+            message.append("Servlet is langer dan toegestaan. Max aantal karakters: ").append(IMenuitem.SIZE_SERVLET).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -252,67 +237,70 @@ public abstract class Bmenuitem extends GeneralEntityObject implements ProjectCo
      * delete all records in tables where menuitemPK is used in a primary key
      * @param menuitemPK: Menuitem primary key
      */
-    public void cascadedeleteMenuitem(String senderobject, IMenuitemPK menuitemPK) {
+    public void cascadedeleteMenuitem(IMenuitemPK menuitemPK) {
     }
 
     /**
      * @param menuPK: foreign key for Menu
      * @delete all Menuitem Entity objects for Menu in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4menu(String senderobject, IMenuPK menuPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Menuitem.SQLDelete4menu, menuPK.getKeyFields());
-        }
+    public void delete4menu(IMenuPK menuPK) {
+        super.addStatement(EMmenuitem.SQLDelete4menu, menuPK.getSQLprimarykey());
     }
 
     /**
      * @param menuPK: foreign key for Menu
      * @return all Menuitem Entity objects for Menu
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getMenuitems4menu(IMenuPK menuPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Menuitem.SQLSelect4menu, menuPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Menuitem> getMenuitems4menu(IMenuPK menuPK) throws CustomException {
+        return super.getEntities(EMmenuitem.SQLSelect4menu, menuPK.getSQLprimarykey());
     }
 
     /**
      * get all Menuitem objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Menuitem objects
      * @throws DBException
      */
-    public ArrayList getMenuitems(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Menuitem.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Menuitem> getMenuitems(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMmenuitem.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Menuitem>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Menuitem objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delMenuitem(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Menuitem.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delMenuitem(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Menuitem.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Subject.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -126,15 +126,15 @@ public class Subject extends SecurityDataServlet {
                             break;
                         case ISubjectOperation.DELETE_Subjectcatcat1:
                             ISubjectcatPK subjectcatCat1PK = (ISubjectcatPK)parser.getJavaObject("subjectcatpk");
-                            blsubject.delete4subjectcatCat1(this.getServletName(), subjectcatCat1PK);
+                            blsubject.delete4subjectcatCat1(subjectcatCat1PK);
                             break;
                         case ISubjectOperation.DELETE_Tree7subject:
                             ITree7subjectPK tree7subjectPK = (ITree7subjectPK)parser.getJavaObject("tree7subjectpk");
-                            blsubject.delete4tree7subject(this.getServletName(), tree7subjectPK);
+                            blsubject.delete4tree7subject(tree7subjectPK);
                             break;
                         case ISubjectOperation.DELETE_Subjectcatcat2:
                             ISubjectcatPK subjectcatCat2PK = (ISubjectcatPK)parser.getJavaObject("subjectcatpk");
-                            blsubject.delete4subjectcatCat2(this.getServletName(), subjectcatCat2PK);
+                            blsubject.delete4subjectcatCat2(subjectcatCat2PK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

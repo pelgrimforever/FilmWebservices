@@ -1,3 +1,11 @@
+/*
+ * WSPostalcode.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSPostalcode implements WSIPostalcode {
         Postalcode postalcode;
         try {
             IArealevel3PK arealevel3PK = JSONArealevel3.toArealevel3PK((JSONObject)parser.parse(json));
-            blpostalcode.delete4arealevel3(this.getClass().getName(), arealevel3PK);
+            blpostalcode.delete4arealevel3(arealevel3PK);
         }
         catch(ParseException e) {
         }

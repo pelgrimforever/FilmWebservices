@@ -2,23 +2,25 @@
  * Bart_group.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONArt_group;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMart_group;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bart_group
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bart_group extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bart_group extends BLtable {
 
     /**
      * Constructor, sets Art_group as default Entity
      */
     public Bart_group() {
-        super(new SQLMapper_pgsql(connectionpool, "Art_group"), new Art_group());
+        super(new Art_group(), new EMart_group());
     }
 
     /**
@@ -56,31 +60,8 @@ public abstract class Bart_group extends GeneralEntityObject implements ProjectC
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bart_group(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Art_group());
-    }
-
-    /**
-     * Map ResultSet Field values to Art_group
-     * @param dbresult: Database ResultSet
-     */
-    public Art_group mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        Art_groupPK art_groupPK = null;
-        Art_group art_group;
-        if(dbresult==null) {
-            art_group = new Art_group(art_groupPK);
-        } else {
-            try {
-                art_groupPK = new Art_groupPK(dbresult.getLong("groupid"));
-                art_group = new Art_group(art_groupPK);
-                art_group.initGroupname(dbresult.getString("groupname"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, art_group);
-        return art_group;
+    public Bart_group(BLtable transactionobject) {
+        super(transactionobject, new Art_group(), new EMart_group());
     }
 
     /**
@@ -94,6 +75,7 @@ public abstract class Bart_group extends GeneralEntityObject implements ProjectC
     /**
      * create new empty Art_group object
      * create new primary key with given parameters
+     * @param groupid primary key field
      * @return IArt_group with primary key
      */
     public IArt_group newArt_group(long groupid) {
@@ -119,6 +101,7 @@ public abstract class Bart_group extends GeneralEntityObject implements ProjectC
 
     /**
      * create new primary key with given parameters
+     * @param groupid primary key field
      * @return new IArt_groupPK
      */
     public IArt_groupPK newArt_groupPK(long groupid) {
@@ -130,10 +113,8 @@ public abstract class Bart_group extends GeneralEntityObject implements ProjectC
      * @return ArrayList of Art_group objects
      * @throws DBException
      */
-    public ArrayList getArt_groups() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Art_group.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Art_group> getArt_groups() throws DBException {
+        return (ArrayList<Art_group>)super.getEntities(EMart_group.SQLSelectAll);
     }
 
     /**
@@ -143,21 +124,28 @@ public abstract class Bart_group extends GeneralEntityObject implements ProjectC
      * @throws DBException
      */
     public Art_group getArt_group(IArt_groupPK art_groupPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Art_group)super.getEntity((Art_groupPK)art_groupPK);
-        } else return null;
+        return (Art_group)super.getEntity((Art_groupPK)art_groupPK);
     }
 
-    public ArrayList searchart_groups(IArt_groupsearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search art_group with IArt_groupsearch parameters
+     * @param search IArt_groupsearch
+     * @return ArrayList of Art_group
+     * @throws DBException 
+     */
+    public ArrayList<Art_group> searchart_groups(IArt_groupsearch search) throws DBException {
+        return (ArrayList<Art_group>)this.search(search);
     }
 
-    public ArrayList searchart_groups(IArt_groupsearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search art_group with IArt_groupsearch parameters, order by orderby sql clause
+     * @param search IArt_groupsearch
+     * @param orderby sql order by string
+     * @return ArrayList of Art_group
+     * @throws DBException 
+     */
+    public ArrayList<Art_group> searchart_groups(IArt_groupsearch search, String orderby) throws DBException {
+        return (ArrayList<Art_group>)this.search(search, orderby);
     }
 
     /**
@@ -167,28 +155,26 @@ public abstract class Bart_group extends GeneralEntityObject implements ProjectC
      * @throws DBException
      */
     public boolean getArt_groupExists(IArt_groupPK art_groupPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((Art_groupPK)art_groupPK);
-        } else return false;
+        return super.getEntityExists((Art_groupPK)art_groupPK);
     }
 
     /**
      * try to insert Art_group in database
-     * @param film: Art_group object
+     * @param art_group Art_group object
      * @throws DBException
+     * @throws DataException
      */
     public void insertArt_group(IArt_group art_group) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(art_group);
-        }
+        super.insertEntity(art_group);
     }
 
     /**
      * check if Art_groupPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Art_group object
+     * @param art_group Art_group object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateArt_group(IArt_group art_group) throws DBException, DataException {
         if(this.getArt_groupExists(art_group.getPrimaryKey())) {
@@ -200,30 +186,27 @@ public abstract class Bart_group extends GeneralEntityObject implements ProjectC
 
     /**
      * try to update Art_group in database
-     * @param film: Art_group object
+     * @param art_group Art_group object
      * @throws DBException
+     * @throws DataException
      */
     public void updateArt_group(IArt_group art_group) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(art_group);
-        }
+        super.updateEntity(art_group);
     }
 
     /**
      * try to delete Art_group in database
-     * @param film: Art_group object
+     * @param art_group Art_group object
      * @throws DBException
      */
     public void deleteArt_group(IArt_group art_group) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteArt_group(art_group.getOwnerobject(), art_group.getPrimaryKey());
-            super.deleteEntity(art_group);
-        }
+        cascadedeleteArt_group(art_group.getPrimaryKey());
+        super.deleteEntity(art_group);
     }
 
     /**
      * check data rules in Art_group, throw DataException with customized message if rules do not apply
-     * @param film: Art_group object
+     * @param art_group Art_group object
      * @throws DataException
      * @throws DBException
      */
@@ -231,7 +214,7 @@ public abstract class Bart_group extends GeneralEntityObject implements ProjectC
         StringBuffer message = new StringBuffer();
         //Primary key
         if(art_group.getGroupname()!=null && art_group.getGroupname().length()>IArt_group.SIZE_GROUPNAME) {
-            message.append("Groupname is langer dan toegestaan. Max aantal karakters: " + IArt_group.SIZE_GROUPNAME + "\n");
+            message.append("Groupname is langer dan toegestaan. Max aantal karakters: ").append(IArt_group.SIZE_GROUPNAME).append("\n");
         }
         if(art_group.getGroupname()==null) {
             message.append("Groupname mag niet leeg zijn.\n");
@@ -245,46 +228,54 @@ public abstract class Bart_group extends GeneralEntityObject implements ProjectC
      * delete all records in tables where art_groupPK is used in a primary key
      * @param art_groupPK: Art_group primary key
      */
-    public void cascadedeleteArt_group(String senderobject, IArt_groupPK art_groupPK) {
+    public void cascadedeleteArt_group(IArt_groupPK art_groupPK) {
     }
 
 
     /**
      * get all Art_group objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Art_group objects
      * @throws DBException
      */
-    public ArrayList getArt_groups(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Art_group.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Art_group> getArt_groups(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMart_group.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Art_group>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Art_group objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delArt_group(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Art_group.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delArt_group(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Art_group.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

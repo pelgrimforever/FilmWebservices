@@ -2,23 +2,25 @@
  * Bmainmenu.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONMainmenu;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMmainmenu;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bmainmenu
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bmainmenu extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bmainmenu extends BLtable {
 
     /**
      * Constructor, sets Mainmenu as default Entity
      */
     public Bmainmenu() {
-        super(new SQLMapper_pgsql(connectionpool, "Mainmenu"), new Mainmenu());
+        super(new Mainmenu(), new EMmainmenu());
     }
 
     /**
@@ -56,32 +60,8 @@ public abstract class Bmainmenu extends GeneralEntityObject implements ProjectCo
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bmainmenu(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Mainmenu());
-    }
-
-    /**
-     * Map ResultSet Field values to Mainmenu
-     * @param dbresult: Database ResultSet
-     */
-    public Mainmenu mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        MainmenuPK mainmenuPK = null;
-        Mainmenu mainmenu;
-        if(dbresult==null) {
-            mainmenu = new Mainmenu(mainmenuPK);
-        } else {
-            try {
-                mainmenuPK = new MainmenuPK(dbresult.getString("mainmenu"));
-                mainmenu = new Mainmenu(mainmenuPK);
-                mainmenu.initPopuplabel(dbresult.getString("popuplabel"));
-                mainmenu.initIcon(dbresult.getString("icon"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, mainmenu);
-        return mainmenu;
+    public Bmainmenu(BLtable transactionobject) {
+        super(transactionobject, new Mainmenu(), new EMmainmenu());
     }
 
     /**
@@ -95,6 +75,7 @@ public abstract class Bmainmenu extends GeneralEntityObject implements ProjectCo
     /**
      * create new empty Mainmenu object
      * create new primary key with given parameters
+     * @param mainmenu primary key field
      * @return IMainmenu with primary key
      */
     public IMainmenu newMainmenu(java.lang.String mainmenu) {
@@ -120,6 +101,7 @@ public abstract class Bmainmenu extends GeneralEntityObject implements ProjectCo
 
     /**
      * create new primary key with given parameters
+     * @param mainmenu primary key field
      * @return new IMainmenuPK
      */
     public IMainmenuPK newMainmenuPK(java.lang.String mainmenu) {
@@ -131,10 +113,8 @@ public abstract class Bmainmenu extends GeneralEntityObject implements ProjectCo
      * @return ArrayList of Mainmenu objects
      * @throws DBException
      */
-    public ArrayList getMainmenus() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Mainmenu.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Mainmenu> getMainmenus() throws DBException {
+        return (ArrayList<Mainmenu>)super.getEntities(EMmainmenu.SQLSelectAll);
     }
 
     /**
@@ -144,21 +124,28 @@ public abstract class Bmainmenu extends GeneralEntityObject implements ProjectCo
      * @throws DBException
      */
     public Mainmenu getMainmenu(IMainmenuPK mainmenuPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Mainmenu)super.getEntity((MainmenuPK)mainmenuPK);
-        } else return null;
+        return (Mainmenu)super.getEntity((MainmenuPK)mainmenuPK);
     }
 
-    public ArrayList searchmainmenus(IMainmenusearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search mainmenu with IMainmenusearch parameters
+     * @param search IMainmenusearch
+     * @return ArrayList of Mainmenu
+     * @throws DBException 
+     */
+    public ArrayList<Mainmenu> searchmainmenus(IMainmenusearch search) throws DBException {
+        return (ArrayList<Mainmenu>)this.search(search);
     }
 
-    public ArrayList searchmainmenus(IMainmenusearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search mainmenu with IMainmenusearch parameters, order by orderby sql clause
+     * @param search IMainmenusearch
+     * @param orderby sql order by string
+     * @return ArrayList of Mainmenu
+     * @throws DBException 
+     */
+    public ArrayList<Mainmenu> searchmainmenus(IMainmenusearch search, String orderby) throws DBException {
+        return (ArrayList<Mainmenu>)this.search(search, orderby);
     }
 
     /**
@@ -168,28 +155,26 @@ public abstract class Bmainmenu extends GeneralEntityObject implements ProjectCo
      * @throws DBException
      */
     public boolean getMainmenuExists(IMainmenuPK mainmenuPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((MainmenuPK)mainmenuPK);
-        } else return false;
+        return super.getEntityExists((MainmenuPK)mainmenuPK);
     }
 
     /**
      * try to insert Mainmenu in database
-     * @param film: Mainmenu object
+     * @param mainmenu Mainmenu object
      * @throws DBException
+     * @throws DataException
      */
     public void insertMainmenu(IMainmenu mainmenu) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(mainmenu);
-        }
+        super.insertEntity(mainmenu);
     }
 
     /**
      * check if MainmenuPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Mainmenu object
+     * @param mainmenu Mainmenu object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateMainmenu(IMainmenu mainmenu) throws DBException, DataException {
         if(this.getMainmenuExists(mainmenu.getPrimaryKey())) {
@@ -201,30 +186,27 @@ public abstract class Bmainmenu extends GeneralEntityObject implements ProjectCo
 
     /**
      * try to update Mainmenu in database
-     * @param film: Mainmenu object
+     * @param mainmenu Mainmenu object
      * @throws DBException
+     * @throws DataException
      */
     public void updateMainmenu(IMainmenu mainmenu) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(mainmenu);
-        }
+        super.updateEntity(mainmenu);
     }
 
     /**
      * try to delete Mainmenu in database
-     * @param film: Mainmenu object
+     * @param mainmenu Mainmenu object
      * @throws DBException
      */
     public void deleteMainmenu(IMainmenu mainmenu) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteMainmenu(mainmenu.getOwnerobject(), mainmenu.getPrimaryKey());
-            super.deleteEntity(mainmenu);
-        }
+        cascadedeleteMainmenu(mainmenu.getPrimaryKey());
+        super.deleteEntity(mainmenu);
     }
 
     /**
      * check data rules in Mainmenu, throw DataException with customized message if rules do not apply
-     * @param film: Mainmenu object
+     * @param mainmenu Mainmenu object
      * @throws DataException
      * @throws DBException
      */
@@ -232,13 +214,13 @@ public abstract class Bmainmenu extends GeneralEntityObject implements ProjectCo
         StringBuffer message = new StringBuffer();
         //Primary key
         if(mainmenu.getPopuplabel()!=null && mainmenu.getPopuplabel().length()>IMainmenu.SIZE_POPUPLABEL) {
-            message.append("Popuplabel is langer dan toegestaan. Max aantal karakters: " + IMainmenu.SIZE_POPUPLABEL + "\n");
+            message.append("Popuplabel is langer dan toegestaan. Max aantal karakters: ").append(IMainmenu.SIZE_POPUPLABEL).append("\n");
         }
         if(mainmenu.getPopuplabel()==null) {
             message.append("Popuplabel mag niet leeg zijn.\n");
         }
         if(mainmenu.getIcon()!=null && mainmenu.getIcon().length()>IMainmenu.SIZE_ICON) {
-            message.append("Icon is langer dan toegestaan. Max aantal karakters: " + IMainmenu.SIZE_ICON + "\n");
+            message.append("Icon is langer dan toegestaan. Max aantal karakters: ").append(IMainmenu.SIZE_ICON).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -249,60 +231,66 @@ public abstract class Bmainmenu extends GeneralEntityObject implements ProjectCo
      * delete all records in tables where mainmenuPK is used in a primary key
      * @param mainmenuPK: Mainmenu primary key
      */
-    public void cascadedeleteMainmenu(String senderobject, IMainmenuPK mainmenuPK) {
+    public void cascadedeleteMainmenu(IMainmenuPK mainmenuPK) {
         BLmenu blmenu = new BLmenu(this);
-        blmenu.delete4mainmenu(senderobject, mainmenuPK);
+        blmenu.delete4mainmenu(mainmenuPK);
     }
 
     /**
      * @param menuPK: parent Menu for child object Mainmenu Entity
      * @return child Mainmenu Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public IMainmenu getMenu(IMenuPK menuPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            MainmenuPK mainmenuPK = new MainmenuPK(menuPK.getMainmenu());
-            return this.getMainmenu(mainmenuPK);
-        } else return null;
+    public Mainmenu getMenu(IMenuPK menuPK) throws CustomException {
+        MainmenuPK mainmenuPK = new MainmenuPK(menuPK.getMainmenu());
+        return this.getMainmenu(mainmenuPK);
     }
 
 
     /**
      * get all Mainmenu objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Mainmenu objects
      * @throws DBException
      */
-    public ArrayList getMainmenus(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Mainmenu.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Mainmenu> getMainmenus(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMmainmenu.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Mainmenu>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Mainmenu objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delMainmenu(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Mainmenu.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delMainmenu(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Mainmenu.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

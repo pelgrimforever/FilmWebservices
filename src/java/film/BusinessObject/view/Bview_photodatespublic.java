@@ -2,19 +2,17 @@
  * Bview_photodatespublic.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.view;
 
-import BusinessObject.GeneralViewObject;
+import BusinessObject.BLview;
+import db.SQLMapperFactory;
 import data.gis.shape.*;
 import db.SQLMapper_pgsql;
-import film.data.ProjectConstants;
-import db.ArchiveViewMapper;
-import db.ViewMapper;
-import db.ViewMapperInterface;
+import film.conversion.entity.EMview_photodatespublic;
 import general.exception.*;
 import java.util.ArrayList;
 import film.logicview.View_photodatespublic;
@@ -34,32 +32,13 @@ import org.postgis.PGgeometry;
  *
  * @author Franky Laseure
  */
-public abstract class Bview_photodatespublic extends GeneralViewObject implements ProjectConstants {
+public abstract class Bview_photodatespublic extends BLview {
 
     /**
      * Constructor, sets View_photodatespublic as default Entity
      */
     public Bview_photodatespublic() {
-        super(new SQLMapper_pgsql(connectionpool, "View_photodatespublic"), new View_photodatespublic());
-    }
-
-    /**
-     * Map ResultSet Field values to View_photodatespublic
-     * @param dbresult: Database ResultSet
-     */
-    public View_photodatespublic mapResultSet2View(ResultSet dbresult) throws SQLException {
-        View_photodatespublic view_photodatespublic = new View_photodatespublic();
-        if(dbresult!=null) {
-            try {
-                view_photodatespublic.setPhotodate(dbresult.getDate("photodate"));
-                view_photodatespublic.setPhotos(dbresult.getLong("photos"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, view_photodatespublic);
-        return view_photodatespublic;
+        super(new View_photodatespublic(), new EMview_photodatespublic());
     }
 
     /**
@@ -67,7 +46,7 @@ public abstract class Bview_photodatespublic extends GeneralViewObject implement
      * @return ArrayList of View_photodatespublic objects
      * @throws DBException
      */
-    public ArrayList getView_photodatespublics() throws DBException {
-        return getMapper().loadViewVector(this, View_photodatespublic.SQLSelectAll);
+    public ArrayList<View_photodatespublic> getView_photodatespublics() throws DBException {
+        return getEntities(EMview_photodatespublic.SQLSelectAll);
     }
 }

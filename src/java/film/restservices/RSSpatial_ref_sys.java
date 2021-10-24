@@ -1,3 +1,10 @@
+/*
+ * RSSpatial_ref_sys.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -46,9 +53,6 @@ import org.json.simple.parser.ParseException;
 @Path("rsspatial_ref_sys")
 public class RSSpatial_ref_sys {
 
-    @Context
-    private UriInfo context;
-
     /**
      * Creates a new instance of HelloWorld
      */
@@ -57,6 +61,7 @@ public class RSSpatial_ref_sys {
 
     /**
      * Retrieves representation of an instance of spatial_ref_sys.restservices.RSSpatial_ref_sys
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @GET
@@ -76,6 +81,7 @@ public class RSSpatial_ref_sys {
 
     /**
      * Retrieves representation of an instance of spatial_ref_sys.restservices.RSSpatial_ref_sys
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @POST
@@ -255,7 +261,6 @@ public class RSSpatial_ref_sys {
     /**
      * PUT method for updating or creating an instance of RSSpatial_ref_sys
      * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("text/html")

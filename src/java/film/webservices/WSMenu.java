@@ -1,3 +1,11 @@
+/*
+ * WSMenu.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSMenu implements WSIMenu {
         Menu menu;
         try {
             IMainmenuPK mainmenuPK = JSONMainmenu.toMainmenuPK((JSONObject)parser.parse(json));
-            blmenu.delete4mainmenu(this.getClass().getName(), mainmenuPK);
+            blmenu.delete4mainmenu(mainmenuPK);
         }
         catch(ParseException e) {
         }

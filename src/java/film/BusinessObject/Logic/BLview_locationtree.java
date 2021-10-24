@@ -8,14 +8,7 @@
 
 package film.BusinessObject.Logic;
 
-import general.exception.DBException;
-import data.interfaces.db.View;
-import film.interfaces.logicview.IView_locationtree;
-import film.logicview.View_locationtree;
 import film.BusinessObject.view.Bview_locationtree;
-import film.interfaces.BusinessObject.IBLview_locationtree;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLview_locationtree
@@ -27,7 +20,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLview_locationtree extends Bview_locationtree implements IBLview_locationtree {
+public class BLview_locationtree extends Bview_locationtree {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -36,9 +29,4 @@ public class BLview_locationtree extends Bview_locationtree implements IBLview_l
     public BLview_locationtree() {
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, View view_locationtree) throws SQLException {
-        
-    }
-    
 }

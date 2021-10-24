@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Photosubjects.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -120,11 +120,11 @@ public class Photosubjects extends SecurityDataServlet {
                             break;
                         case IPhotosubjectsOperation.DELETE_Photo:
                             IPhotoPK photoPK = (IPhotoPK)parser.getJavaObject("photopk");
-                            blphotosubjects.delete4photo(this.getServletName(), photoPK);
+                            blphotosubjects.delete4photo(photoPK);
                             break;
                         case IPhotosubjectsOperation.DELETE_Subject:
                             ISubjectPK subjectPK = (ISubjectPK)parser.getJavaObject("subjectpk");
-                            blphotosubjects.delete4subject(this.getServletName(), subjectPK);
+                            blphotosubjects.delete4subject(subjectPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

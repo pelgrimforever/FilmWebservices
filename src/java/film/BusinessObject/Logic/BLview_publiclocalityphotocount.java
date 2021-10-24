@@ -8,14 +8,7 @@
 
 package film.BusinessObject.Logic;
 
-import general.exception.DBException;
-import data.interfaces.db.View;
-import film.interfaces.logicview.IView_publiclocalityphotocount;
-import film.logicview.View_publiclocalityphotocount;
 import film.BusinessObject.view.Bview_publiclocalityphotocount;
-import film.interfaces.BusinessObject.IBLview_publiclocalityphotocount;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLview_publiclocalityphotocount
@@ -27,7 +20,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLview_publiclocalityphotocount extends Bview_publiclocalityphotocount implements IBLview_publiclocalityphotocount {
+public class BLview_publiclocalityphotocount extends Bview_publiclocalityphotocount {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -36,9 +29,4 @@ public class BLview_publiclocalityphotocount extends Bview_publiclocalityphotoco
     public BLview_publiclocalityphotocount() {
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, View view_publiclocalityphotocount) throws SQLException {
-        
-    }
-    
 }

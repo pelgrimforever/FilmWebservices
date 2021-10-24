@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Securityuserprofile.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -110,7 +110,7 @@ public class Securityuserprofile extends SecurityDataServlet {
                             break;
                         case ISecurityuserprofileOperation.DELETE_Securityprofile:
                             ISecurityprofilePK securityprofilePK = (ISecurityprofilePK)parser.getJavaObject("securityprofilepk");
-                            blsecurityuserprofile.delete4securityprofile(this.getServletName(), securityprofilePK);
+                            blsecurityuserprofile.delete4securityprofile(securityprofilePK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

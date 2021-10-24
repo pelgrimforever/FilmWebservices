@@ -1,3 +1,11 @@
+/*
+ * WSArealevel3.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSArealevel3 implements WSIArealevel3 {
         Arealevel3 arealevel3;
         try {
             IArealevel2PK arealevel2PK = JSONArealevel2.toArealevel2PK((JSONObject)parser.parse(json));
-            blarealevel3.delete4arealevel2(this.getClass().getName(), arealevel2PK);
+            blarealevel3.delete4arealevel2(arealevel2PK);
         }
         catch(ParseException e) {
         }

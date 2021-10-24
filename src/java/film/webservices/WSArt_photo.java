@@ -1,3 +1,11 @@
+/*
+ * WSArt_photo.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSArt_photo implements WSIArt_photo {
         Art_photo art_photo;
         try {
             IPhotoPK photoPK = JSONPhoto.toPhotoPK((JSONObject)parser.parse(json));
-            blart_photo.delete4photo(this.getClass().getName(), photoPK);
+            blart_photo.delete4photo(photoPK);
         }
         catch(ParseException e) {
         }
@@ -213,7 +221,7 @@ public class WSArt_photo implements WSIArt_photo {
         Art_photo art_photo;
         try {
             IArt_subgroupPK art_subgroupPK = JSONArt_subgroup.toArt_subgroupPK((JSONObject)parser.parse(json));
-            blart_photo.delete4art_subgroup(this.getClass().getName(), art_subgroupPK);
+            blart_photo.delete4art_subgroup(art_subgroupPK);
         }
         catch(ParseException e) {
         }
@@ -250,7 +258,7 @@ public class WSArt_photo implements WSIArt_photo {
         Art_photo art_photo;
         try {
             IArt_academyPK art_academyPK = JSONArt_academy.toArt_academyPK((JSONObject)parser.parse(json));
-            blart_photo.delete4art_academy(this.getClass().getName(), art_academyPK);
+            blart_photo.delete4art_academy(art_academyPK);
         }
         catch(ParseException e) {
         }
@@ -287,7 +295,7 @@ public class WSArt_photo implements WSIArt_photo {
         Art_photo art_photo;
         try {
             IArt_groupPK art_groupPK = JSONArt_group.toArt_groupPK((JSONObject)parser.parse(json));
-            blart_photo.delete4art_group(this.getClass().getName(), art_groupPK);
+            blart_photo.delete4art_group(art_groupPK);
         }
         catch(ParseException e) {
         }

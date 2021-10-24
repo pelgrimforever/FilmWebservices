@@ -2,23 +2,25 @@
  * Bart_academy.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONArt_academy;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMart_academy;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bart_academy
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bart_academy extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bart_academy extends BLtable {
 
     /**
      * Constructor, sets Art_academy as default Entity
      */
     public Bart_academy() {
-        super(new SQLMapper_pgsql(connectionpool, "Art_academy"), new Art_academy());
+        super(new Art_academy(), new EMart_academy());
     }
 
     /**
@@ -56,32 +60,8 @@ public abstract class Bart_academy extends GeneralEntityObject implements Projec
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bart_academy(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Art_academy());
-    }
-
-    /**
-     * Map ResultSet Field values to Art_academy
-     * @param dbresult: Database ResultSet
-     */
-    public Art_academy mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        Art_academyPK art_academyPK = null;
-        Art_academy art_academy;
-        if(dbresult==null) {
-            art_academy = new Art_academy(art_academyPK);
-        } else {
-            try {
-                art_academyPK = new Art_academyPK(dbresult.getLong("academyid"));
-                art_academy = new Art_academy(art_academyPK);
-                art_academy.initAcademy(dbresult.getString("academy"));
-                art_academy.initAcademylocation(dbresult.getString("academylocation"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, art_academy);
-        return art_academy;
+    public Bart_academy(BLtable transactionobject) {
+        super(transactionobject, new Art_academy(), new EMart_academy());
     }
 
     /**
@@ -95,6 +75,7 @@ public abstract class Bart_academy extends GeneralEntityObject implements Projec
     /**
      * create new empty Art_academy object
      * create new primary key with given parameters
+     * @param academyid primary key field
      * @return IArt_academy with primary key
      */
     public IArt_academy newArt_academy(long academyid) {
@@ -120,6 +101,7 @@ public abstract class Bart_academy extends GeneralEntityObject implements Projec
 
     /**
      * create new primary key with given parameters
+     * @param academyid primary key field
      * @return new IArt_academyPK
      */
     public IArt_academyPK newArt_academyPK(long academyid) {
@@ -131,10 +113,8 @@ public abstract class Bart_academy extends GeneralEntityObject implements Projec
      * @return ArrayList of Art_academy objects
      * @throws DBException
      */
-    public ArrayList getArt_academys() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Art_academy.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Art_academy> getArt_academys() throws DBException {
+        return (ArrayList<Art_academy>)super.getEntities(EMart_academy.SQLSelectAll);
     }
 
     /**
@@ -144,21 +124,28 @@ public abstract class Bart_academy extends GeneralEntityObject implements Projec
      * @throws DBException
      */
     public Art_academy getArt_academy(IArt_academyPK art_academyPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Art_academy)super.getEntity((Art_academyPK)art_academyPK);
-        } else return null;
+        return (Art_academy)super.getEntity((Art_academyPK)art_academyPK);
     }
 
-    public ArrayList searchart_academys(IArt_academysearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search art_academy with IArt_academysearch parameters
+     * @param search IArt_academysearch
+     * @return ArrayList of Art_academy
+     * @throws DBException 
+     */
+    public ArrayList<Art_academy> searchart_academys(IArt_academysearch search) throws DBException {
+        return (ArrayList<Art_academy>)this.search(search);
     }
 
-    public ArrayList searchart_academys(IArt_academysearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search art_academy with IArt_academysearch parameters, order by orderby sql clause
+     * @param search IArt_academysearch
+     * @param orderby sql order by string
+     * @return ArrayList of Art_academy
+     * @throws DBException 
+     */
+    public ArrayList<Art_academy> searchart_academys(IArt_academysearch search, String orderby) throws DBException {
+        return (ArrayList<Art_academy>)this.search(search, orderby);
     }
 
     /**
@@ -168,28 +155,26 @@ public abstract class Bart_academy extends GeneralEntityObject implements Projec
      * @throws DBException
      */
     public boolean getArt_academyExists(IArt_academyPK art_academyPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((Art_academyPK)art_academyPK);
-        } else return false;
+        return super.getEntityExists((Art_academyPK)art_academyPK);
     }
 
     /**
      * try to insert Art_academy in database
-     * @param film: Art_academy object
+     * @param art_academy Art_academy object
      * @throws DBException
+     * @throws DataException
      */
     public void insertArt_academy(IArt_academy art_academy) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(art_academy);
-        }
+        super.insertEntity(art_academy);
     }
 
     /**
      * check if Art_academyPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Art_academy object
+     * @param art_academy Art_academy object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateArt_academy(IArt_academy art_academy) throws DBException, DataException {
         if(this.getArt_academyExists(art_academy.getPrimaryKey())) {
@@ -201,30 +186,27 @@ public abstract class Bart_academy extends GeneralEntityObject implements Projec
 
     /**
      * try to update Art_academy in database
-     * @param film: Art_academy object
+     * @param art_academy Art_academy object
      * @throws DBException
+     * @throws DataException
      */
     public void updateArt_academy(IArt_academy art_academy) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(art_academy);
-        }
+        super.updateEntity(art_academy);
     }
 
     /**
      * try to delete Art_academy in database
-     * @param film: Art_academy object
+     * @param art_academy Art_academy object
      * @throws DBException
      */
     public void deleteArt_academy(IArt_academy art_academy) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteArt_academy(art_academy.getOwnerobject(), art_academy.getPrimaryKey());
-            super.deleteEntity(art_academy);
-        }
+        cascadedeleteArt_academy(art_academy.getPrimaryKey());
+        super.deleteEntity(art_academy);
     }
 
     /**
      * check data rules in Art_academy, throw DataException with customized message if rules do not apply
-     * @param film: Art_academy object
+     * @param art_academy Art_academy object
      * @throws DataException
      * @throws DBException
      */
@@ -232,13 +214,13 @@ public abstract class Bart_academy extends GeneralEntityObject implements Projec
         StringBuffer message = new StringBuffer();
         //Primary key
         if(art_academy.getAcademy()!=null && art_academy.getAcademy().length()>IArt_academy.SIZE_ACADEMY) {
-            message.append("Academy is langer dan toegestaan. Max aantal karakters: " + IArt_academy.SIZE_ACADEMY + "\n");
+            message.append("Academy is langer dan toegestaan. Max aantal karakters: ").append(IArt_academy.SIZE_ACADEMY).append("\n");
         }
         if(art_academy.getAcademy()==null) {
             message.append("Academy mag niet leeg zijn.\n");
         }
         if(art_academy.getAcademylocation()!=null && art_academy.getAcademylocation().length()>IArt_academy.SIZE_ACADEMYLOCATION) {
-            message.append("Academylocation is langer dan toegestaan. Max aantal karakters: " + IArt_academy.SIZE_ACADEMYLOCATION + "\n");
+            message.append("Academylocation is langer dan toegestaan. Max aantal karakters: ").append(IArt_academy.SIZE_ACADEMYLOCATION).append("\n");
         }
         if(art_academy.getAcademylocation()==null) {
             message.append("Academylocation mag niet leeg zijn.\n");
@@ -252,46 +234,54 @@ public abstract class Bart_academy extends GeneralEntityObject implements Projec
      * delete all records in tables where art_academyPK is used in a primary key
      * @param art_academyPK: Art_academy primary key
      */
-    public void cascadedeleteArt_academy(String senderobject, IArt_academyPK art_academyPK) {
+    public void cascadedeleteArt_academy(IArt_academyPK art_academyPK) {
     }
 
 
     /**
      * get all Art_academy objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Art_academy objects
      * @throws DBException
      */
-    public ArrayList getArt_academys(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Art_academy.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Art_academy> getArt_academys(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMart_academy.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Art_academy>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Art_academy objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delArt_academy(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Art_academy.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delArt_academy(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Art_academy.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

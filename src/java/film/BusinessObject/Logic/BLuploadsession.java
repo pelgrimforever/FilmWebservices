@@ -8,20 +8,13 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.BLRecordcount;
-import BusinessObject.GeneralEntityObject;
-import data.interfaces.db.LogicEntity;
-import data.interfaces.db.Recordcount;
-import db.AbstractSQLMapper;
-import db.ViewMapper;
+import BusinessObject.BLtable;
 import film.interfaces.logicentity.IUploadsession;
 import film.logicentity.Uploadsession;
 import film.BusinessObject.table.Buploadsession;
-import film.interfaces.BusinessObject.IBLuploadsession;
+import film.conversion.entity.EMuploadsession;
 import general.exception.DBException;
 import general.exception.DataException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -34,7 +27,7 @@ import java.util.ArrayList;
  *
  * @author Franky Laseure
  */
-public class BLuploadsession extends Buploadsession implements IBLuploadsession {
+public class BLuploadsession extends Buploadsession {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data
 	
@@ -51,34 +44,26 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLuploadsession(GeneralEntityObject transactionobject) {
+    public BLuploadsession(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity uploadsession) throws SQLException {
-        
-    }
-    
     /**
      * get all Uploadsession objects from database
      * @return ArrayList of Uploadsession objects
      * @throws DBException
      */
+    @Override
     public ArrayList getUploadsessions() throws DBException {
-            return getMapper().loadEntityVector(this, Uploadsession.SQLSelectAllsorded);
+        return this.getEntities(EMuploadsession.SQLSelectAllsorded);
     }
 
     public void insertCompletesession(ArrayList uploadsessions) throws DBException, DataException {
         //if Uploadsession table is empty, insert records
         //else only update
-        AbstractSQLMapper sqlmapper = entitymapper.resetSQLMapper("");
-        BLRecordcount blrecordcount = new BLRecordcount(sqlmapper);
         String sql = "select count(distinct tablecount.*) as count from uploadsession as tablecount";
-        ViewMapper viewmapper = new ViewMapper(sqlmapper);
-        Recordcount recordcount = (Recordcount)viewmapper.loadView(blrecordcount, sql, null);
-        long count = recordcount.getCount();
+        long count = this.count(sql, null);
         if(count==0) {
             Uploadsession uploadsession;
             for(int i=0; i<uploadsessions.size(); i++) {
@@ -105,9 +90,10 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * try to insert Uploadsession object in database
      * commit transaction
      * @param uploadsession: Uploadsession Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertUploadsession(IUploadsession uploadsession) throws DBException, DataException {
         trans_insertUploadsession(uploadsession);
         super.Commit2DB();
@@ -117,8 +103,8 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * try to insert Uploadsession object in database
      * commit transaction
      * @param uploadsession: Uploadsession Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertUploadsession(IUploadsession uploadsession) throws DBException, DataException {
         trans_insertUploadsession(uploadsession);
@@ -129,9 +115,10 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * try to update Uploadsession object in database
      * commit transaction
      * @param uploadsession: Uploadsession Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateUploadsession(IUploadsession uploadsession) throws DBException, DataException {
         trans_updateUploadsession(uploadsession);
         super.Commit2DB();
@@ -141,8 +128,8 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * try to update Uploadsession object in database
      * commit transaction
      * @param uploadsession: Uploadsession Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateUploadsession(IUploadsession uploadsession) throws DBException, DataException {
         trans_updateUploadsession(uploadsession);
@@ -153,8 +140,9 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * try to delete Uploadsession object in database
      * commit transaction
      * @param uploadsession: Uploadsession Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteUploadsession(IUploadsession uploadsession) throws DBException {
         trans_deleteUploadsession(uploadsession);
         super.Commit2DB();
@@ -164,7 +152,7 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * try to delete Uploadsession object in database
      * commit transaction
      * @param uploadsession: Uploadsession Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteUploadsession(IUploadsession uploadsession) throws DBException {
         trans_deleteUploadsession(uploadsession);
@@ -175,8 +163,8 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * try to insert Uploadsession object in database
      * do not commit transaction
      * @param uploadsession: Uploadsession Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertUploadsession(IUploadsession uploadsession) throws DBException, DataException {
         super.checkDATA(uploadsession);
@@ -187,8 +175,8 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * try to update Uploadsession object in database
      * do not commit transaction
      * @param uploadsession: Uploadsession Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateUploadsession(IUploadsession uploadsession) throws DBException, DataException {
         super.checkDATA(uploadsession);
@@ -199,7 +187,7 @@ public class BLuploadsession extends Buploadsession implements IBLuploadsession 
      * try to delete Uploadsession object in database
      * do not commit transaction
      * @param uploadsession: Uploadsession Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteUploadsession(IUploadsession uploadsession) throws DBException {
         super.deleteUploadsession((Uploadsession)uploadsession);

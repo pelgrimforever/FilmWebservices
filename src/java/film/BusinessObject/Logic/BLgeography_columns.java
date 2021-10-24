@@ -8,11 +8,7 @@
 
 package film.BusinessObject.Logic;
 
-import data.interfaces.db.View;
 import film.BusinessObject.view.Bgeography_columns;
-import film.interfaces.BusinessObject.IBLgeography_columns;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLgeography_columns
@@ -24,7 +20,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLgeography_columns extends Bgeography_columns implements IBLgeography_columns {
+public class BLgeography_columns extends Bgeography_columns {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -33,9 +29,4 @@ public class BLgeography_columns extends Bgeography_columns implements IBLgeogra
     public BLgeography_columns() {
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, View geography_columns) throws SQLException {
-        
-    }
-    
 }

@@ -8,11 +8,7 @@
 
 package film.BusinessObject.Logic;
 
-import data.interfaces.db.View;
 import film.BusinessObject.view.Bgeometry_columns;
-import film.interfaces.BusinessObject.IBLgeometry_columns;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLgeometry_columns
@@ -24,7 +20,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLgeometry_columns extends Bgeometry_columns implements IBLgeometry_columns {
+public class BLgeometry_columns extends Bgeometry_columns {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -33,9 +29,4 @@ public class BLgeometry_columns extends Bgeometry_columns implements IBLgeometry
     public BLgeometry_columns() {
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, View geometry_columns) throws SQLException {
-        
-    }
-    
 }

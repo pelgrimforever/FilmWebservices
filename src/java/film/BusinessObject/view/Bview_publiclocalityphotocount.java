@@ -2,19 +2,17 @@
  * Bview_publiclocalityphotocount.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.view;
 
-import BusinessObject.GeneralViewObject;
+import BusinessObject.BLview;
+import db.SQLMapperFactory;
 import data.gis.shape.*;
 import db.SQLMapper_pgsql;
-import film.data.ProjectConstants;
-import db.ArchiveViewMapper;
-import db.ViewMapper;
-import db.ViewMapperInterface;
+import film.conversion.entity.EMview_publiclocalityphotocount;
 import general.exception.*;
 import java.util.ArrayList;
 import film.logicview.View_publiclocalityphotocount;
@@ -34,38 +32,13 @@ import org.postgis.PGgeometry;
  *
  * @author Franky Laseure
  */
-public abstract class Bview_publiclocalityphotocount extends GeneralViewObject implements ProjectConstants {
+public abstract class Bview_publiclocalityphotocount extends BLview {
 
     /**
      * Constructor, sets View_publiclocalityphotocount as default Entity
      */
     public Bview_publiclocalityphotocount() {
-        super(new SQLMapper_pgsql(connectionpool, "View_publiclocalityphotocount"), new View_publiclocalityphotocount());
-    }
-
-    /**
-     * Map ResultSet Field values to View_publiclocalityphotocount
-     * @param dbresult: Database ResultSet
-     */
-    public View_publiclocalityphotocount mapResultSet2View(ResultSet dbresult) throws SQLException {
-        View_publiclocalityphotocount view_publiclocalityphotocount = new View_publiclocalityphotocount();
-        if(dbresult!=null) {
-            try {
-                view_publiclocalityphotocount.setCountrycode(dbresult.getString("countrycode"));
-                view_publiclocalityphotocount.setLocality(dbresult.getString("locality"));
-                Object o_location = dbresult.getObject("location");
-                if(o_location!=null) {
-                    piShape c_location = new psqlGeometry((PGgeometry)o_location);
-                    view_publiclocalityphotocount.setLocation(c_location.abstractclone());
-                }
-                view_publiclocalityphotocount.setPhotocount(dbresult.getLong("photocount"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, view_publiclocalityphotocount);
-        return view_publiclocalityphotocount;
+        super(new View_publiclocalityphotocount(), new EMview_publiclocalityphotocount());
     }
 
     /**
@@ -73,7 +46,7 @@ public abstract class Bview_publiclocalityphotocount extends GeneralViewObject i
      * @return ArrayList of View_publiclocalityphotocount objects
      * @throws DBException
      */
-    public ArrayList getView_publiclocalityphotocounts() throws DBException {
-        return getMapper().loadViewVector(this, View_publiclocalityphotocount.SQLSelectAll);
+    public ArrayList<View_publiclocalityphotocount> getView_publiclocalityphotocounts() throws DBException {
+        return getEntities(EMview_publiclocalityphotocount.SQLSelectAll);
     }
 }

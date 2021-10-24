@@ -2,23 +2,25 @@
  * Bcountry.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONCountry;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMcountry;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bcountry
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bcountry extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bcountry extends BLtable {
 
     /**
      * Constructor, sets Country as default Entity
      */
     public Bcountry() {
-        super(new SQLMapper_pgsql(connectionpool, "Country"), new Country());
+        super(new Country(), new EMcountry());
     }
 
     /**
@@ -56,50 +60,8 @@ public abstract class Bcountry extends GeneralEntityObject implements ProjectCon
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bcountry(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Country());
-    }
-
-    /**
-     * Map ResultSet Field values to Country
-     * @param dbresult: Database ResultSet
-     */
-    public Country mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        CountryPK countryPK = null;
-        Country country;
-        if(dbresult==null) {
-            country = new Country(countryPK);
-        } else {
-            try {
-                countryPK = new CountryPK(dbresult.getString("code"));
-                country = new Country(countryPK);
-                country.initName(dbresult.getString("name"));
-                Object o_location = dbresult.getObject("location");
-                if(o_location!=null) {
-                    piShape c_location = new psqlGeometry((PGgeometry)o_location);
-                    country.initLocation(c_location.abstractclone());
-                }
-                Object o_bounds = dbresult.getObject("bounds");
-                if(o_bounds!=null) {
-                    piShape c_bounds = new psqlGeometry((PGgeometry)o_bounds);
-                    country.initBounds(c_bounds.abstractclone());
-                }
-                Object o_viewport = dbresult.getObject("viewport");
-                if(o_viewport!=null) {
-                    piShape c_viewport = new psqlGeometry((PGgeometry)o_viewport);
-                    country.initViewport(c_viewport.abstractclone());
-                }
-                country.initApproximate(dbresult.getBoolean("approximate"));
-                country.initHasarealevel1(dbresult.getBoolean("hasarealevel1"));
-                country.initHasarealevel2(dbresult.getBoolean("hasarealevel2"));
-                country.initHasarealevel3(dbresult.getBoolean("hasarealevel3"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, country);
-        return country;
+    public Bcountry(BLtable transactionobject) {
+        super(transactionobject, new Country(), new EMcountry());
     }
 
     /**
@@ -113,6 +75,7 @@ public abstract class Bcountry extends GeneralEntityObject implements ProjectCon
     /**
      * create new empty Country object
      * create new primary key with given parameters
+     * @param code primary key field
      * @return ICountry with primary key
      */
     public ICountry newCountry(java.lang.String code) {
@@ -138,6 +101,7 @@ public abstract class Bcountry extends GeneralEntityObject implements ProjectCon
 
     /**
      * create new primary key with given parameters
+     * @param code primary key field
      * @return new ICountryPK
      */
     public ICountryPK newCountryPK(java.lang.String code) {
@@ -149,10 +113,8 @@ public abstract class Bcountry extends GeneralEntityObject implements ProjectCon
      * @return ArrayList of Country objects
      * @throws DBException
      */
-    public ArrayList getCountrys() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Country.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Country> getCountrys() throws DBException {
+        return (ArrayList<Country>)super.getEntities(EMcountry.SQLSelectAll);
     }
 
     /**
@@ -162,21 +124,28 @@ public abstract class Bcountry extends GeneralEntityObject implements ProjectCon
      * @throws DBException
      */
     public Country getCountry(ICountryPK countryPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Country)super.getEntity((CountryPK)countryPK);
-        } else return null;
+        return (Country)super.getEntity((CountryPK)countryPK);
     }
 
-    public ArrayList searchcountrys(ICountrysearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search country with ICountrysearch parameters
+     * @param search ICountrysearch
+     * @return ArrayList of Country
+     * @throws DBException 
+     */
+    public ArrayList<Country> searchcountrys(ICountrysearch search) throws DBException {
+        return (ArrayList<Country>)this.search(search);
     }
 
-    public ArrayList searchcountrys(ICountrysearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search country with ICountrysearch parameters, order by orderby sql clause
+     * @param search ICountrysearch
+     * @param orderby sql order by string
+     * @return ArrayList of Country
+     * @throws DBException 
+     */
+    public ArrayList<Country> searchcountrys(ICountrysearch search, String orderby) throws DBException {
+        return (ArrayList<Country>)this.search(search, orderby);
     }
 
     /**
@@ -186,28 +155,26 @@ public abstract class Bcountry extends GeneralEntityObject implements ProjectCon
      * @throws DBException
      */
     public boolean getCountryExists(ICountryPK countryPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((CountryPK)countryPK);
-        } else return false;
+        return super.getEntityExists((CountryPK)countryPK);
     }
 
     /**
      * try to insert Country in database
-     * @param film: Country object
+     * @param country Country object
      * @throws DBException
+     * @throws DataException
      */
     public void insertCountry(ICountry country) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(country);
-        }
+        super.insertEntity(country);
     }
 
     /**
      * check if CountryPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Country object
+     * @param country Country object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateCountry(ICountry country) throws DBException, DataException {
         if(this.getCountryExists(country.getPrimaryKey())) {
@@ -219,30 +186,27 @@ public abstract class Bcountry extends GeneralEntityObject implements ProjectCon
 
     /**
      * try to update Country in database
-     * @param film: Country object
+     * @param country Country object
      * @throws DBException
+     * @throws DataException
      */
     public void updateCountry(ICountry country) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(country);
-        }
+        super.updateEntity(country);
     }
 
     /**
      * try to delete Country in database
-     * @param film: Country object
+     * @param country Country object
      * @throws DBException
      */
     public void deleteCountry(ICountry country) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteCountry(country.getOwnerobject(), country.getPrimaryKey());
-            super.deleteEntity(country);
-        }
+        cascadedeleteCountry(country.getPrimaryKey());
+        super.deleteEntity(country);
     }
 
     /**
      * check data rules in Country, throw DataException with customized message if rules do not apply
-     * @param film: Country object
+     * @param country Country object
      * @throws DataException
      * @throws DBException
      */
@@ -250,7 +214,7 @@ public abstract class Bcountry extends GeneralEntityObject implements ProjectCon
         StringBuffer message = new StringBuffer();
         //Primary key
         if(country.getName()!=null && country.getName().length()>ICountry.SIZE_NAME) {
-            message.append("Name is langer dan toegestaan. Max aantal karakters: " + ICountry.SIZE_NAME + "\n");
+            message.append("Name is langer dan toegestaan. Max aantal karakters: ").append(ICountry.SIZE_NAME).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -261,60 +225,66 @@ public abstract class Bcountry extends GeneralEntityObject implements ProjectCon
      * delete all records in tables where countryPK is used in a primary key
      * @param countryPK: Country primary key
      */
-    public void cascadedeleteCountry(String senderobject, ICountryPK countryPK) {
+    public void cascadedeleteCountry(ICountryPK countryPK) {
         BLarealevel1 blarealevel1 = new BLarealevel1(this);
-        blarealevel1.delete4country(senderobject, countryPK);
+        blarealevel1.delete4country(countryPK);
     }
 
     /**
      * @param arealevel1PK: parent Arealevel1 for child object Country Entity
      * @return child Country Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ICountry getArealevel1(IArealevel1PK arealevel1PK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            CountryPK countryPK = new CountryPK(arealevel1PK.getCountrycode());
-            return this.getCountry(countryPK);
-        } else return null;
+    public Country getArealevel1(IArealevel1PK arealevel1PK) throws CustomException {
+        CountryPK countryPK = new CountryPK(arealevel1PK.getCountrycode());
+        return this.getCountry(countryPK);
     }
 
 
     /**
      * get all Country objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Country objects
      * @throws DBException
      */
-    public ArrayList getCountrys(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Country.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Country> getCountrys(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMcountry.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Country>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Country objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delCountry(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Country.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delCountry(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Country.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

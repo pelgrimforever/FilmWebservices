@@ -10,14 +10,12 @@ package film.BusinessObject.Logic;
 
 import data.gis.shape.piPoint;
 import general.exception.DBException;
-import data.interfaces.db.View;
+import db.SQLparameters;
 import film.logicview.View_localityphotocount;
 import film.BusinessObject.view.Bview_localityphotocount;
-import film.interfaces.BusinessObject.IBLview_localityphotocount;
+import film.conversion.entity.EMview_localityphotocount;
+import film.conversion.entity.EMview_publiclocalityphotocount;
 import film.logicview.View_locality_photolocations;
-import film.logicview.View_publiclocalityphotocount;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -31,7 +29,7 @@ import java.util.Iterator;
  *
  * @author Franky Laseure
  */
-public class BLview_localityphotocount extends Bview_localityphotocount implements IBLview_localityphotocount {
+public class BLview_localityphotocount extends Bview_localityphotocount {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -40,11 +38,6 @@ public class BLview_localityphotocount extends Bview_localityphotocount implemen
     public BLview_localityphotocount() {
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, View view_localityphotocount) throws SQLException {
-        
-    }
-    
     /**
      * get all View_publiclocalityphotocount objects from database
      * prevent from getting private data
@@ -53,16 +46,17 @@ public class BLview_localityphotocount extends Bview_localityphotocount implemen
      */
     @Override
     public ArrayList getView_localityphotocounts() throws DBException {
-        return getMapper().loadViewVector(this, View_publiclocalityphotocount.SQLSelectAll);
+        return this.getEntities(EMview_publiclocalityphotocount.SQLSelectAll);
     }
     
     public ArrayList get4Countrycode(String countrycode, boolean loggedin) throws DBException {
         Object[][] parameter = { { "countrycode", countrycode } };
-        String sql = View_publiclocalityphotocount.SQLSelect4countrycode;
+        SQLparameters parameters = new SQLparameters(parameter);
+        String sql = EMview_publiclocalityphotocount.SQLSelect4countrycode;
         if(loggedin) {
-            sql = View_localityphotocount.SQLSelect4countrycode;
+            sql = EMview_localityphotocount.SQLSelect4countrycode;
         }
-        ArrayList localities = getMapper().loadViewVector(this, sql, parameter);
+        ArrayList localities = this.getEntities(sql, parameters);
         ArrayList result = new ArrayList();
         Iterator<View_localityphotocount> localitiesI = localities.iterator();
         View_localityphotocount locality;

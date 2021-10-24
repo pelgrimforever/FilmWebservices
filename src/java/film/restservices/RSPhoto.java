@@ -1,27 +1,35 @@
+/*
+ * RSPhoto.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
+import base.servlets.Securitycheck;
 import data.conversion.JSONConversion;
 import data.gis.shape.GISConversion;
 import data.gis.shape.piPoint;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
+import film.entity.pk.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IPhotosearch;
 import film.interfaces.servlet.IPhotoOperation;
+import film.logicentity.Photo;
+import film.searchentity.Photosearch;
 import film.servlets.DataServlet;
 import general.exception.CustomException;
+import general.exception.DataException;
 import general.exception.DBException;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.sql.Date;
+import java.sql.Time;
 import java.io.File;
 import java.io.IOException;
-import static java.lang.String.format;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Iterator;
-import javax.imageio.ImageIO;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.Consumes;
@@ -45,9 +53,6 @@ import org.json.simple.parser.ParseException;
 @Path("rsphoto")
 public class RSPhoto {
 
-    @Context
-    private UriInfo context;
-
     /**
      * Creates a new instance of HelloWorld
      */
@@ -56,6 +61,7 @@ public class RSPhoto {
 
     /**
      * Retrieves representation of an instance of photo.restservices.RSPhoto
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @GET
@@ -75,6 +81,7 @@ public class RSPhoto {
 
     /**
      * Retrieves representation of an instance of photo.restservices.RSPhoto
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @POST
@@ -410,7 +417,6 @@ public class RSPhoto {
     /**
      * PUT method for updating or creating an instance of RSPhoto
      * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("text/html")

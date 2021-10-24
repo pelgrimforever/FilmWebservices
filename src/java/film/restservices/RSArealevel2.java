@@ -1,3 +1,10 @@
+/*
+ * RSArealevel2.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -46,9 +53,6 @@ import org.json.simple.parser.ParseException;
 @Path("rsarealevel2")
 public class RSArealevel2 {
 
-    @Context
-    private UriInfo context;
-
     /**
      * Creates a new instance of HelloWorld
      */
@@ -57,6 +61,7 @@ public class RSArealevel2 {
 
     /**
      * Retrieves representation of an instance of arealevel2.restservices.RSArealevel2
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @GET
@@ -76,6 +81,7 @@ public class RSArealevel2 {
 
     /**
      * Retrieves representation of an instance of arealevel2.restservices.RSArealevel2
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @POST
@@ -271,7 +277,6 @@ public class RSArealevel2 {
     /**
      * PUT method for updating or creating an instance of RSArealevel2
      * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("text/html")

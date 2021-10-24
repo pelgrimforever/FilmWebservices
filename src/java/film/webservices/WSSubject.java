@@ -1,3 +1,11 @@
+/*
+ * WSSubject.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSSubject implements WSISubject {
         Subject subject;
         try {
             ISubjectcatPK subjectcatCat1PK = JSONSubjectcat.toSubjectcatPK((JSONObject)parser.parse(json));
-            blsubject.delete4subjectcatCat1(this.getClass().getName(), subjectcatCat1PK);
+            blsubject.delete4subjectcatCat1(subjectcatCat1PK);
         }
         catch(ParseException e) {
         }
@@ -213,7 +221,7 @@ public class WSSubject implements WSISubject {
         Subject subject;
         try {
             ITree7subjectPK tree7subjectPK = JSONTree7subject.toTree7subjectPK((JSONObject)parser.parse(json));
-            blsubject.delete4tree7subject(this.getClass().getName(), tree7subjectPK);
+            blsubject.delete4tree7subject(tree7subjectPK);
         }
         catch(ParseException e) {
         }
@@ -250,7 +258,7 @@ public class WSSubject implements WSISubject {
         Subject subject;
         try {
             ISubjectcatPK subjectcatCat2PK = JSONSubjectcat.toSubjectcatPK((JSONObject)parser.parse(json));
-            blsubject.delete4subjectcatCat2(this.getClass().getName(), subjectcatCat2PK);
+            blsubject.delete4subjectcatCat2(subjectcatCat2PK);
         }
         catch(ParseException e) {
         }

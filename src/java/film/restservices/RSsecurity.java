@@ -1,6 +1,8 @@
 /*
- * RSsecurity
- * check standard authorization in Sitesecurity project
+ * RSsecurity.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
  */
 
 package film.restservices;

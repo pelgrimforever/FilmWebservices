@@ -1,3 +1,11 @@
+/*
+ * WSFilm.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSFilm implements WSIFilm {
         Film film;
         try {
             IFilmtypePK filmtypePK = JSONFilmtype.toFilmtypePK((JSONObject)parser.parse(json));
-            blfilm.delete4filmtype(this.getClass().getName(), filmtypePK);
+            blfilm.delete4filmtype(filmtypePK);
         }
         catch(ParseException e) {
         }

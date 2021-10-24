@@ -8,27 +8,18 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.BLRecordcount;
-import BusinessObject.BLviewinterface;
-import BusinessObject.GeneralEntityObject;
-import BusinessObject.GeneralObject;
-import static BusinessObject.GeneralObject.FILEROOT;
+import BusinessObject.BLtable;
+import BusinessObject.BusinessLogic;
+import static BusinessObject.BusinessLogic.FILEROOT;
 import data.gis.shape.piPoint;
 import data.gis.shape.piPolyline;
 import data.google.geocode.Googleaddresscomponent;
 import data.google.geocode.Googleaddresssubcomponent;
 import data.google.geocode.Googlegeocode;
 import data.interfaces.db.Filedata;
-import data.interfaces.db.ITablesearch;
-import data.interfaces.db.LogicEntity;
-import data.interfaces.db.Recordcount;
-import data.interfaces.db.View;
-import db.AbstractSQLMapper;
-import db.ViewMapper;
 import film.logicentity.Photo;
 import film.BusinessObject.table.Bphoto;
 import film.entity.pk.*;
-import film.interfaces.BusinessObject.IBLphoto;
 import film.interfaces.entity.pk.IFilmPK;
 import film.interfaces.entity.pk.IPhotoPK;
 import film.interfaces.logicentity.IFilm;
@@ -50,26 +41,22 @@ import general.exception.DataException;
 import graphic.jpeg.Graphicfile;
 import graphic.jpeg.Tag;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import data.google.geocode.Googlegeocodestatus;
-import data.interfaces.db.AFieldsearcher;
 import data.osm.geocode.OSMgeocode;
-import static film.logicentity.Photo.SQLWherePublic;
-import film.searchentity.Photosearch;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import javax.imageio.ImageIO;
+import data.interfaces.db.Tablesearcher;
+import db.SQLparameters;
+import film.conversion.entity.EMphoto;
+import film.logicview.Viewdescriptions;
 
 /**
  * Business Logic Entity class BLphoto
@@ -81,7 +68,7 @@ import javax.imageio.ImageIO;
  *
  * @author Franky Laseure
  */
-public class BLphoto extends Bphoto implements IBLphoto {
+public class BLphoto extends Bphoto {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     public final static String THUMBNAILPATH = "thumbnail" + File.separator;
@@ -111,21 +98,16 @@ public class BLphoto extends Bphoto implements IBLphoto {
 
     /**
      * Constructor, sets Photo as default Entity
-     * sets transaction queue from given GeneralObject implementation
-     * all transactions will commit at same time
+ sets transaction queue from given BusinessLogic implementation
+ all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLphoto(GeneralEntityObject transactionobject) {
+    public BLphoto(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
         this.setAuthenticated(transactionobject.isAuthenticated());
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity photo) throws SQLException {
-        
-    }
-    
     public boolean hasAccess(Userprofile userprofile, IPhotoPK photoPK) throws DBException {
         boolean hasaccess = userprofile!=null && userprofile.privateaccess();
         if(!hasaccess) {
@@ -143,26 +125,19 @@ public class BLphoto extends Bphoto implements IBLphoto {
     @Override
     public long count() throws DBException {
         String searchsql = "select count(*) as count from photo where public";
-        AbstractSQLMapper sqlmapper = entitymapper.resetSQLMapper("");
-        BLRecordcount blrecordcount = new BLRecordcount(sqlmapper);
-        ViewMapper viewmapper = new ViewMapper(sqlmapper);
-        Recordcount recordcount = (Recordcount)viewmapper.loadView(blrecordcount, searchsql);
-        return recordcount.getCount();
+        return this.count(searchsql, null);
     }
 
     /**
      * count all records of table
+     * @param loggedin
      * @return records amount
      * @throws DBException 
      */
     public long count(boolean loggedin) throws DBException {
         if(loggedin) {
             String searchsql = "select count(*) as count from photo";
-            AbstractSQLMapper sqlmapper = entitymapper.resetSQLMapper("");
-            BLRecordcount blrecordcount = new BLRecordcount(sqlmapper);
-            ViewMapper viewmapper = new ViewMapper(sqlmapper);
-            Recordcount recordcount = (Recordcount)viewmapper.loadView(blrecordcount, searchsql);
-            return recordcount.getCount();
+            return this.count(searchsql, null);
         } else {
             return this.count();
         }
@@ -179,14 +154,16 @@ public class BLphoto extends Bphoto implements IBLphoto {
     
     /**
      * get all Photo objects from database
+     * @param privateaccess
      * @return ArrayList of Photo objects
      * @throws DBException
      */
     public ArrayList getPhotos(boolean privateaccess) throws DBException {
         if(privateaccess)
-            return getMapper().loadEntityVector(this, Photo.SQLSelect4photo_sorted);
+            return this.getEntities(EMphoto.SQLSelect4photo_sorted);
         else {
-            return getMapper().loadEntityVector(this, Photo.SQLSelectAll4Public, publiconly);
+            SQLparameters parameters = new SQLparameters(publiconly);
+            return this.getEntities(EMphoto.SQLSelectAll4Public, parameters);
         }
     }
 
@@ -196,12 +173,14 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * @return Photo object
      * @throws DBException
      */
+    @Override
     public Photo getPhoto(IPhotoPK photoPK) throws DBException {
         return (Photo)super.getEntity((PhotoPK)photoPK);
     }
 
     /**
      * search Photo for primary key
+     * @param userprofile
      * @param photoPK: Photo primary key
      * @return Photo object
      * @throws DBException
@@ -234,12 +213,12 @@ public class BLphoto extends Bphoto implements IBLphoto {
      */
     public ArrayList search(IPhotosearch search) throws DBException {
         if(search.used()) {
-            String sqlorderby = Photo.OrderByDateTime;
+            String sqlorderby = EMphoto.OrderByDateTime;
             search.build("");
             String searchsql = "select distinct photo.* from photo" + search.getJoin() + " where (" + search.getSql() + ")";
             if(!this.isAuthenticated()) searchsql += " and public";
             searchsql += sqlorderby;
-            ArrayList photos = getMapper().loadEntityVector(this, searchsql, search.getParameters());
+            ArrayList photos = this.getEntities(searchsql, search.getParameters());
             //this.addSmallimage(photos, hasprivateaccess);
             return photos;
         } else {
@@ -265,27 +244,6 @@ public class BLphoto extends Bphoto implements IBLphoto {
         }
     }
     
-//to be deleted    
-    /**
-     * add to each photo the path to the small image
-     * @param photos 
-     */
-/*    public void addSmallimage(ArrayList photos, boolean hasprivateaccess) throws DBException {
-        Photo photo;
-        for(int i=0; i<photos.size(); i++) {
-            photo = (Photo)photos.get(i);
-            String filepath = "";
-            try {
-                filepath = publishSmall(hasprivateaccess, photo.getPrimaryKey(), TEMPdestinationpath + File.separator);
-            }
-            catch(IOException e) {
-            }
-            filepath = TEMPonlinepath + filepath;
-            photo.setSmallfilepath(filepath);
-        }
-    }
-*/
-    
     /**
      * perform photos search with search parameters
      * return only the amount of records found
@@ -297,14 +255,10 @@ public class BLphoto extends Bphoto implements IBLphoto {
         long count = 0;
         if(search.used()) {
             search.build("");
-            String searchsql = defaultentity.getSQLSelectAll() + search.getJoin() + " where (" + search.getSql() + ")";
+            String searchsql = EMphoto.SQLSelectAll + search.getJoin() + " where (" + search.getSql() + ")";
             if(!this.isAuthenticated()) searchsql += " and public";        
             searchsql = "select count(distinct tablecount.*) as count from (" + searchsql + ") as tablecount";
-            AbstractSQLMapper sqlmapper = entitymapper.resetSQLMapper("");
-            BLRecordcount blrecordcount = new BLRecordcount(sqlmapper);
-            ViewMapper viewmapper = new ViewMapper(sqlmapper);
-            Recordcount recordcount = (Recordcount)viewmapper.loadView(blrecordcount, searchsql, search.getParameters());
-            count = recordcount.getCount();
+            count = this.count(searchsql, search.getParameters());
         }
         return count;
     }
@@ -319,11 +273,12 @@ public class BLphoto extends Bphoto implements IBLphoto {
     public ArrayList getPhoto4Location(boolean hasprivateaccess, piPoint location) throws DBException {
         ArrayList photos;
         Object[][] parameter = { { "location", location } };
+        SQLparameters parameters = new SQLparameters(parameter);
         if(hasprivateaccess) {
-            photos = getMapper().loadEntityVector(this, Photo.SQLSelect4location, parameter);
+            photos = this.getEntities(EMphoto.SQLSelect4location, parameters);
         } else {
-            parameter = AbstractSQLMapper.addKeyArrays(parameter, publiconly);
-            photos = getMapper().loadEntityVector(this, Photo.SQLSelect4publiclocation, parameter);
+            parameters.add(publiconly);
+            photos = this.getEntities(EMphoto.SQLSelect4publiclocation, parameters);
         }
         return photos;
     }
@@ -336,7 +291,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
      */
     public ArrayList getPhoto4Locations(ArrayList<piPoint> locations) throws DBException {
         ArrayList photos;
-        Object[][] parameter = {};
+        SQLparameters parameters = new SQLparameters();
         Iterator<piPoint> locationsI = locations.iterator();
         int l = 0;
         StringBuilder sqlwhere = new StringBuilder("");
@@ -344,22 +299,22 @@ public class BLphoto extends Bphoto implements IBLphoto {
         while(locationsI.hasNext()) {
             parametername = "location" + l;
             Object[][] p = {{ parametername, locationsI.next() }};
-            parameter = AbstractSQLMapper.addKeyArrays(parameter, p);
+            parameters.add(p);
             sqlwhere.append(Photo.fieldnames[Photo.LOCATION-1]).append(" = :").append(parametername).append(":");
             if(locationsI.hasNext()) {
                 sqlwhere.append(" or ");
             }
             l++;
         }
-        StringBuilder sql = new StringBuilder(Photo.SQLSelectAll).append(" where ");
+        StringBuilder sql = new StringBuilder(EMphoto.SQLSelectAll).append(" where ");
         if(this.isAuthenticated()) {
             sql.append(sqlwhere);
         } else {
-            parameter = AbstractSQLMapper.addKeyArrays(parameter, publiconly);
-            sql.append(Photo.SQLWherePublic).append(" and (").append(sqlwhere).append(")");
+            parameters.add(publiconly);
+            sql.append(EMphoto.SQLWherePublic).append(" and (").append(sqlwhere).append(")");
         }
-        sql.append(Photo.OrderByDateTime);
-        return getMapper().loadEntityVector(this, sql.toString(), parameter);
+        sql.append(EMphoto.OrderByDateTime);
+        return this.getEntities(sql.toString(), parameters);
     }
     
     /**
@@ -372,11 +327,12 @@ public class BLphoto extends Bphoto implements IBLphoto {
     public ArrayList getPhoto4Date(boolean hasprivateaccess, Date date) throws DBException {
         ArrayList photos;
         Object[][] parameter = { { "photodate", date } };
+        SQLparameters parameters = new SQLparameters(parameter);
         if(hasprivateaccess) {
-            photos = getMapper().loadEntityVector(this, Photo.SQLSelect4date, parameter);
+            photos = this.getEntities(EMphoto.SQLSelect4date, parameters);
         } else {
-            parameter = AbstractSQLMapper.addKeyArrays(parameter, publiconly);
-            photos = getMapper().loadEntityVector(this, Photo.SQLSelect4publicdate, parameter);
+            parameters.add(publiconly);
+            photos = this.getEntities(EMphoto.SQLSelect4publicdate, parameters);
         }
         return photos;
     }
@@ -386,16 +342,16 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * @param filmPK: foreign key for Film
      * @param loadthumbnails: boolean, load thumbnail pictures in ArrayList for found photo objects
      * @return all Photo Entity objects for Film
-     * @throws :project:.general.exception.CustomException
+     * @throws general.exception.CustomException
      */
     public ArrayList getPhotos4photo_film(boolean hasprivateaccess, IFilmPK filmPK, boolean loadthumbnails) throws CustomException {
-        Object[][] parameter = filmPK.getKeyFields();
+        SQLparameters parameters = filmPK.getSQLprimarykey();
         ArrayList photos;
         if(hasprivateaccess) {
-            photos = getMapper().loadEntityVector(this, Photo.SQLSelect4photo_film_sorted, parameter);
+            photos = this.getEntities(EMphoto.SQLSelect4photo_film_sorted, parameters);
         } else {
-            parameter = AbstractSQLMapper.addKeyArrays(filmPK.getKeyFields(), publiconly);
-            photos = getMapper().loadEntityVector(this, Photo.SQLSelect4photo_filmpublic_sorted, parameter);
+            parameters.add(publiconly);
+            photos = this.getEntities(EMphoto.SQLSelect4photo_filmpublic_sorted, parameters);
         }
         if(loadthumbnails)
             return loadThumbnailImages(photos);
@@ -405,12 +361,13 @@ public class BLphoto extends Bphoto implements IBLphoto {
 
     /**
      *
+     * @param userprofile
      * @param filmPK: foreign key for Film
+     * @param loadthumbnails
      * @return all Photo Entity objects for Film
-     * @throws :project:.general.exception.CustomException
+     * @throws general.exception.CustomException
      */
     public ArrayList getPhotos4photo_film_edit(Userprofile userprofile, IFilmPK filmPK, boolean loadthumbnails) throws CustomException {
-        Object[][] parameter = filmPK.getKeyFields();
         ArrayList photos = new ArrayList();
         if(userprofile!=null && userprofile.isEditor()) {
             photos = getPhotos4photo_film(userprofile.privateaccess(), filmPK, loadthumbnails);
@@ -422,20 +379,20 @@ public class BLphoto extends Bphoto implements IBLphoto {
      *
      * @param filmPK: foreign key for Film
      * @return all Photo Entity objects for Film where imagebackup
-     * @throws :project:.general.exception.CustomException
+     * @throws general.exception.CustomException
      */
     public ArrayList getPhotos4photo_film_imagebackup(IFilmPK filmPK) throws CustomException {
-        return getMapper().loadEntityVector(this, Photo.SQLSelect4photo_film_imagebackup, filmPK.getKeyFields());
+        return this.getEntities(EMphoto.SQLSelect4photo_film_imagebackup, filmPK.getSQLprimarykey());
     }
 
     /**
      *
      * @param filmPK: foreign key for Film
      * @return all Photo Entity objects for Film where backup
-     * @throws :project:.general.exception.CustomException
+     * @throws general.exception.CustomException
      */
     public ArrayList getPhotos4photo_film_backup(IFilmPK filmPK) throws CustomException {
-        return getMapper().loadEntityVector(this, Photo.SQLSelect4photo_film_backup, filmPK.getKeyFields());
+        return this.getEntities(EMphoto.SQLSelect4photo_film_backup, filmPK.getSQLprimarykey());
     }
 
     /**
@@ -494,7 +451,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
         if(isAuthenticated() || photo.getPublic()) {
             String filepath = getImagePath(photoPK, THUMBNAILPATH);
             String filename = getFilename(photoPK);
-            return new File(GeneralObject.FILEROOT + filepath + filename);
+            return new File(BusinessLogic.FILEROOT + filepath + filename);
         } else {
             return null;
         }
@@ -511,7 +468,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
         if(isAuthenticated() || photo.getPublic()) {
             String filepath = getImagePath(photoPK, SMALLPATH);
             String filename = getFilename(photoPK);
-            return new File(GeneralObject.FILEROOT + filepath + filename);
+            return new File(BusinessLogic.FILEROOT + filepath + filename);
         } else {
             return null;
         }
@@ -532,7 +489,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
 
     /**
      *
-     * @param photoPK: Photo primary key
+     * @param photoPK Photo primary key
      * @return Small image path
      * @throws DBException
      */
@@ -542,42 +499,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
         return FILEROOT + filepath + filename;
     }
 
-//to be deleted
     /**
-     * copy the jpg file to the destinationpath in /docroot
-     * @param photoPK: photo primary key
-     * @param destinationpath: destination path in /docroot
-     * @return new file name, not including destinationpath
-     * @throws IOException 
-     */
-/*    public String publishSmall(boolean hasprivateaccess, IPhotoPK photoPK, String destinationpath) throws IOException, DBException {
-        Photo photo = this.getPhoto(hasprivateaccess, photoPK);
-        String newfilename = "";
-        if(photo!=null) {
-            newfilename = ConstructUID() + ".jpg";
-            StringBuilder sb = new StringBuilder(destinationpath);
-            sb.append(newfilename);
-            String newfile = sb.toString();
-            String filename = getSmallfilepath(photoPK);
-            log.fine("copy " + filename + " to " + newfile);
-            File source = new File(filename);
-            File dest = new File(newfile);
-            FileChannel inputChannel = null;
-            FileChannel outputChannel = null;
-            try {
-                inputChannel = new FileInputStream(source).getChannel();
-                outputChannel = new FileOutputStream(dest).getChannel();
-                outputChannel.transferFrom(inputChannel, 0, inputChannel.size());
-            } finally {
-                inputChannel.close();
-                outputChannel.close();
-            }
-        }
-        return newfilename;
-    }*/
-    
-    /**
-     *
      * @param photoPK: Photo primary key
      * @return Small image for this photo
      * @throws DBException
@@ -589,7 +511,6 @@ public class BLphoto extends Bphoto implements IBLphoto {
     }
 
     /**
-     *
      * @param photoPK: Photo primary key
      * @param format: format suffix in filename (C, P, COMPOSITION, ...)
      * @return Small image for this photo
@@ -602,7 +523,6 @@ public class BLphoto extends Bphoto implements IBLphoto {
     }
 
     /**
-     *
      * @param photoPK: Photo primary key
      * @return Cropped image for this photo
      * @throws DBException
@@ -614,7 +534,6 @@ public class BLphoto extends Bphoto implements IBLphoto {
     }
 
     /**
-     *
      * @param photoPK: Photo primary key
      * @param format: format suffix in filename (C, P, COMPOSITION, ...)
      * @return Cropped image for this photo
@@ -627,7 +546,6 @@ public class BLphoto extends Bphoto implements IBLphoto {
     }
 
     /**
-     *
      * @param photoPK: Photo primary key
      * @return Cropped image for this photo
      * @throws DBException
@@ -647,110 +565,36 @@ public class BLphoto extends Bphoto implements IBLphoto {
     public ArrayList getDescriptions(String searchtext) throws DBException {
         String search = ":*:" + searchtext + ":*:";
         Object[][] parameter = { { "description", search } };
-        AbstractSQLMapper sqlmapper = entitymapper.resetSQLMapper("");
-        BLRecordcount blrecordcount = new BLRecordcount(sqlmapper);
-        ViewMapper viewmapper = new ViewMapper(sqlmapper);
-        String sql = Photo.SQLSelectDescriptions;
+        SQLparameters parameters = new SQLparameters(parameter);
+        String sql = EMphoto.SQLSelectDescriptions;
         if(!this.isAuthenticated()) {
-            sql += " and " + Photo.SQLWherePublic;
-            parameter = AbstractSQLMapper.addKeyArrays(parameter, publiconly);
+            sql += " and " + EMphoto.SQLWherePublic;
+            parameters.add(publiconly);
         }
-        sql += Photo.OrderByDescription;
-        ArrayList descriptions = viewmapper.loadViewVector(new BLphoto.BLdescriptionsview(), sql, parameter);
+        sql += EMphoto.OrderByDescription;
+        BLviewdescriptions blviewdescriptions = new BLviewdescriptions();
+        ArrayList<Viewdescriptions> descriptions = blviewdescriptions.getEntities(sql, parameters);
         ArrayList<String> descriptionsarray = new ArrayList<String>();
-        Iterator<Descriptionview> descriptionsI = descriptions.iterator();
-        Descriptionview descriptionview;
-        while(descriptionsI.hasNext()) {
-            descriptionview = descriptionsI.next();
+        for(Viewdescriptions descriptionview: descriptions) {
             descriptionsarray.add(descriptionview.getDescription());
         }
         return descriptionsarray;
     }
     
-    private class BLdescriptionsview implements BLviewinterface {
-        
-        public BLdescriptionsview() {
-        }
-        
-        public String getExecutedSQLselect() {
-            return "";
-        }
-        
-        public View mapResultSet2View(ResultSet dbresult) throws SQLException {
-            Descriptionview descriptionview = new Descriptionview();
-            if(dbresult!=null) {
-                try {
-                    descriptionview.setDescription(dbresult.getString("description"));
-                }
-                catch(SQLException sqle) {
-                    throw sqle;
-                }
-            }
-            this.loadExtra(dbresult, descriptionview);
-            return descriptionview;
-        }
-        
-        public void loadExtra(ResultSet dbresult, View view) throws SQLException {
-            
-        }
-    }
-    
-    private class Descriptionview implements View {        
-        public static final String table = "";
-        public static final String SQLSelectAll = "";
-        
-        private String description;
-        
-        /**
-         * @return Select statement for retreiving all records (using SQLSelectAll)
-         */
-        public String getSQLSelectAll() {
-            return SQLSelectAll;
-        }
-
-        /**
-         * @return DB Table name
-         */
-        public String getTable() {
-            return table;
-        }
-
-        /**
-         * @return Classname of Entity
-         */
-        public String getClassName() {
-            return this.getClass().getName();
-        }
-
-        /**
-         * @return is :Entity: Empty ?
-         */
-        public boolean isEmpty() {
-            return false;
-        }
-        
-        public String getDescription() {
-            return this.description;
-        }
-        
-        public void setDescription(String description) {
-            this.description = description;
-        }
-    }
-
     /**
      * get photos where location or date/time is not in database
      * @return ArrayList of Photo objects
      * @throws DBException 
      */
     public ArrayList getPhotoDataErrors() throws DBException {
-        return getMapper().loadEntityVector(this, Photo.SQLSelectDataError);
+        return this.getEntities(EMphoto.SQLSelectDataError);
     }
     
     /**
      * Backup Image files
      * Delete images in root and cropped directory to save server diskspace
      * only keep files in small and thumbnail
+     * @param film
      * @param photo
      * @param backupdir
      * @throws DBException
@@ -903,9 +747,10 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to insert Photo object in database
      * commit transaction
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertPhoto(IPhoto photo) throws DBException, DataException {
         trans_insertPhoto(photo);
         super.Commit2DB();
@@ -915,8 +760,8 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to insert Photo object in database
      * commit transaction
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertPhoto(IPhoto photo) throws DBException, DataException {
         trans_insertPhoto(photo);
@@ -930,7 +775,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
      */
     public void checkwritepermissions() throws DataException {
         //check writing permissions on disk
-        File checkpermissionsfile = new File(GeneralObject.FILEROOT + BLfilm.PHOTOSUBROOT);
+        File checkpermissionsfile = new File(BusinessLogic.FILEROOT + BLfilm.PHOTOSUBROOT);
         if(!checkpermissionsfile.canWrite()) {
             throw new DataException("No write permission on server disk");
         }
@@ -940,8 +785,8 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to insert Photo object in database, based on root and cropped photo file data
      * commit transaction
      * @param root: root Photo file
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void uploadPhotoImage_Root(Filedata root) throws DBException, DataException {
         checkwritepermissions(); //DataException is thrown when not ok
@@ -965,8 +810,10 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to insert Photo object in database, based on root and cropped photo file data
      * commit transaction
      * @param root: root Photo file
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @param photoproperties
+     * @return 
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public String uploadPhotoImage_CONRoot(Filedata root, HashMap photoproperties) throws DBException, DataException {
         checkwritepermissions(); //DataException is thrown when not ok
@@ -1153,7 +1000,8 @@ public class BLphoto extends Bphoto implements IBLphoto {
 
     public Photo getLastPhotoinGroup(String filmgroupid) throws DBException {
         Object[][] parameter = { { "groupid", filmgroupid + "%" } };
-        return (Photo)getMapper().loadEntity(this, Photo.SQLSelectLastPhotoinGroup, parameter);
+        SQLparameters parameters = new SQLparameters(parameter);
+        return (Photo)this.getEntity(EMphoto.SQLSelectLastPhotoinGroup, parameters);
     }
 
     public Photo getLastPhotoinGroupAndType(String filmgroupid, String uploadtype) throws DBException {
@@ -1161,15 +1009,16 @@ public class BLphoto extends Bphoto implements IBLphoto {
             { "groupid", filmgroupid + "%" },
             { "type", uploadtype }
         };
-        return (Photo)getMapper().loadEntity(this, Photo.SQLSelectLastPhotoinGroupAndFilmtype, parameter);
+        SQLparameters parameters = new SQLparameters(parameter);
+        return (Photo)this.getEntity(EMphoto.SQLSelectLastPhotoinGroupAndFilmtype, parameters);
     }
 
     /**
      * try to insert Photo object in database, based on root and cropped photo file data
      * commit transaction
      * @param cropped: cropped Photo file
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void uploadPhotoImage_Cropped(Filedata cropped) throws DBException, DataException {
         checkwritepermissions(); //DataException is thrown when not ok
@@ -1212,9 +1061,10 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to update Photo object in database
      * commit transaction
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updatePhoto(IPhoto photo) throws DBException, DataException {
         trans_updatePhoto(photo);
         super.Commit2DB();
@@ -1224,8 +1074,8 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to update Photo object in database
      * commit transaction
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdatePhoto(IPhoto photo) throws DBException, DataException {
         trans_updatePhoto(photo);
@@ -1239,9 +1089,6 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * @throws DataException 
      */
     public void updateGeolocation(IPhoto photo) throws DBException, DataException {
-/*        if(photo.getReversegeocode()!=null 
-                && photo.getReversegeocode().length()>0
-                && (photo.isLocationUpdated() || photo.getRoutePK()==null)) {*/
         log.fine("updateGeolocation start");
         if(photo.getReversegeocode()!=null && photo.getReversegeocode().length()>0 && 
                 (photo.isReversegeocodeUpdated() || photo.isLocationUpdated())) {   
@@ -1264,6 +1111,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * copy previous used location in this photo series
      * update location and dependent parameters
      * @param photo
+     * @return 
      * @throws DBException
      * @throws DataException 
      */
@@ -1304,6 +1152,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * update location and dependent parameters
      * @param photo: photo to update
      * @param photopk: photo primary key containing the location to use
+     * @return 
      * @throws DBException
      * @throws DataException 
      */
@@ -1329,9 +1178,13 @@ public class BLphoto extends Bphoto implements IBLphoto {
     /**
      * try to update Photo object in database
      * commit transaction
+     * @param senderobject
+     * @param userprofile
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @param subjects
+     * @param tree7subjects
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void updatePhoto(String senderobject, Userprofile userprofile, IPhoto photo, ArrayList subjects, ArrayList tree7subjects) throws DBException, DataException {
         //check if user is allowed to edit
@@ -1369,8 +1222,9 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to delete Photo object in database
      * commit transaction
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deletePhoto(IPhoto photo) throws DBException {
         trans_deletePhoto(photo);
         super.Commit2DB();
@@ -1380,7 +1234,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to delete Photo object in database
      * commit transaction
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeletePhoto(IPhoto photo) throws DBException {
         trans_deletePhoto(photo);
@@ -1391,8 +1245,8 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to insert Photo object in database
      * do not commit transaction
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertPhoto(IPhoto photo) throws DBException, DataException {
         super.checkDATA(photo);
@@ -1403,8 +1257,8 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to update Photo object in database
      * do not commit transaction
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updatePhoto(IPhoto photo) throws DBException, DataException {
         super.checkDATA(photo);
@@ -1416,7 +1270,7 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * try to delete Photo object in database
      * do not commit transaction
      * @param photo: Photo Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deletePhoto(IPhoto photo) throws DBException {
         super.deletePhoto((Photo)photo);
@@ -1424,8 +1278,9 @@ public class BLphoto extends Bphoto implements IBLphoto {
 
     public void setBackedup(String senderobject, IFilmPK filmpk) throws DBException {
         Object[][] parameter = { { "backup", false } };
-        parameter = AbstractSQLMapper.addKeyArrays(filmpk.getKeyFields(), parameter);
-        addStatement(senderobject, Photo.SQLUpdateBackup4Film, parameter);
+        SQLparameters parameters = new SQLparameters(parameter);
+        parameters.add(filmpk.getSQLprimarykey());
+        addStatement(EMphoto.SQLUpdateBackup4Film, parameters);
         Commit2DB();
     }
 
@@ -1433,12 +1288,12 @@ public class BLphoto extends Bphoto implements IBLphoto {
      * search database table with search parameters
      * if no search is used, return empty list
      * @param userprofile: Userprofile of logged in user
-     * @param search: ITablesearch object
+     * @param search: Tablesearcher object
      * @param loadthumbnails: boolean, load thumbnail pictures in ArrayList for found photo objects
      * @return ArrayList of found entities
      * @throws DBException
      */
-    public ArrayList search(Userprofile userprofile, ITablesearch search, boolean loadthumbnails) throws DBException {
+    public ArrayList search(Userprofile userprofile, Tablesearcher search, boolean loadthumbnails) throws DBException {
         ArrayList photos = new ArrayList();
         if(userprofile!=null && userprofile.privateaccess()) {
             photos = super.search(search);

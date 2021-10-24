@@ -9,16 +9,11 @@
 package film.BusinessObject.Logic;
 
 import general.exception.DBException;
-import general.exception.DataException;
-import data.interfaces.db.LogicEntity;
 import film.interfaces.logicentity.ICreator;
 import film.logicentity.Creator;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import film.BusinessObject.table.Bcreator;
 import general.exception.DataException;
-import film.interfaces.BusinessObject.IBLcreator;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLcreator
@@ -30,7 +25,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLcreator extends Bcreator implements IBLcreator {
+public class BLcreator extends Bcreator {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -47,26 +42,19 @@ public class BLcreator extends Bcreator implements IBLcreator {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLcreator(GeneralEntityObject transactionobject) {
+    public BLcreator(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
     /**
-     * load extra fields from adjusted sql statement
-     */
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity creator) throws SQLException {
-        
-    }
-    
-    /**
      * try to insert Creator object in database
      * commit transaction
      * @param creator: Creator Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertCreator(ICreator creator) throws DBException, DataException {
         trans_insertCreator(creator);
         super.Commit2DB();
@@ -77,8 +65,8 @@ public class BLcreator extends Bcreator implements IBLcreator {
      * an alternative to insertCreator, which can be made an empty function
      * commit transaction
      * @param creator: Creator Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertCreator(ICreator creator) throws DBException, DataException {
         trans_insertCreator(creator);
@@ -89,9 +77,10 @@ public class BLcreator extends Bcreator implements IBLcreator {
      * try to update Creator object in database
      * commit transaction
      * @param creator: Creator Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateCreator(ICreator creator) throws DBException, DataException {
         trans_updateCreator(creator);
         super.Commit2DB();
@@ -102,8 +91,8 @@ public class BLcreator extends Bcreator implements IBLcreator {
      * an alternative to updateCreator, which can be made an empty function
      * commit transaction
      * @param creator: Creator Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateCreator(ICreator creator) throws DBException, DataException {
         this.deleteEntity(creator);
@@ -114,8 +103,9 @@ public class BLcreator extends Bcreator implements IBLcreator {
      * try to delete Creator object in database
      * commit transaction
      * @param creator: Creator Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteCreator(ICreator creator) throws DBException {
         this.deleteEntity(creator);
         super.Commit2DB();
@@ -126,7 +116,7 @@ public class BLcreator extends Bcreator implements IBLcreator {
      * an alternative to deleteCreator, which can be made an empty function
      * commit transaction
      * @param creator: Creator Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteCreator(ICreator creator) throws DBException {
         trans_deleteCreator(creator);
@@ -137,8 +127,8 @@ public class BLcreator extends Bcreator implements IBLcreator {
      * try to insert Creator object in database
      * do not commit transaction
      * @param creator: Creator Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertCreator(ICreator creator) throws DBException, DataException {
         super.checkDATA(creator);
@@ -149,8 +139,8 @@ public class BLcreator extends Bcreator implements IBLcreator {
      * try to update Creator object in database
      * do not commit transaction
      * @param creator: Creator Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateCreator(ICreator creator) throws DBException, DataException {
         super.checkDATA(creator);
@@ -161,7 +151,7 @@ public class BLcreator extends Bcreator implements IBLcreator {
      * try to delete Creator object in database
      * do not commit transaction
      * @param creator: Creator Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteCreator(ICreator creator) throws DBException {
         super.deleteCreator((Creator)creator);

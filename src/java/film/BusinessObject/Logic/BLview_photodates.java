@@ -9,13 +9,9 @@
 package film.BusinessObject.Logic;
 
 import general.exception.DBException;
-import data.interfaces.db.View;
 import film.BusinessObject.view.Bview_photodates;
-import film.interfaces.BusinessObject.IBLview_photodates;
-import film.logicview.View_photodates;
-import film.logicview.View_photodatespublic;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import film.conversion.entity.EMview_photodates;
+import film.conversion.entity.EMview_photodatespublic;
 import java.util.ArrayList;
 
 /**
@@ -28,7 +24,7 @@ import java.util.ArrayList;
  *
  * @author Franky Laseure
  */
-public class BLview_photodates extends Bview_photodates implements IBLview_photodates {
+public class BLview_photodates extends Bview_photodates {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -44,7 +40,7 @@ public class BLview_photodates extends Bview_photodates implements IBLview_photo
      */
     @Override
     public ArrayList getView_photodatess() throws DBException {
-        return getMapper().loadViewVector(this, View_photodatespublic.SQLSelectAll);
+        return this.getEntities(EMview_photodatespublic.SQLSelectAll);
     }
     
     /**
@@ -54,15 +50,10 @@ public class BLview_photodates extends Bview_photodates implements IBLview_photo
      */
     public ArrayList getView_photodatess(boolean loggedin) throws DBException {
         if(loggedin) {
-            return getMapper().loadViewVector(this, View_photodates.SQLSelectAll);
+            return this.getEntities(EMview_photodates.SQLSelectAll);
         } else {
             return this.getView_photodatess();
         }
-    }
-    
-    @Override
-    public void loadExtra(ResultSet dbresult, View view_photodates) throws SQLException {
-        
     }
     
 }

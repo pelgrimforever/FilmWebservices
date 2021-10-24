@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Tree7subject.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -144,7 +144,7 @@ public class Tree7subject extends SecurityDataServlet {
                             break;
                         case ITree7subjectOperation.DELETE_Tree7subjectparentsubjectid:
                             ITree7subjectPK tree7subjectParentsubjectidPK = (ITree7subjectPK)parser.getJavaObject("tree7subjectpk");
-                            bltree7subject.delete4tree7subjectParentsubjectid(this.getServletName(), tree7subjectParentsubjectidPK);
+                            bltree7subject.delete4tree7subjectParentsubjectid(tree7subjectParentsubjectidPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

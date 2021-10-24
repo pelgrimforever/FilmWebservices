@@ -8,17 +8,12 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
-import BusinessObject.GeneralObject;
-import data.interfaces.db.LogicEntity;
+import BusinessObject.BLtable;
 import film.interfaces.logicentity.IMainmenu;
 import film.logicentity.Mainmenu;
 import film.BusinessObject.table.Bmainmenu;
-import film.interfaces.BusinessObject.IBLmainmenu;
 import general.exception.DBException;
 import general.exception.DataException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLmainmenu
@@ -30,7 +25,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
+public class BLmainmenu extends Bmainmenu {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -47,23 +42,19 @@ public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLmainmenu(GeneralEntityObject transactionobject) {
+    public BLmainmenu(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity mainmenu) throws SQLException {
-        
-    }
-    
     /**
      * try to insert Mainmenu object in database
      * commit transaction
      * @param mainmenu: Mainmenu Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertMainmenu(IMainmenu mainmenu) throws DBException, DataException {
         trans_insertMainmenu(mainmenu);
         super.Commit2DB();
@@ -73,8 +64,8 @@ public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
      * try to insert Mainmenu object in database
      * commit transaction
      * @param mainmenu: Mainmenu Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertMainmenu(IMainmenu mainmenu) throws DBException, DataException {
         trans_insertMainmenu(mainmenu);
@@ -85,9 +76,10 @@ public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
      * try to update Mainmenu object in database
      * commit transaction
      * @param mainmenu: Mainmenu Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateMainmenu(IMainmenu mainmenu) throws DBException, DataException {
         trans_updateMainmenu(mainmenu);
         super.Commit2DB();
@@ -97,8 +89,8 @@ public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
      * try to update Mainmenu object in database
      * commit transaction
      * @param mainmenu: Mainmenu Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateMainmenu(IMainmenu mainmenu) throws DBException, DataException {
         trans_updateMainmenu(mainmenu);
@@ -109,8 +101,9 @@ public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
      * try to delete Mainmenu object in database
      * commit transaction
      * @param mainmenu: Mainmenu Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteMainmenu(IMainmenu mainmenu) throws DBException {
         trans_deleteMainmenu(mainmenu);
         super.Commit2DB();
@@ -120,7 +113,7 @@ public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
      * try to delete Mainmenu object in database
      * commit transaction
      * @param mainmenu: Mainmenu Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteMainmenu(IMainmenu mainmenu) throws DBException {
         trans_deleteMainmenu(mainmenu);
@@ -131,8 +124,8 @@ public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
      * try to insert Mainmenu object in database
      * do not commit transaction
      * @param mainmenu: Mainmenu Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertMainmenu(IMainmenu mainmenu) throws DBException, DataException {
         super.checkDATA(mainmenu);
@@ -143,8 +136,8 @@ public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
      * try to update Mainmenu object in database
      * do not commit transaction
      * @param mainmenu: Mainmenu Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateMainmenu(IMainmenu mainmenu) throws DBException, DataException {
         super.checkDATA(mainmenu);
@@ -155,7 +148,7 @@ public class BLmainmenu extends Bmainmenu implements IBLmainmenu {
      * try to delete Mainmenu object in database
      * do not commit transaction
      * @param mainmenu: Mainmenu Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteMainmenu(IMainmenu mainmenu) throws DBException {
         super.deleteMainmenu((Mainmenu)mainmenu);

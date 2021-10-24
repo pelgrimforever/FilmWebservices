@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Menuitem.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -110,7 +110,7 @@ public class Menuitem extends SecurityDataServlet {
                             break;
                         case IMenuitemOperation.DELETE_Menu:
                             IMenuPK menuPK = (IMenuPK)parser.getJavaObject("menupk");
-                            blmenuitem.delete4menu(this.getServletName(), menuPK);
+                            blmenuitem.delete4menu(menuPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

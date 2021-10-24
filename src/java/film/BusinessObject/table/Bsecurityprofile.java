@@ -2,23 +2,25 @@
  * Bsecurityprofile.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONSecurityprofile;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMsecurityprofile;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bsecurityprofile
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bsecurityprofile extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bsecurityprofile extends BLtable {
 
     /**
      * Constructor, sets Securityprofile as default Entity
      */
     public Bsecurityprofile() {
-        super(new SQLMapper_pgsql(connectionpool, "Securityprofile"), new Securityprofile());
+        super(new Securityprofile(), new EMsecurityprofile());
     }
 
     /**
@@ -56,31 +60,8 @@ public abstract class Bsecurityprofile extends GeneralEntityObject implements Pr
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bsecurityprofile(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Securityprofile());
-    }
-
-    /**
-     * Map ResultSet Field values to Securityprofile
-     * @param dbresult: Database ResultSet
-     */
-    public Securityprofile mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        SecurityprofilePK securityprofilePK = null;
-        Securityprofile securityprofile;
-        if(dbresult==null) {
-            securityprofile = new Securityprofile(securityprofilePK);
-        } else {
-            try {
-                securityprofilePK = new SecurityprofilePK(dbresult.getString("userprofile"));
-                securityprofile = new Securityprofile(securityprofilePK);
-                securityprofile.initPrivateaccess(dbresult.getBoolean("privateaccess"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, securityprofile);
-        return securityprofile;
+    public Bsecurityprofile(BLtable transactionobject) {
+        super(transactionobject, new Securityprofile(), new EMsecurityprofile());
     }
 
     /**
@@ -94,6 +75,7 @@ public abstract class Bsecurityprofile extends GeneralEntityObject implements Pr
     /**
      * create new empty Securityprofile object
      * create new primary key with given parameters
+     * @param userprofile primary key field
      * @return ISecurityprofile with primary key
      */
     public ISecurityprofile newSecurityprofile(java.lang.String userprofile) {
@@ -119,6 +101,7 @@ public abstract class Bsecurityprofile extends GeneralEntityObject implements Pr
 
     /**
      * create new primary key with given parameters
+     * @param userprofile primary key field
      * @return new ISecurityprofilePK
      */
     public ISecurityprofilePK newSecurityprofilePK(java.lang.String userprofile) {
@@ -130,10 +113,8 @@ public abstract class Bsecurityprofile extends GeneralEntityObject implements Pr
      * @return ArrayList of Securityprofile objects
      * @throws DBException
      */
-    public ArrayList getSecurityprofiles() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Securityprofile.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Securityprofile> getSecurityprofiles() throws DBException {
+        return (ArrayList<Securityprofile>)super.getEntities(EMsecurityprofile.SQLSelectAll);
     }
 
     /**
@@ -143,21 +124,28 @@ public abstract class Bsecurityprofile extends GeneralEntityObject implements Pr
      * @throws DBException
      */
     public Securityprofile getSecurityprofile(ISecurityprofilePK securityprofilePK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Securityprofile)super.getEntity((SecurityprofilePK)securityprofilePK);
-        } else return null;
+        return (Securityprofile)super.getEntity((SecurityprofilePK)securityprofilePK);
     }
 
-    public ArrayList searchsecurityprofiles(ISecurityprofilesearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search securityprofile with ISecurityprofilesearch parameters
+     * @param search ISecurityprofilesearch
+     * @return ArrayList of Securityprofile
+     * @throws DBException 
+     */
+    public ArrayList<Securityprofile> searchsecurityprofiles(ISecurityprofilesearch search) throws DBException {
+        return (ArrayList<Securityprofile>)this.search(search);
     }
 
-    public ArrayList searchsecurityprofiles(ISecurityprofilesearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search securityprofile with ISecurityprofilesearch parameters, order by orderby sql clause
+     * @param search ISecurityprofilesearch
+     * @param orderby sql order by string
+     * @return ArrayList of Securityprofile
+     * @throws DBException 
+     */
+    public ArrayList<Securityprofile> searchsecurityprofiles(ISecurityprofilesearch search, String orderby) throws DBException {
+        return (ArrayList<Securityprofile>)this.search(search, orderby);
     }
 
     /**
@@ -167,28 +155,26 @@ public abstract class Bsecurityprofile extends GeneralEntityObject implements Pr
      * @throws DBException
      */
     public boolean getSecurityprofileExists(ISecurityprofilePK securityprofilePK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((SecurityprofilePK)securityprofilePK);
-        } else return false;
+        return super.getEntityExists((SecurityprofilePK)securityprofilePK);
     }
 
     /**
      * try to insert Securityprofile in database
-     * @param film: Securityprofile object
+     * @param securityprofile Securityprofile object
      * @throws DBException
+     * @throws DataException
      */
     public void insertSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(securityprofile);
-        }
+        super.insertEntity(securityprofile);
     }
 
     /**
      * check if SecurityprofilePK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Securityprofile object
+     * @param securityprofile Securityprofile object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
         if(this.getSecurityprofileExists(securityprofile.getPrimaryKey())) {
@@ -200,30 +186,27 @@ public abstract class Bsecurityprofile extends GeneralEntityObject implements Pr
 
     /**
      * try to update Securityprofile in database
-     * @param film: Securityprofile object
+     * @param securityprofile Securityprofile object
      * @throws DBException
+     * @throws DataException
      */
     public void updateSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(securityprofile);
-        }
+        super.updateEntity(securityprofile);
     }
 
     /**
      * try to delete Securityprofile in database
-     * @param film: Securityprofile object
+     * @param securityprofile Securityprofile object
      * @throws DBException
      */
     public void deleteSecurityprofile(ISecurityprofile securityprofile) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteSecurityprofile(securityprofile.getOwnerobject(), securityprofile.getPrimaryKey());
-            super.deleteEntity(securityprofile);
-        }
+        cascadedeleteSecurityprofile(securityprofile.getPrimaryKey());
+        super.deleteEntity(securityprofile);
     }
 
     /**
      * check data rules in Securityprofile, throw DataException with customized message if rules do not apply
-     * @param film: Securityprofile object
+     * @param securityprofile Securityprofile object
      * @throws DataException
      * @throws DBException
      */
@@ -239,60 +222,66 @@ public abstract class Bsecurityprofile extends GeneralEntityObject implements Pr
      * delete all records in tables where securityprofilePK is used in a primary key
      * @param securityprofilePK: Securityprofile primary key
      */
-    public void cascadedeleteSecurityprofile(String senderobject, ISecurityprofilePK securityprofilePK) {
+    public void cascadedeleteSecurityprofile(ISecurityprofilePK securityprofilePK) {
         BLsecurityuserprofile blsecurityuserprofile = new BLsecurityuserprofile(this);
-        blsecurityuserprofile.delete4securityprofile(senderobject, securityprofilePK);
+        blsecurityuserprofile.delete4securityprofile(securityprofilePK);
     }
 
     /**
      * @param securityuserprofilePK: parent Securityuserprofile for child object Securityprofile Entity
      * @return child Securityprofile Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ISecurityprofile getSecurityuserprofile(ISecurityuserprofilePK securityuserprofilePK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            SecurityprofilePK securityprofilePK = new SecurityprofilePK(securityuserprofilePK.getUserprofile());
-            return this.getSecurityprofile(securityprofilePK);
-        } else return null;
+    public Securityprofile getSecurityuserprofile(ISecurityuserprofilePK securityuserprofilePK) throws CustomException {
+        SecurityprofilePK securityprofilePK = new SecurityprofilePK(securityuserprofilePK.getUserprofile());
+        return this.getSecurityprofile(securityprofilePK);
     }
 
 
     /**
      * get all Securityprofile objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Securityprofile objects
      * @throws DBException
      */
-    public ArrayList getSecurityprofiles(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Securityprofile.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Securityprofile> getSecurityprofiles(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMsecurityprofile.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Securityprofile>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Securityprofile objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delSecurityprofile(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Securityprofile.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delSecurityprofile(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Securityprofile.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

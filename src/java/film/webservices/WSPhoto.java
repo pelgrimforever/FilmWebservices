@@ -1,3 +1,11 @@
+/*
+ * WSPhoto.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSPhoto implements WSIPhoto {
         Photo photo;
         try {
             IRoutePK routePK = JSONRoute.toRoutePK((JSONObject)parser.parse(json));
-            blphoto.delete4route(this.getClass().getName(), routePK);
+            blphoto.delete4route(routePK);
         }
         catch(ParseException e) {
         }
@@ -213,7 +221,7 @@ public class WSPhoto implements WSIPhoto {
         Photo photo;
         try {
             ICreatorPK creatorPK = JSONCreator.toCreatorPK((JSONObject)parser.parse(json));
-            blphoto.delete4creator(this.getClass().getName(), creatorPK);
+            blphoto.delete4creator(creatorPK);
         }
         catch(ParseException e) {
         }
@@ -250,7 +258,7 @@ public class WSPhoto implements WSIPhoto {
         Photo photo;
         try {
             IFilmPK filmPK = JSONFilm.toFilmPK((JSONObject)parser.parse(json));
-            blphoto.delete4film(this.getClass().getName(), filmPK);
+            blphoto.delete4film(filmPK);
         }
         catch(ParseException e) {
         }

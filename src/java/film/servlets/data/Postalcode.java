@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Postalcode.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -114,7 +114,7 @@ public class Postalcode extends SecurityDataServlet {
                             break;
                         case IPostalcodeOperation.DELETE_Arealevel3:
                             IArealevel3PK arealevel3PK = (IArealevel3PK)parser.getJavaObject("arealevel3pk");
-                            blpostalcode.delete4arealevel3(this.getServletName(), arealevel3PK);
+                            blpostalcode.delete4arealevel3(arealevel3PK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

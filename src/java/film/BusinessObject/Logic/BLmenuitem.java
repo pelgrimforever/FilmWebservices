@@ -8,17 +8,12 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
-import BusinessObject.GeneralObject;
-import data.interfaces.db.LogicEntity;
+import BusinessObject.BLtable;
 import film.interfaces.logicentity.IMenuitem;
 import film.logicentity.Menuitem;
 import film.BusinessObject.table.Bmenuitem;
-import film.interfaces.BusinessObject.IBLmenuitem;
 import general.exception.DBException;
 import general.exception.DataException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLmenuitem
@@ -30,7 +25,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
+public class BLmenuitem extends Bmenuitem {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -47,23 +42,19 @@ public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLmenuitem(GeneralEntityObject transactionobject) {
+    public BLmenuitem(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity menuitem) throws SQLException {
-        
-    }
-    
     /**
      * try to insert Menuitem object in database
      * commit transaction
      * @param menuitem: Menuitem Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertMenuitem(IMenuitem menuitem) throws DBException, DataException {
         trans_insertMenuitem(menuitem);
         super.Commit2DB();
@@ -73,8 +64,8 @@ public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
      * try to insert Menuitem object in database
      * commit transaction
      * @param menuitem: Menuitem Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertMenuitem(IMenuitem menuitem) throws DBException, DataException {
         trans_insertMenuitem(menuitem);
@@ -85,9 +76,10 @@ public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
      * try to update Menuitem object in database
      * commit transaction
      * @param menuitem: Menuitem Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateMenuitem(IMenuitem menuitem) throws DBException, DataException {
         trans_updateMenuitem(menuitem);
         super.Commit2DB();
@@ -97,8 +89,8 @@ public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
      * try to update Menuitem object in database
      * commit transaction
      * @param menuitem: Menuitem Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateMenuitem(IMenuitem menuitem) throws DBException, DataException {
         trans_updateMenuitem(menuitem);
@@ -109,8 +101,9 @@ public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
      * try to delete Menuitem object in database
      * commit transaction
      * @param menuitem: Menuitem Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteMenuitem(IMenuitem menuitem) throws DBException {
         trans_deleteMenuitem(menuitem);
         super.Commit2DB();
@@ -120,7 +113,7 @@ public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
      * try to delete Menuitem object in database
      * commit transaction
      * @param menuitem: Menuitem Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteMenuitem(IMenuitem menuitem) throws DBException {
         trans_deleteMenuitem(menuitem);
@@ -131,8 +124,8 @@ public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
      * try to insert Menuitem object in database
      * do not commit transaction
      * @param menuitem: Menuitem Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertMenuitem(IMenuitem menuitem) throws DBException, DataException {
         super.checkDATA(menuitem);
@@ -143,8 +136,8 @@ public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
      * try to update Menuitem object in database
      * do not commit transaction
      * @param menuitem: Menuitem Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateMenuitem(IMenuitem menuitem) throws DBException, DataException {
         super.checkDATA(menuitem);
@@ -155,7 +148,7 @@ public class BLmenuitem extends Bmenuitem implements IBLmenuitem {
      * try to delete Menuitem object in database
      * do not commit transaction
      * @param menuitem: Menuitem Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteMenuitem(IMenuitem menuitem) throws DBException {
         super.deleteMenuitem((Menuitem)menuitem);

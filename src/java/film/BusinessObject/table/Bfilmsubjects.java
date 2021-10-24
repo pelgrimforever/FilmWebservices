@@ -2,23 +2,25 @@
  * Bfilmsubjects.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONFilmsubjects;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMfilmsubjects;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bfilmsubjects
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bfilmsubjects extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bfilmsubjects extends BLtable {
 
     /**
      * Constructor, sets Filmsubjects as default Entity
      */
     public Bfilmsubjects() {
-        super(new SQLMapper_pgsql(connectionpool, "Filmsubjects"), new Filmsubjects());
+        super(new Filmsubjects(), new EMfilmsubjects());
     }
 
     /**
@@ -56,30 +60,8 @@ public abstract class Bfilmsubjects extends GeneralEntityObject implements Proje
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bfilmsubjects(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Filmsubjects());
-    }
-
-    /**
-     * Map ResultSet Field values to Filmsubjects
-     * @param dbresult: Database ResultSet
-     */
-    public Filmsubjects mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        FilmsubjectsPK filmsubjectsPK = null;
-        Filmsubjects filmsubjects;
-        if(dbresult==null) {
-            filmsubjects = new Filmsubjects(filmsubjectsPK);
-        } else {
-            try {
-                filmsubjectsPK = new FilmsubjectsPK(dbresult.getString("film"), dbresult.getString("cat1"), dbresult.getString("cat2"), dbresult.getInt("subject"));
-                filmsubjects = new Filmsubjects(filmsubjectsPK);
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, filmsubjects);
-        return filmsubjects;
+    public Bfilmsubjects(BLtable transactionobject) {
+        super(transactionobject, new Filmsubjects(), new EMfilmsubjects());
     }
 
     /**
@@ -93,6 +75,10 @@ public abstract class Bfilmsubjects extends GeneralEntityObject implements Proje
     /**
      * create new empty Filmsubjects object
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param cat1 primary key field
+     * @param cat2 primary key field
+     * @param subject primary key field
      * @return IFilmsubjects with primary key
      */
     public IFilmsubjects newFilmsubjects(java.lang.String film, java.lang.String cat1, java.lang.String cat2, int subject) {
@@ -118,6 +104,10 @@ public abstract class Bfilmsubjects extends GeneralEntityObject implements Proje
 
     /**
      * create new primary key with given parameters
+     * @param film primary key field
+     * @param cat1 primary key field
+     * @param cat2 primary key field
+     * @param subject primary key field
      * @return new IFilmsubjectsPK
      */
     public IFilmsubjectsPK newFilmsubjectsPK(java.lang.String film, java.lang.String cat1, java.lang.String cat2, int subject) {
@@ -129,10 +119,8 @@ public abstract class Bfilmsubjects extends GeneralEntityObject implements Proje
      * @return ArrayList of Filmsubjects objects
      * @throws DBException
      */
-    public ArrayList getFilmsubjectss() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Filmsubjects.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Filmsubjects> getFilmsubjectss() throws DBException {
+        return (ArrayList<Filmsubjects>)super.getEntities(EMfilmsubjects.SQLSelectAll);
     }
 
     /**
@@ -142,21 +130,28 @@ public abstract class Bfilmsubjects extends GeneralEntityObject implements Proje
      * @throws DBException
      */
     public Filmsubjects getFilmsubjects(IFilmsubjectsPK filmsubjectsPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Filmsubjects)super.getEntity((FilmsubjectsPK)filmsubjectsPK);
-        } else return null;
+        return (Filmsubjects)super.getEntity((FilmsubjectsPK)filmsubjectsPK);
     }
 
-    public ArrayList searchfilmsubjectss(IFilmsubjectssearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search filmsubjects with IFilmsubjectssearch parameters
+     * @param search IFilmsubjectssearch
+     * @return ArrayList of Filmsubjects
+     * @throws DBException 
+     */
+    public ArrayList<Filmsubjects> searchfilmsubjectss(IFilmsubjectssearch search) throws DBException {
+        return (ArrayList<Filmsubjects>)this.search(search);
     }
 
-    public ArrayList searchfilmsubjectss(IFilmsubjectssearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search filmsubjects with IFilmsubjectssearch parameters, order by orderby sql clause
+     * @param search IFilmsubjectssearch
+     * @param orderby sql order by string
+     * @return ArrayList of Filmsubjects
+     * @throws DBException 
+     */
+    public ArrayList<Filmsubjects> searchfilmsubjectss(IFilmsubjectssearch search, String orderby) throws DBException {
+        return (ArrayList<Filmsubjects>)this.search(search, orderby);
     }
 
     /**
@@ -166,28 +161,26 @@ public abstract class Bfilmsubjects extends GeneralEntityObject implements Proje
      * @throws DBException
      */
     public boolean getFilmsubjectsExists(IFilmsubjectsPK filmsubjectsPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((FilmsubjectsPK)filmsubjectsPK);
-        } else return false;
+        return super.getEntityExists((FilmsubjectsPK)filmsubjectsPK);
     }
 
     /**
      * try to insert Filmsubjects in database
-     * @param film: Filmsubjects object
+     * @param filmsubjects Filmsubjects object
      * @throws DBException
+     * @throws DataException
      */
     public void insertFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(filmsubjects);
-        }
+        super.insertEntity(filmsubjects);
     }
 
     /**
      * check if FilmsubjectsPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Filmsubjects object
+     * @param filmsubjects Filmsubjects object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
         if(this.getFilmsubjectsExists(filmsubjects.getPrimaryKey())) {
@@ -199,30 +192,27 @@ public abstract class Bfilmsubjects extends GeneralEntityObject implements Proje
 
     /**
      * try to update Filmsubjects in database
-     * @param film: Filmsubjects object
+     * @param filmsubjects Filmsubjects object
      * @throws DBException
+     * @throws DataException
      */
     public void updateFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(filmsubjects);
-        }
+        super.updateEntity(filmsubjects);
     }
 
     /**
      * try to delete Filmsubjects in database
-     * @param film: Filmsubjects object
+     * @param filmsubjects Filmsubjects object
      * @throws DBException
      */
     public void deleteFilmsubjects(IFilmsubjects filmsubjects) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteFilmsubjects(filmsubjects.getOwnerobject(), filmsubjects.getPrimaryKey());
-            super.deleteEntity(filmsubjects);
-        }
+        cascadedeleteFilmsubjects(filmsubjects.getPrimaryKey());
+        super.deleteEntity(filmsubjects);
     }
 
     /**
      * check data rules in Filmsubjects, throw DataException with customized message if rules do not apply
-     * @param film: Filmsubjects object
+     * @param filmsubjects Filmsubjects object
      * @throws DataException
      * @throws DBException
      */
@@ -241,88 +231,86 @@ public abstract class Bfilmsubjects extends GeneralEntityObject implements Proje
      * delete all records in tables where filmsubjectsPK is used in a primary key
      * @param filmsubjectsPK: Filmsubjects primary key
      */
-    public void cascadedeleteFilmsubjects(String senderobject, IFilmsubjectsPK filmsubjectsPK) {
+    public void cascadedeleteFilmsubjects(IFilmsubjectsPK filmsubjectsPK) {
     }
 
     /**
      * @param subjectPK: foreign key for Subject
      * @delete all Filmsubjects Entity objects for Subject in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4subject(String senderobject, ISubjectPK subjectPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Filmsubjects.SQLDelete4subject, subjectPK.getKeyFields());
-        }
+    public void delete4subject(ISubjectPK subjectPK) {
+        super.addStatement(EMfilmsubjects.SQLDelete4subject, subjectPK.getSQLprimarykey());
     }
 
     /**
      * @param subjectPK: foreign key for Subject
      * @return all Filmsubjects Entity objects for Subject
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getFilmsubjectss4subject(ISubjectPK subjectPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Filmsubjects.SQLSelect4subject, subjectPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Filmsubjects> getFilmsubjectss4subject(ISubjectPK subjectPK) throws CustomException {
+        return super.getEntities(EMfilmsubjects.SQLSelect4subject, subjectPK.getSQLprimarykey());
     }
     /**
      * @param filmPK: foreign key for Film
      * @delete all Filmsubjects Entity objects for Film in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4film(String senderobject, IFilmPK filmPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Filmsubjects.SQLDelete4film, filmPK.getKeyFields());
-        }
+    public void delete4film(IFilmPK filmPK) {
+        super.addStatement(EMfilmsubjects.SQLDelete4film, filmPK.getSQLprimarykey());
     }
 
     /**
      * @param filmPK: foreign key for Film
      * @return all Filmsubjects Entity objects for Film
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getFilmsubjectss4film(IFilmPK filmPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Filmsubjects.SQLSelect4film, filmPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Filmsubjects> getFilmsubjectss4film(IFilmPK filmPK) throws CustomException {
+        return super.getEntities(EMfilmsubjects.SQLSelect4film, filmPK.getSQLprimarykey());
     }
 
     /**
      * get all Filmsubjects objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Filmsubjects objects
      * @throws DBException
      */
-    public ArrayList getFilmsubjectss(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Filmsubjects.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Filmsubjects> getFilmsubjectss(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMfilmsubjects.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Filmsubjects>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Filmsubjects objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delFilmsubjects(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Filmsubjects.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delFilmsubjects(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Filmsubjects.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

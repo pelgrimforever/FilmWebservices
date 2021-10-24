@@ -1,3 +1,10 @@
+/*
+ * RSUploadsession.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -46,9 +53,6 @@ import org.json.simple.parser.ParseException;
 @Path("rsuploadsession")
 public class RSUploadsession {
 
-    @Context
-    private UriInfo context;
-
     /**
      * Creates a new instance of HelloWorld
      */
@@ -57,6 +61,7 @@ public class RSUploadsession {
 
     /**
      * Retrieves representation of an instance of uploadsession.restservices.RSUploadsession
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @GET
@@ -76,6 +81,7 @@ public class RSUploadsession {
 
     /**
      * Retrieves representation of an instance of uploadsession.restservices.RSUploadsession
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @POST
@@ -263,7 +269,6 @@ public class RSUploadsession {
     /**
      * PUT method for updating or creating an instance of RSUploadsession
      * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("text/html")

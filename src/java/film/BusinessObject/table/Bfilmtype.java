@@ -2,23 +2,25 @@
  * Bfilmtype.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONFilmtype;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMfilmtype;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bfilmtype
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bfilmtype extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bfilmtype extends BLtable {
 
     /**
      * Constructor, sets Filmtype as default Entity
      */
     public Bfilmtype() {
-        super(new SQLMapper_pgsql(connectionpool, "Filmtype"), new Filmtype());
+        super(new Filmtype(), new EMfilmtype());
     }
 
     /**
@@ -56,31 +60,8 @@ public abstract class Bfilmtype extends GeneralEntityObject implements ProjectCo
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bfilmtype(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Filmtype());
-    }
-
-    /**
-     * Map ResultSet Field values to Filmtype
-     * @param dbresult: Database ResultSet
-     */
-    public Filmtype mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        FilmtypePK filmtypePK = null;
-        Filmtype filmtype;
-        if(dbresult==null) {
-            filmtype = new Filmtype(filmtypePK);
-        } else {
-            try {
-                filmtypePK = new FilmtypePK(dbresult.getString("type"));
-                filmtype = new Filmtype(filmtypePK);
-                filmtype.initDescription(dbresult.getString("description"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, filmtype);
-        return filmtype;
+    public Bfilmtype(BLtable transactionobject) {
+        super(transactionobject, new Filmtype(), new EMfilmtype());
     }
 
     /**
@@ -94,6 +75,7 @@ public abstract class Bfilmtype extends GeneralEntityObject implements ProjectCo
     /**
      * create new empty Filmtype object
      * create new primary key with given parameters
+     * @param type primary key field
      * @return IFilmtype with primary key
      */
     public IFilmtype newFilmtype(java.lang.String type) {
@@ -119,6 +101,7 @@ public abstract class Bfilmtype extends GeneralEntityObject implements ProjectCo
 
     /**
      * create new primary key with given parameters
+     * @param type primary key field
      * @return new IFilmtypePK
      */
     public IFilmtypePK newFilmtypePK(java.lang.String type) {
@@ -130,10 +113,8 @@ public abstract class Bfilmtype extends GeneralEntityObject implements ProjectCo
      * @return ArrayList of Filmtype objects
      * @throws DBException
      */
-    public ArrayList getFilmtypes() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Filmtype.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Filmtype> getFilmtypes() throws DBException {
+        return (ArrayList<Filmtype>)super.getEntities(EMfilmtype.SQLSelectAll);
     }
 
     /**
@@ -143,21 +124,28 @@ public abstract class Bfilmtype extends GeneralEntityObject implements ProjectCo
      * @throws DBException
      */
     public Filmtype getFilmtype(IFilmtypePK filmtypePK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Filmtype)super.getEntity((FilmtypePK)filmtypePK);
-        } else return null;
+        return (Filmtype)super.getEntity((FilmtypePK)filmtypePK);
     }
 
-    public ArrayList searchfilmtypes(IFilmtypesearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search filmtype with IFilmtypesearch parameters
+     * @param search IFilmtypesearch
+     * @return ArrayList of Filmtype
+     * @throws DBException 
+     */
+    public ArrayList<Filmtype> searchfilmtypes(IFilmtypesearch search) throws DBException {
+        return (ArrayList<Filmtype>)this.search(search);
     }
 
-    public ArrayList searchfilmtypes(IFilmtypesearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search filmtype with IFilmtypesearch parameters, order by orderby sql clause
+     * @param search IFilmtypesearch
+     * @param orderby sql order by string
+     * @return ArrayList of Filmtype
+     * @throws DBException 
+     */
+    public ArrayList<Filmtype> searchfilmtypes(IFilmtypesearch search, String orderby) throws DBException {
+        return (ArrayList<Filmtype>)this.search(search, orderby);
     }
 
     /**
@@ -167,28 +155,26 @@ public abstract class Bfilmtype extends GeneralEntityObject implements ProjectCo
      * @throws DBException
      */
     public boolean getFilmtypeExists(IFilmtypePK filmtypePK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((FilmtypePK)filmtypePK);
-        } else return false;
+        return super.getEntityExists((FilmtypePK)filmtypePK);
     }
 
     /**
      * try to insert Filmtype in database
-     * @param film: Filmtype object
+     * @param filmtype Filmtype object
      * @throws DBException
+     * @throws DataException
      */
     public void insertFilmtype(IFilmtype filmtype) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(filmtype);
-        }
+        super.insertEntity(filmtype);
     }
 
     /**
      * check if FilmtypePK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Filmtype object
+     * @param filmtype Filmtype object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateFilmtype(IFilmtype filmtype) throws DBException, DataException {
         if(this.getFilmtypeExists(filmtype.getPrimaryKey())) {
@@ -200,30 +186,27 @@ public abstract class Bfilmtype extends GeneralEntityObject implements ProjectCo
 
     /**
      * try to update Filmtype in database
-     * @param film: Filmtype object
+     * @param filmtype Filmtype object
      * @throws DBException
+     * @throws DataException
      */
     public void updateFilmtype(IFilmtype filmtype) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(filmtype);
-        }
+        super.updateEntity(filmtype);
     }
 
     /**
      * try to delete Filmtype in database
-     * @param film: Filmtype object
+     * @param filmtype Filmtype object
      * @throws DBException
      */
     public void deleteFilmtype(IFilmtype filmtype) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteFilmtype(filmtype.getOwnerobject(), filmtype.getPrimaryKey());
-            super.deleteEntity(filmtype);
-        }
+        cascadedeleteFilmtype(filmtype.getPrimaryKey());
+        super.deleteEntity(filmtype);
     }
 
     /**
      * check data rules in Filmtype, throw DataException with customized message if rules do not apply
-     * @param film: Filmtype object
+     * @param filmtype Filmtype object
      * @throws DataException
      * @throws DBException
      */
@@ -231,7 +214,7 @@ public abstract class Bfilmtype extends GeneralEntityObject implements ProjectCo
         StringBuffer message = new StringBuffer();
         //Primary key
         if(filmtype.getDescription()!=null && filmtype.getDescription().length()>IFilmtype.SIZE_DESCRIPTION) {
-            message.append("Description is langer dan toegestaan. Max aantal karakters: " + IFilmtype.SIZE_DESCRIPTION + "\n");
+            message.append("Description is langer dan toegestaan. Max aantal karakters: ").append(IFilmtype.SIZE_DESCRIPTION).append("\n");
         }
         if(message.length()>0) {
             throw new DataException(message.toString());
@@ -242,46 +225,54 @@ public abstract class Bfilmtype extends GeneralEntityObject implements ProjectCo
      * delete all records in tables where filmtypePK is used in a primary key
      * @param filmtypePK: Filmtype primary key
      */
-    public void cascadedeleteFilmtype(String senderobject, IFilmtypePK filmtypePK) {
+    public void cascadedeleteFilmtype(IFilmtypePK filmtypePK) {
     }
 
 
     /**
      * get all Filmtype objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Filmtype objects
      * @throws DBException
      */
-    public ArrayList getFilmtypes(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Filmtype.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Filmtype> getFilmtypes(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMfilmtype.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Filmtype>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Filmtype objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delFilmtype(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Filmtype.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delFilmtype(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Filmtype.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

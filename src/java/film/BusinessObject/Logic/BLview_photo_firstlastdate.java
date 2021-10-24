@@ -8,14 +8,7 @@
 
 package film.BusinessObject.Logic;
 
-import general.exception.DBException;
-import data.interfaces.db.View;
-import film.interfaces.logicview.IView_photo_firstlastdate;
-import film.logicview.View_photo_firstlastdate;
 import film.BusinessObject.view.Bview_photo_firstlastdate;
-import film.interfaces.BusinessObject.IBLview_photo_firstlastdate;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLview_photo_firstlastdate
@@ -27,7 +20,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLview_photo_firstlastdate extends Bview_photo_firstlastdate implements IBLview_photo_firstlastdate {
+public class BLview_photo_firstlastdate extends Bview_photo_firstlastdate {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 	
     /**
@@ -36,9 +29,4 @@ public class BLview_photo_firstlastdate extends Bview_photo_firstlastdate implem
     public BLview_photo_firstlastdate() {
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, View view_photo_firstlastdate) throws SQLException {
-        
-    }
-    
 }

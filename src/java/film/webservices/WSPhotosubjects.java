@@ -1,3 +1,11 @@
+/*
+ * WSPhotosubjects.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSPhotosubjects implements WSIPhotosubjects {
         Photosubjects photosubjects;
         try {
             IPhotoPK photoPK = JSONPhoto.toPhotoPK((JSONObject)parser.parse(json));
-            blphotosubjects.delete4photo(this.getClass().getName(), photoPK);
+            blphotosubjects.delete4photo(photoPK);
         }
         catch(ParseException e) {
         }
@@ -213,7 +221,7 @@ public class WSPhotosubjects implements WSIPhotosubjects {
         Photosubjects photosubjects;
         try {
             ISubjectPK subjectPK = JSONSubject.toSubjectPK((JSONObject)parser.parse(json));
-            blphotosubjects.delete4subject(this.getClass().getName(), subjectPK);
+            blphotosubjects.delete4subject(subjectPK);
         }
         catch(ParseException e) {
         }

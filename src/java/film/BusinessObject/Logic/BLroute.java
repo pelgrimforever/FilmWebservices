@@ -9,17 +9,14 @@
 package film.BusinessObject.Logic;
 
 import general.exception.DBException;
-import data.interfaces.db.LogicEntity;
 import film.interfaces.logicentity.IRoute;
 import film.logicentity.Route;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import film.BusinessObject.table.Broute;
+import film.conversion.entity.EMroute;
 import general.exception.DataException;
-import film.interfaces.BusinessObject.IBLroute;
 import film.interfaces.entity.pk.ILocalityPK;
 import general.exception.CustomException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -32,7 +29,7 @@ import java.util.ArrayList;
  *
  * @author Franky Laseure
  */
-public class BLroute extends Broute implements IBLroute {
+public class BLroute extends Broute {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -49,35 +46,28 @@ public class BLroute extends Broute implements IBLroute {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLroute(GeneralEntityObject transactionobject) {
+    public BLroute(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
     /**
-     * load extra fields from adjusted sql statement
-     */
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity route) throws SQLException {
-        
-    }
-
-    /**
      * @param localityPK: foreign key for Locality
      * @return all Route Entity objects for Locality
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.CustomException
      */
     public ArrayList getRoutes4locality(ILocalityPK localityPK) throws CustomException {
-        return getMapper().loadEntityVector(this, Route.SQLSelect4localityPK, localityPK.getKeyFields());
+        return this.getEntities(EMroute.SQLSelect4localityPK, localityPK.getSQLprimarykey());
     }
     
     /**
      * try to insert Route object in database
      * commit transaction
      * @param route: Route Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertRoute(IRoute route) throws DBException, DataException {
         if(route.getName()==null) route.setName(route.getPrimaryKey().getRoutecode());
         trans_insertRoute(route);
@@ -88,8 +78,8 @@ public class BLroute extends Broute implements IBLroute {
      * try to insert Route object in database
      * commit transaction
      * @param route: Route Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertRoute(IRoute route) throws DBException, DataException {
         if(route.getName()==null) route.setName(route.getPrimaryKey().getRoutecode());
@@ -102,6 +92,7 @@ public class BLroute extends Broute implements IBLroute {
      * if not, try to insert Route in database
      * @param route: Route object
      * @throws DBException
+     * @throws general.exception.DataException
      */
     public void insertcheckRoute(IRoute route) throws DBException, DataException {
         if(this.getRoute(route.getPrimaryKey())==null) {
@@ -113,9 +104,10 @@ public class BLroute extends Broute implements IBLroute {
      * try to update Route object in database
      * commit transaction
      * @param route: Route Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateRoute(IRoute route) throws DBException, DataException {
         trans_updateRoute(route);
         super.Commit2DB();
@@ -125,8 +117,8 @@ public class BLroute extends Broute implements IBLroute {
      * try to update Route object in database
      * commit transaction
      * @param route: Route Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateRoute(IRoute route) throws DBException, DataException {
         trans_updateRoute(route);
@@ -137,8 +129,9 @@ public class BLroute extends Broute implements IBLroute {
      * try to delete Route object in database
      * commit transaction
      * @param route: Route Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteRoute(IRoute route) throws DBException {
         trans_deleteRoute(route);
         super.Commit2DB();
@@ -148,7 +141,7 @@ public class BLroute extends Broute implements IBLroute {
      * try to delete Route object in database
      * commit transaction
      * @param route: Route Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteRoute(IRoute route) throws DBException {
         trans_deleteRoute(route);
@@ -159,8 +152,8 @@ public class BLroute extends Broute implements IBLroute {
      * try to insert Route object in database
      * do not commit transaction
      * @param route: Route Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertRoute(IRoute route) throws DBException, DataException {
         super.checkDATA(route);
@@ -171,8 +164,8 @@ public class BLroute extends Broute implements IBLroute {
      * try to update Route object in database
      * do not commit transaction
      * @param route: Route Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateRoute(IRoute route) throws DBException, DataException {
         super.checkDATA(route);
@@ -183,7 +176,7 @@ public class BLroute extends Broute implements IBLroute {
      * try to delete Route object in database
      * do not commit transaction
      * @param route: Route Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteRoute(IRoute route) throws DBException {
         super.deleteRoute((Route)route);

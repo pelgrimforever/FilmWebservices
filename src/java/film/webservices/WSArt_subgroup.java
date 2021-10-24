@@ -1,3 +1,11 @@
+/*
+ * WSArt_subgroup.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSArt_subgroup implements WSIArt_subgroup {
         Art_subgroup art_subgroup;
         try {
             IArt_groupPK art_groupPK = JSONArt_group.toArt_groupPK((JSONObject)parser.parse(json));
-            blart_subgroup.delete4art_group(this.getClass().getName(), art_groupPK);
+            blart_subgroup.delete4art_group(art_groupPK);
         }
         catch(ParseException e) {
         }

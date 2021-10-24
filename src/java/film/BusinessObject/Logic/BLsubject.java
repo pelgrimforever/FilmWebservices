@@ -8,20 +8,18 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
-import data.interfaces.db.LogicEntity;
+import BusinessObject.BLtable;
+import db.SQLparameters;
 import film.interfaces.logicentity.ISubject;
 import film.logicentity.Subject;
 import film.BusinessObject.table.Bsubject;
+import film.conversion.entity.EMsubject;
 import film.entity.pk.SubjectPK;
-import film.interfaces.BusinessObject.IBLsubject;
 import film.interfaces.entity.pk.IFilmPK;
 import film.interfaces.entity.pk.IPhotoPK;
 import film.interfaces.entity.pk.ISubjectcatPK;
 import general.exception.DBException;
 import general.exception.DataException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -34,7 +32,7 @@ import java.util.ArrayList;
  *
  * @author Franky Laseure
  */
-public class BLsubject extends Bsubject implements IBLsubject {
+public class BLsubject extends Bsubject {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -51,16 +49,11 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLsubject(GeneralEntityObject transactionobject) {
+    public BLsubject(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity subject) throws SQLException {
-        
-    }
-    
     /**
      * Get Subjects for subjectcat1PK, subjectcat2PK
      * @param subjectcat1PK: Subjectcat Primary Key
@@ -70,7 +63,8 @@ public class BLsubject extends Bsubject implements IBLsubject {
      */
     public ArrayList getSubjects(ISubjectcatPK subjectcat1PK, ISubjectcatPK subjectcat2PK) throws DBException {
         Object[][] parameter = { { "cat1", subjectcat1PK.getCat() }, { "cat2", subjectcat2PK.getCat() } };
-        return getMapper().loadEntityVector(this, Subject.SQLSelect4cat1cat2, parameter);
+        SQLparameters parameters = new SQLparameters(parameter);
+        return this.getEntities(EMsubject.SQLSelect4cat1cat2, parameters);
     }
 
     public ArrayList getSubjects(ArrayList subjectpks) throws DBException {
@@ -88,30 +82,31 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * @throws DBException
      */
     public ArrayList getSubjects(IPhotoPK photoPK) throws DBException {
-        return getMapper().loadEntityVector(this, Subject.SQLSelect4photo, photoPK.getKeyFields());
+        return this.getEntities(EMsubject.SQLSelect4photo, photoPK.getSQLprimarykey());
     }
 
     /**
      * Get Subjects for photoPK
-     * @param photoPK: Photo Primary Key
+     * @param filmPK: Film Primary Key
      * @return ArrayList with Subjects linked by photo in filmsubjects
      * @throws DBException
      */
     public ArrayList getSubjects(IFilmPK filmPK) throws DBException {
-        return getMapper().loadEntityVector(this, Subject.SQLSelect4film, filmPK.getKeyFields());
+        return this.getEntities(EMsubject.SQLSelect4film, filmPK.getSQLprimarykey());
     }
 
     public int getMaxSubjectid() throws DBException {
-        return ((Subject)getMapper().loadEntity(this, Subject.getMaxsubjectid)).getPrimaryKey().getId();
+        return ((Subject)this.getEntity(EMsubject.getMaxsubjectid)).getPrimaryKey().getId();
     }
 
     /**
      * try to insert Subject object in database
      * commit transaction
      * @param subject: Subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertSubject(ISubject subject) throws DBException, DataException {
         subject.getPrimaryKey().setId(getMaxSubjectid() + 1);
         trans_insertSubject(subject);
@@ -122,8 +117,8 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * try to insert Subject object in database
      * commit transaction
      * @param subject: Subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertSubject(ISubject subject) throws DBException, DataException {
         subject.getPrimaryKey().setId(getMaxSubjectid() + 1);
@@ -135,9 +130,10 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * try to update Subject object in database
      * commit transaction
      * @param subject: Subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateSubject(ISubject subject) throws DBException, DataException {
         trans_updateSubject(subject);
         super.Commit2DB();
@@ -147,8 +143,8 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * try to update Subject object in database
      * commit transaction
      * @param subject: Subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateSubject(ISubject subject) throws DBException, DataException {
         trans_updateSubject(subject);
@@ -159,8 +155,9 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * try to delete Subject object in database
      * commit transaction
      * @param subject: Subject Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteSubject(ISubject subject) throws DBException {
         trans_deleteSubject(subject);
         super.Commit2DB();
@@ -170,7 +167,7 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * try to delete Subject object in database
      * commit transaction
      * @param subject: Subject Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteSubject(ISubject subject) throws DBException {
         trans_deleteSubject(subject);
@@ -181,8 +178,8 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * try to insert Subject object in database
      * do not commit transaction
      * @param subject: Subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertSubject(ISubject subject) throws DBException, DataException {
         super.checkDATA(subject);
@@ -193,8 +190,8 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * try to update Subject object in database
      * do not commit transaction
      * @param subject: Subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateSubject(ISubject subject) throws DBException, DataException {
         super.checkDATA(subject);
@@ -205,7 +202,7 @@ public class BLsubject extends Bsubject implements IBLsubject {
      * try to delete Subject object in database
      * do not commit transaction
      * @param subject: Subject Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteSubject(ISubject subject) throws DBException {
         super.deleteSubject((Subject)subject);

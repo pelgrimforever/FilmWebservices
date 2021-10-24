@@ -1,3 +1,11 @@
+/*
+ * WSPhototags.java
+ *
+ * Created on Dec 23, 2012, 7:24 PM
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.webservices;
 
 import film.BusinessObject.Logic.*;
@@ -176,7 +184,7 @@ public class WSPhototags implements WSIPhototags {
         Phototags phototags;
         try {
             IPhotoPK photoPK = JSONPhoto.toPhotoPK((JSONObject)parser.parse(json));
-            blphototags.delete4photo(this.getClass().getName(), photoPK);
+            blphototags.delete4photo(photoPK);
         }
         catch(ParseException e) {
         }

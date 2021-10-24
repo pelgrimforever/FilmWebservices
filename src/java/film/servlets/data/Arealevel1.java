@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Arealevel1.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -114,7 +114,7 @@ public class Arealevel1 extends SecurityDataServlet {
                             break;
                         case IArealevel1Operation.DELETE_Country:
                             ICountryPK countryPK = (ICountryPK)parser.getJavaObject("countrypk");
-                            blarealevel1.delete4country(this.getServletName(), countryPK);
+                            blarealevel1.delete4country(countryPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

@@ -2,23 +2,25 @@
  * Bpostalcode.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONPostalcode;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMpostalcode;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bpostalcode
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bpostalcode extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bpostalcode extends BLtable {
 
     /**
      * Constructor, sets Postalcode as default Entity
      */
     public Bpostalcode() {
-        super(new SQLMapper_pgsql(connectionpool, "Postalcode"), new Postalcode());
+        super(new Postalcode(), new EMpostalcode());
     }
 
     /**
@@ -56,48 +60,8 @@ public abstract class Bpostalcode extends GeneralEntityObject implements Project
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bpostalcode(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Postalcode());
-    }
-
-    /**
-     * Map ResultSet Field values to Postalcode
-     * @param dbresult: Database ResultSet
-     */
-    public Postalcode mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        PostalcodePK postalcodePK = null;
-        Postalcode postalcode;
-        if(dbresult==null) {
-            postalcode = new Postalcode(postalcodePK);
-        } else {
-            try {
-                postalcodePK = new PostalcodePK(dbresult.getString("countrycode"), dbresult.getString("postalcode"));
-                postalcode = new Postalcode(postalcodePK);
-                postalcode.initArealevel3PK(new Arealevel3PK(dbresult.getString("countrycode"), dbresult.getString("al1code"), dbresult.getString("al2code"), dbresult.getString("al3code")));
-                if(dbresult.wasNull()) postalcode.setArealevel3PK(null);                
-                Object o_location = dbresult.getObject("location");
-                if(o_location!=null) {
-                    piShape c_location = new psqlGeometry((PGgeometry)o_location);
-                    postalcode.initLocation(c_location.abstractclone());
-                }
-                Object o_bounds = dbresult.getObject("bounds");
-                if(o_bounds!=null) {
-                    piShape c_bounds = new psqlGeometry((PGgeometry)o_bounds);
-                    postalcode.initBounds(c_bounds.abstractclone());
-                }
-                Object o_viewport = dbresult.getObject("viewport");
-                if(o_viewport!=null) {
-                    piShape c_viewport = new psqlGeometry((PGgeometry)o_viewport);
-                    postalcode.initViewport(c_viewport.abstractclone());
-                }
-                postalcode.initApproximate(dbresult.getBoolean("approximate"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, postalcode);
-        return postalcode;
+    public Bpostalcode(BLtable transactionobject) {
+        super(transactionobject, new Postalcode(), new EMpostalcode());
     }
 
     /**
@@ -111,6 +75,8 @@ public abstract class Bpostalcode extends GeneralEntityObject implements Project
     /**
      * create new empty Postalcode object
      * create new primary key with given parameters
+     * @param countrycode primary key field
+     * @param postalcode primary key field
      * @return IPostalcode with primary key
      */
     public IPostalcode newPostalcode(java.lang.String countrycode, java.lang.String postalcode) {
@@ -136,6 +102,8 @@ public abstract class Bpostalcode extends GeneralEntityObject implements Project
 
     /**
      * create new primary key with given parameters
+     * @param countrycode primary key field
+     * @param postalcode primary key field
      * @return new IPostalcodePK
      */
     public IPostalcodePK newPostalcodePK(java.lang.String countrycode, java.lang.String postalcode) {
@@ -147,10 +115,8 @@ public abstract class Bpostalcode extends GeneralEntityObject implements Project
      * @return ArrayList of Postalcode objects
      * @throws DBException
      */
-    public ArrayList getPostalcodes() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Postalcode.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Postalcode> getPostalcodes() throws DBException {
+        return (ArrayList<Postalcode>)super.getEntities(EMpostalcode.SQLSelectAll);
     }
 
     /**
@@ -160,21 +126,28 @@ public abstract class Bpostalcode extends GeneralEntityObject implements Project
      * @throws DBException
      */
     public Postalcode getPostalcode(IPostalcodePK postalcodePK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Postalcode)super.getEntity((PostalcodePK)postalcodePK);
-        } else return null;
+        return (Postalcode)super.getEntity((PostalcodePK)postalcodePK);
     }
 
-    public ArrayList searchpostalcodes(IPostalcodesearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search postalcode with IPostalcodesearch parameters
+     * @param search IPostalcodesearch
+     * @return ArrayList of Postalcode
+     * @throws DBException 
+     */
+    public ArrayList<Postalcode> searchpostalcodes(IPostalcodesearch search) throws DBException {
+        return (ArrayList<Postalcode>)this.search(search);
     }
 
-    public ArrayList searchpostalcodes(IPostalcodesearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search postalcode with IPostalcodesearch parameters, order by orderby sql clause
+     * @param search IPostalcodesearch
+     * @param orderby sql order by string
+     * @return ArrayList of Postalcode
+     * @throws DBException 
+     */
+    public ArrayList<Postalcode> searchpostalcodes(IPostalcodesearch search, String orderby) throws DBException {
+        return (ArrayList<Postalcode>)this.search(search, orderby);
     }
 
     /**
@@ -184,28 +157,26 @@ public abstract class Bpostalcode extends GeneralEntityObject implements Project
      * @throws DBException
      */
     public boolean getPostalcodeExists(IPostalcodePK postalcodePK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((PostalcodePK)postalcodePK);
-        } else return false;
+        return super.getEntityExists((PostalcodePK)postalcodePK);
     }
 
     /**
      * try to insert Postalcode in database
-     * @param film: Postalcode object
+     * @param postalcode Postalcode object
      * @throws DBException
+     * @throws DataException
      */
     public void insertPostalcode(IPostalcode postalcode) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(postalcode);
-        }
+        super.insertEntity(postalcode);
     }
 
     /**
      * check if PostalcodePK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Postalcode object
+     * @param postalcode Postalcode object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdatePostalcode(IPostalcode postalcode) throws DBException, DataException {
         if(this.getPostalcodeExists(postalcode.getPrimaryKey())) {
@@ -217,30 +188,27 @@ public abstract class Bpostalcode extends GeneralEntityObject implements Project
 
     /**
      * try to update Postalcode in database
-     * @param film: Postalcode object
+     * @param postalcode Postalcode object
      * @throws DBException
+     * @throws DataException
      */
     public void updatePostalcode(IPostalcode postalcode) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(postalcode);
-        }
+        super.updateEntity(postalcode);
     }
 
     /**
      * try to delete Postalcode in database
-     * @param film: Postalcode object
+     * @param postalcode Postalcode object
      * @throws DBException
      */
     public void deletePostalcode(IPostalcode postalcode) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeletePostalcode(postalcode.getOwnerobject(), postalcode.getPrimaryKey());
-            super.deleteEntity(postalcode);
-        }
+        cascadedeletePostalcode(postalcode.getPrimaryKey());
+        super.deleteEntity(postalcode);
     }
 
     /**
      * check data rules in Postalcode, throw DataException with customized message if rules do not apply
-     * @param film: Postalcode object
+     * @param postalcode Postalcode object
      * @throws DataException
      * @throws DBException
      */
@@ -248,23 +216,18 @@ public abstract class Bpostalcode extends GeneralEntityObject implements Project
         StringBuffer message = new StringBuffer();
         //Primary key
         //Primary key
-	//if(postalcode.getArealevel3PK()!=null && postalcode.getArealevel3PK().getCountrycode()!=null && postalcode.getArealevel3PK().getCountrycode().length()>IPostalcode.SIZE_COUNTRYCODE) {
         if(postalcode.getArealevel3PK()!=null && postalcode.getArealevel3PK().getCountrycode()!=null && postalcode.getArealevel3PK().getCountrycode().length()>IPostalcode.SIZE_COUNTRYCODE) {
             message.append("Countrycode is langer dan toegestaan. Max aantal karakters: " + IPostalcode.SIZE_COUNTRYCODE + "\n");
         }
-	//if(postalcode.getArealevel3PK()==null || postalcode.getArealevel3PK().getCountrycode()==null) {
         if(postalcode.getArealevel3PK()==null || postalcode.getArealevel3PK().getCountrycode()==null) {
             message.append("Countrycode mag niet leeg zijn.\n");
         }
-	//if(postalcode.getArealevel3PK()!=null && postalcode.getArealevel3PK().getAl1code()!=null && postalcode.getArealevel3PK().getAl1code().length()>IPostalcode.SIZE_AL1CODE) {
         if(postalcode.getArealevel3PK()!=null && postalcode.getArealevel3PK().getAl1code()!=null && postalcode.getArealevel3PK().getAl1code().length()>IPostalcode.SIZE_AL1CODE) {
             message.append("Al1code is langer dan toegestaan. Max aantal karakters: " + IPostalcode.SIZE_AL1CODE + "\n");
         }
-	//if(postalcode.getArealevel3PK()!=null && postalcode.getArealevel3PK().getAl2code()!=null && postalcode.getArealevel3PK().getAl2code().length()>IPostalcode.SIZE_AL2CODE) {
         if(postalcode.getArealevel3PK()!=null && postalcode.getArealevel3PK().getAl2code()!=null && postalcode.getArealevel3PK().getAl2code().length()>IPostalcode.SIZE_AL2CODE) {
             message.append("Al2code is langer dan toegestaan. Max aantal karakters: " + IPostalcode.SIZE_AL2CODE + "\n");
         }
-	//if(postalcode.getArealevel3PK()!=null && postalcode.getArealevel3PK().getAl3code()!=null && postalcode.getArealevel3PK().getAl3code().length()>IPostalcode.SIZE_AL3CODE) {
         if(postalcode.getArealevel3PK()!=null && postalcode.getArealevel3PK().getAl3code()!=null && postalcode.getArealevel3PK().getAl3code().length()>IPostalcode.SIZE_AL3CODE) {
             message.append("Al3code is langer dan toegestaan. Max aantal karakters: " + IPostalcode.SIZE_AL3CODE + "\n");
         }
@@ -278,81 +241,82 @@ public abstract class Bpostalcode extends GeneralEntityObject implements Project
      * delete all records in tables where postalcodePK is used in a primary key
      * @param postalcodePK: Postalcode primary key
      */
-    public void cascadedeletePostalcode(String senderobject, IPostalcodePK postalcodePK) {
+    public void cascadedeletePostalcode(IPostalcodePK postalcodePK) {
         BLlocality bllocality = new BLlocality(this);
-        bllocality.delete4postalcode(senderobject, postalcodePK);
+        bllocality.delete4postalcode(postalcodePK);
     }
 
     /**
      * @param arealevel3PK: foreign key for Arealevel3
      * @delete all Postalcode Entity objects for Arealevel3 in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4arealevel3(String senderobject, IArealevel3PK arealevel3PK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Postalcode.SQLDelete4arealevel3, arealevel3PK.getKeyFields());
-        }
+    public void delete4arealevel3(IArealevel3PK arealevel3PK) {
+        super.addStatement(EMpostalcode.SQLDelete4arealevel3, arealevel3PK.getSQLprimarykey());
     }
 
     /**
      * @param arealevel3PK: foreign key for Arealevel3
      * @return all Postalcode Entity objects for Arealevel3
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getPostalcodes4arealevel3(IArealevel3PK arealevel3PK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Postalcode.SQLSelect4arealevel3, arealevel3PK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Postalcode> getPostalcodes4arealevel3(IArealevel3PK arealevel3PK) throws CustomException {
+        return super.getEntities(EMpostalcode.SQLSelect4arealevel3, arealevel3PK.getSQLprimarykey());
     }
     /**
      * @param localityPK: parent Locality for child object Postalcode Entity
      * @return child Postalcode Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public IPostalcode getLocality(ILocalityPK localityPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            PostalcodePK postalcodePK = new PostalcodePK(localityPK.getCountrycode(), localityPK.getPostalcode());
-            return this.getPostalcode(postalcodePK);
-        } else return null;
+    public Postalcode getLocality(ILocalityPK localityPK) throws CustomException {
+        PostalcodePK postalcodePK = new PostalcodePK(localityPK.getCountrycode(), localityPK.getPostalcode());
+        return this.getPostalcode(postalcodePK);
     }
 
 
     /**
      * get all Postalcode objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Postalcode objects
      * @throws DBException
      */
-    public ArrayList getPostalcodes(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Postalcode.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Postalcode> getPostalcodes(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMpostalcode.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Postalcode>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Postalcode objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delPostalcode(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Postalcode.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delPostalcode(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Postalcode.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

@@ -8,19 +8,15 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
-import data.interfaces.db.LogicEntity;
+import BusinessObject.BLtable;
 import film.interfaces.logicentity.IFilmsubjects;
 import film.logicentity.Filmsubjects;
 import film.BusinessObject.table.Bfilmsubjects;
 import film.entity.pk.FilmsubjectsPK;
-import film.interfaces.BusinessObject.IBLfilmsubjects;
 import film.interfaces.entity.pk.IFilmPK;
 import film.interfaces.logicentity.ISubject;
 import general.exception.DBException;
 import general.exception.DataException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -33,7 +29,7 @@ import java.util.ArrayList;
  *
  * @author Franky Laseure
  */
-public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
+public class BLfilmsubjects extends Bfilmsubjects {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -50,23 +46,19 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLfilmsubjects(GeneralEntityObject transactionobject) {
+    public BLfilmsubjects(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity filmsubjects) throws SQLException {
-        
-    }
-    
     /**
      * try to insert Filmsubjects object in database
      * commit transaction
      * @param filmsubjects: Filmsubjects Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
         trans_insertFilmsubjects(filmsubjects);
         super.Commit2DB();
@@ -76,8 +68,8 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * try to insert Filmsubjects object in database commit transaction
      *
      * @param filmsubjects: Filmsubjects Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
         trans_insertFilmsubjects(filmsubjects);
@@ -88,9 +80,10 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * try to update Filmsubjects object in database
      * commit transaction
      * @param filmsubjects: Filmsubjects Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
         trans_updateFilmsubjects(filmsubjects);
         super.Commit2DB();
@@ -100,8 +93,8 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * try to update Filmsubjects object in database
      * commit transaction
      * @param filmsubjects: Filmsubjects Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
         trans_updateFilmsubjects(filmsubjects);
@@ -112,10 +105,11 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * Replace subjects for film with new subjects
      * @param filmPK: Film primary key
      * @param subjects: Subject objects
+     * @throws general.exception.DataException
      * @throws DBException
      */
-    public void linkFilm_with_Subjects(String senderobject, IFilmPK filmPK, ArrayList subjects) throws DataException, DBException {
-        delete4film(senderobject, filmPK);
+    public void linkFilm_with_Subjects(IFilmPK filmPK, ArrayList subjects) throws DataException, DBException {
+        delete4film(filmPK);
         ISubject subject;
         Filmsubjects filmsubject;
         FilmsubjectsPK filmsubjectPK;
@@ -133,8 +127,9 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * try to delete Filmsubjects object in database
      * commit transaction
      * @param filmsubjects: Filmsubjects Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteFilmsubjects(IFilmsubjects filmsubjects) throws DBException {
         trans_deleteFilmsubjects(filmsubjects);
         super.Commit2DB();
@@ -144,7 +139,7 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * try to delete Filmsubjects object in database
      * commit transaction
      * @param filmsubjects: Filmsubjects Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteFilmsubjects(IFilmsubjects filmsubjects) throws DBException {
         trans_deleteFilmsubjects(filmsubjects);
@@ -155,8 +150,8 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * try to insert Filmsubjects object in database
      * do not commit transaction
      * @param filmsubjects: Filmsubjects Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
         super.checkDATA(filmsubjects);
@@ -167,8 +162,8 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * try to update Filmsubjects object in database
      * do not commit transaction
      * @param filmsubjects: Filmsubjects Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
         super.checkDATA(filmsubjects);
@@ -179,7 +174,7 @@ public class BLfilmsubjects extends Bfilmsubjects implements IBLfilmsubjects {
      * try to delete Filmsubjects object in database
      * do not commit transaction
      * @param filmsubjects: Filmsubjects Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteFilmsubjects(IFilmsubjects filmsubjects) throws DBException {
         super.deleteFilmsubjects((Filmsubjects)filmsubjects);

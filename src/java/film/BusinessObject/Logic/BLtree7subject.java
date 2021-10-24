@@ -8,13 +8,13 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
-import data.interfaces.db.LogicEntity;
+import BusinessObject.BLtable;
+import db.SQLparameters;
 import film.interfaces.logicentity.ITree7subject;
 import film.logicentity.Tree7subject;
 import film.BusinessObject.table.Btree7subject;
+import film.conversion.entity.EMtree7subject;
 import film.entity.pk.Tree7subjectPK;
-import film.interfaces.BusinessObject.IBLtree7subject;
 import film.interfaces.entity.pk.IFilmPK;
 import film.interfaces.entity.pk.IPhotoPK;
 import film.interfaces.entity.pk.ITree7subjectPK;
@@ -25,8 +25,6 @@ import film.searchentity.Tree7subjectsearch;
 import general.exception.CustomException;
 import general.exception.DBException;
 import general.exception.DataException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -39,7 +37,7 @@ import java.util.ArrayList;
  *
  * @author Franky Laseure
  */
-public class BLtree7subject extends Btree7subject implements IBLtree7subject {
+public class BLtree7subject extends Btree7subject {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -56,23 +54,18 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLtree7subject(GeneralEntityObject transactionobject) {
+    public BLtree7subject(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity tree7subject) throws SQLException {
-        
-    }
-    
     /**
      * get all items at top level (step = 1)
      * @return ArrayList of Subjects
      * @throws DBException
      */
     public ArrayList getAllStep1() throws DBException {
-        return getMapper().loadEntityVector(this, Tree7subject.SQLSelect4tree7subject_step1);
+        return this.getEntities(EMtree7subject.SQLSelect4tree7subject_step1);
     }
 
     /**
@@ -81,7 +74,7 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
      * @throws DBException 
      */
     public ArrayList getMostUsed() throws DBException {
-        return addParents2Tree7subjects(getMapper().loadEntityVector(this, Tree7subject.SQLSelectMostused));
+        return addParents2Tree7subjects(this.getEntities(EMtree7subject.SQLSelectMostused));
     }
     
     /**
@@ -116,7 +109,7 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
         String sqlorderby = " order by " + orderby;
         search.build("");
         String searchsql = "select distinct tree7subject.* from tree7subject" + search.getJoin() + " where " + search.getSql() + sqlorderby;
-        ArrayList result = getMapper().loadEntityVector(this, searchsql, search.getParameters());
+        ArrayList result = this.getEntities(searchsql, search.getParameters());
         return addParents2Tree7subjects(result);
     }
 
@@ -147,11 +140,11 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
      * 
      * @param tree7subjectPK: foreign key for Tree7subject
      * @return all Tree7subject Entity objects for Tree7subject
-     * @throws :project:.general.exception.CustomException
+     * @throws general.exception.CustomException
      */
     @Override
     public ArrayList getTree7subjects4tree7subjectParentsubjectid(ITree7subjectPK tree7subjectPK) throws CustomException {
-        return addParents2Tree7subjects(getMapper().loadEntityVector(this, Tree7subject.SQLSelect4parent, tree7subjectPK.getKeyFields()));
+        return addParents2Tree7subjects(this.getEntities(EMtree7subject.SQLSelect4parent, tree7subjectPK.getSQLprimarykey()));
     }
     
     /**
@@ -162,7 +155,8 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
      */
     public ArrayList getTree7subjects4Tree7id(String tree7id) throws DBException {
         Object[][] parameter = { { "liketree7id", tree7id + ":*:" }, { "tree7id", tree7id } };
-        return getMapper().loadEntityVector(this, Tree7subject.SQLSelectchildren4tree7id, parameter);
+        SQLparameters parameters = new SQLparameters(parameter);
+        return this.getEntities(EMtree7subject.SQLSelectchildren4tree7id, parameters);
     }
 
     /**
@@ -201,17 +195,16 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
 
     /**
      * no insert without authorisation
-     * @param userprofile
      * @param tree7subject
      * @throws DBException
      * @throws DataException
      */
+    @Override
     public void insertTree7subject(ITree7subject tree7subject) throws DBException, DataException {
     }
 
     /**
      * no insert without authorisation
-     * @param userprofile
      * @param tree7subject
      * @throws DBException
      * @throws DataException
@@ -222,9 +215,10 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
     /**
      * try to insert Tree7subject object in database
      * commit transaction
+     * @param userprofile
      * @param tree7subject: Tree7subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void insertTree7subject(Userprofile userprofile, ITree7subject tree7subject) throws DBException, DataException, CustomException {
         if(userprofile.isEditor()) {
@@ -321,6 +315,7 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
      * @throws DBException
      * @throws DataException
      */
+    @Override
     public void updateTree7subject(ITree7subject tree7subject) throws DBException, DataException {
     }
 
@@ -336,9 +331,10 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
     /**
      * try to update Tree7subject object in database
      * commit transaction
+     * @param userprofile
      * @param tree7subject: Tree7subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void updateTree7subject(Userprofile userprofile, ITree7subject tree7subject) throws DBException, DataException, CustomException {
         if(userprofile.isEditor()) {
@@ -368,16 +364,15 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
 
     /**
      * no delete without authorisation
-     * @param userprofile
      * @param tree7subject
      * @throws DBException
      */
+    @Override
     public void deleteTree7subject(ITree7subject tree7subject) throws DBException {
     }
 
     /**
      * no delete without authorisation
-     * @param userprofile
      * @param tree7subject
      * @throws DBException
      */
@@ -387,8 +382,9 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
     /**
      * try to delete Tree7subject object in database
      * commit transaction
+     * @param userprofile
      * @param tree7subject: Tree7subject Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void deleteTree7subject(Userprofile userprofile, ITree7subject tree7subject) throws DBException {
         if(userprofile.isEditor()) {
@@ -401,8 +397,8 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
      * try to insert Tree7subject object in database
      * do not commit transaction
      * @param tree7subject: Tree7subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertTree7subject(ITree7subject tree7subject) throws DBException, DataException {
         super.checkDATA(tree7subject);
@@ -413,8 +409,8 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
      * try to update Tree7subject object in database
      * do not commit transaction
      * @param tree7subject: Tree7subject Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateTree7subject(ITree7subject tree7subject) throws DBException, DataException {
         super.checkDATA(tree7subject);
@@ -425,7 +421,7 @@ public class BLtree7subject extends Btree7subject implements IBLtree7subject {
      * try to delete Tree7subject object in database
      * do not commit transaction
      * @param tree7subject: Tree7subject Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteTree7subject(ITree7subject tree7subject) throws DBException {
         super.deleteTree7subject((Tree7subject)tree7subject);

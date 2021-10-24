@@ -1,3 +1,10 @@
+/*
+ * RSRoute.java
+ *
+ * Generated on 24.9.2021 14:50
+ *
+ */
+
 package film.restservices;
 
 import base.servlets.Securitycheck;
@@ -46,9 +53,6 @@ import org.json.simple.parser.ParseException;
 @Path("rsroute")
 public class RSRoute {
 
-    @Context
-    private UriInfo context;
-
     /**
      * Creates a new instance of HelloWorld
      */
@@ -57,6 +61,7 @@ public class RSRoute {
 
     /**
      * Retrieves representation of an instance of route.restservices.RSRoute
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @GET
@@ -76,6 +81,7 @@ public class RSRoute {
 
     /**
      * Retrieves representation of an instance of route.restservices.RSRoute
+     * @param jsonstring
      * @return an instance of java.lang.String
      */
     @POST
@@ -267,7 +273,6 @@ public class RSRoute {
     /**
      * PUT method for updating or creating an instance of RSRoute
      * @param content representation for the resource
-     * @return an HTTP response with content of the updated or created resource.
      */
     @PUT
     @Consumes("text/html")

@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Locality.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -114,7 +114,7 @@ public class Locality extends SecurityDataServlet {
                             break;
                         case ILocalityOperation.DELETE_Postalcode:
                             IPostalcodePK postalcodePK = (IPostalcodePK)parser.getJavaObject("postalcodepk");
-                            bllocality.delete4postalcode(this.getServletName(), postalcodePK);
+                            bllocality.delete4postalcode(postalcodePK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

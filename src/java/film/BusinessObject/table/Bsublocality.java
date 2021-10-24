@@ -2,23 +2,25 @@
  * Bsublocality.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.GeneralEntityInterface;
-import BusinessObject.GeneralEntityObject;
+import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-
+import db.SQLMapperFactory;
+import db.SQLparameters;
 import data.gis.shape.*;
+import data.json.piJson;
+import data.json.psqlJsonobject;
 import db.SQLMapper_pgsql;
 import data.interfaces.db.Filedata;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONSublocality;
-import film.data.ProjectConstants;
+import film.conversion.entity.EMsublocality;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
@@ -30,6 +32,8 @@ import java.sql.Time;
 import org.postgresql.geometric.PGpoint;
 import org.postgis.PGgeometry;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Business Entity class Bsublocality
@@ -41,13 +45,13 @@ import org.json.simple.JSONObject;
  *
  * @author Franky Laseure
  */
-public abstract class Bsublocality extends GeneralEntityObject implements ProjectConstants {
+public abstract class Bsublocality extends BLtable {
 
     /**
      * Constructor, sets Sublocality as default Entity
      */
     public Bsublocality() {
-        super(new SQLMapper_pgsql(connectionpool, "Sublocality"), new Sublocality());
+        super(new Sublocality(), new EMsublocality());
     }
 
     /**
@@ -56,46 +60,8 @@ public abstract class Bsublocality extends GeneralEntityObject implements Projec
      * all transactions will commit at same time
      * @param transactionobject: GeneralEntityObjects that holds the transaction queue
      */
-    public Bsublocality(GeneralEntityInterface transactionobject) {
-        super(transactionobject, new Sublocality());
-    }
-
-    /**
-     * Map ResultSet Field values to Sublocality
-     * @param dbresult: Database ResultSet
-     */
-    public Sublocality mapResultSet2Entity(ResultSet dbresult) throws SQLException {
-        SublocalityPK sublocalityPK = null;
-        Sublocality sublocality;
-        if(dbresult==null) {
-            sublocality = new Sublocality(sublocalityPK);
-        } else {
-            try {
-                sublocalityPK = new SublocalityPK(dbresult.getString("countrycode"), dbresult.getString("postalcode"), dbresult.getString("locality"), dbresult.getString("sublocality"));
-                sublocality = new Sublocality(sublocalityPK);
-                Object o_location = dbresult.getObject("location");
-                if(o_location!=null) {
-                    piShape c_location = new psqlGeometry((PGgeometry)o_location);
-                    sublocality.initLocation(c_location.abstractclone());
-                }
-                Object o_bounds = dbresult.getObject("bounds");
-                if(o_bounds!=null) {
-                    piShape c_bounds = new psqlGeometry((PGgeometry)o_bounds);
-                    sublocality.initBounds(c_bounds.abstractclone());
-                }
-                Object o_viewport = dbresult.getObject("viewport");
-                if(o_viewport!=null) {
-                    piShape c_viewport = new psqlGeometry((PGgeometry)o_viewport);
-                    sublocality.initViewport(c_viewport.abstractclone());
-                }
-                sublocality.initApproximate(dbresult.getBoolean("approximate"));
-            }
-            catch(SQLException sqle) {
-                throw sqle;
-            }
-        }
-        this.loadExtra(dbresult, sublocality);
-        return sublocality;
+    public Bsublocality(BLtable transactionobject) {
+        super(transactionobject, new Sublocality(), new EMsublocality());
     }
 
     /**
@@ -109,6 +75,10 @@ public abstract class Bsublocality extends GeneralEntityObject implements Projec
     /**
      * create new empty Sublocality object
      * create new primary key with given parameters
+     * @param countrycode primary key field
+     * @param postalcode primary key field
+     * @param locality primary key field
+     * @param sublocality primary key field
      * @return ISublocality with primary key
      */
     public ISublocality newSublocality(java.lang.String countrycode, java.lang.String postalcode, java.lang.String locality, java.lang.String sublocality) {
@@ -134,6 +104,10 @@ public abstract class Bsublocality extends GeneralEntityObject implements Projec
 
     /**
      * create new primary key with given parameters
+     * @param countrycode primary key field
+     * @param postalcode primary key field
+     * @param locality primary key field
+     * @param sublocality primary key field
      * @return new ISublocalityPK
      */
     public ISublocalityPK newSublocalityPK(java.lang.String countrycode, java.lang.String postalcode, java.lang.String locality, java.lang.String sublocality) {
@@ -145,10 +119,8 @@ public abstract class Bsublocality extends GeneralEntityObject implements Projec
      * @return ArrayList of Sublocality objects
      * @throws DBException
      */
-    public ArrayList getSublocalitys() throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Sublocality.SQLSelectAll);
-        } else return new ArrayList();
+    public ArrayList<Sublocality> getSublocalitys() throws DBException {
+        return (ArrayList<Sublocality>)super.getEntities(EMsublocality.SQLSelectAll);
     }
 
     /**
@@ -158,21 +130,28 @@ public abstract class Bsublocality extends GeneralEntityObject implements Projec
      * @throws DBException
      */
     public Sublocality getSublocality(ISublocalityPK sublocalityPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return (Sublocality)super.getEntity((SublocalityPK)sublocalityPK);
-        } else return null;
+        return (Sublocality)super.getEntity((SublocalityPK)sublocalityPK);
     }
 
-    public ArrayList searchsublocalitys(ISublocalitysearch search) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return this.search(search);
-        } else return new ArrayList();
+    /**
+     * search sublocality with ISublocalitysearch parameters
+     * @param search ISublocalitysearch
+     * @return ArrayList of Sublocality
+     * @throws DBException 
+     */
+    public ArrayList<Sublocality> searchsublocalitys(ISublocalitysearch search) throws DBException {
+        return (ArrayList<Sublocality>)this.search(search);
     }
 
-    public ArrayList searchsublocalitys(ISublocalitysearch search, String orderby) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return this.search(search, orderby);
-        } else return new ArrayList();
+    /**
+     * search sublocality with ISublocalitysearch parameters, order by orderby sql clause
+     * @param search ISublocalitysearch
+     * @param orderby sql order by string
+     * @return ArrayList of Sublocality
+     * @throws DBException 
+     */
+    public ArrayList<Sublocality> searchsublocalitys(ISublocalitysearch search, String orderby) throws DBException {
+        return (ArrayList<Sublocality>)this.search(search, orderby);
     }
 
     /**
@@ -182,28 +161,26 @@ public abstract class Bsublocality extends GeneralEntityObject implements Projec
      * @throws DBException
      */
     public boolean getSublocalityExists(ISublocalityPK sublocalityPK) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-	        return super.getEntityExists((SublocalityPK)sublocalityPK);
-        } else return false;
+        return super.getEntityExists((SublocalityPK)sublocalityPK);
     }
 
     /**
      * try to insert Sublocality in database
-     * @param film: Sublocality object
+     * @param sublocality Sublocality object
      * @throws DBException
+     * @throws DataException
      */
     public void insertSublocality(ISublocality sublocality) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.insertEntity(sublocality);
-        }
+        super.insertEntity(sublocality);
     }
 
     /**
      * check if SublocalityPK exists
      * insert if not, update if found
      * do not commit transaction
-     * @param film: Sublocality object
+     * @param sublocality Sublocality object
      * @throws DBException
+     * @throws DataException
      */
     public void insertupdateSublocality(ISublocality sublocality) throws DBException, DataException {
         if(this.getSublocalityExists(sublocality.getPrimaryKey())) {
@@ -215,30 +192,27 @@ public abstract class Bsublocality extends GeneralEntityObject implements Projec
 
     /**
      * try to update Sublocality in database
-     * @param film: Sublocality object
+     * @param sublocality Sublocality object
      * @throws DBException
+     * @throws DataException
      */
     public void updateSublocality(ISublocality sublocality) throws DBException, DataException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.updateEntity(sublocality);
-        }
+        super.updateEntity(sublocality);
     }
 
     /**
      * try to delete Sublocality in database
-     * @param film: Sublocality object
+     * @param sublocality Sublocality object
      * @throws DBException
      */
     public void deleteSublocality(ISublocality sublocality) throws DBException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            cascadedeleteSublocality(sublocality.getOwnerobject(), sublocality.getPrimaryKey());
-            super.deleteEntity(sublocality);
-        }
+        cascadedeleteSublocality(sublocality.getPrimaryKey());
+        super.deleteEntity(sublocality);
     }
 
     /**
      * check data rules in Sublocality, throw DataException with customized message if rules do not apply
-     * @param film: Sublocality object
+     * @param sublocality Sublocality object
      * @throws DataException
      * @throws DBException
      */
@@ -257,81 +231,82 @@ public abstract class Bsublocality extends GeneralEntityObject implements Projec
      * delete all records in tables where sublocalityPK is used in a primary key
      * @param sublocalityPK: Sublocality primary key
      */
-    public void cascadedeleteSublocality(String senderobject, ISublocalityPK sublocalityPK) {
+    public void cascadedeleteSublocality(ISublocalityPK sublocalityPK) {
         BLroute blroute = new BLroute(this);
-        blroute.delete4sublocality(senderobject, sublocalityPK);
+        blroute.delete4sublocality(sublocalityPK);
     }
 
     /**
      * @param localityPK: foreign key for Locality
      * @delete all Sublocality Entity objects for Locality in database
-     * @throws film.general.exception.CustomException
      */
-    public void delete4locality(String senderobject, ILocalityPK localityPK) {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            super.addStatement(senderobject, Sublocality.SQLDelete4locality, localityPK.getKeyFields());
-        }
+    public void delete4locality(ILocalityPK localityPK) {
+        super.addStatement(EMsublocality.SQLDelete4locality, localityPK.getSQLprimarykey());
     }
 
     /**
      * @param localityPK: foreign key for Locality
      * @return all Sublocality Entity objects for Locality
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ArrayList getSublocalitys4locality(ILocalityPK localityPK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            return getMapper().loadEntityVector(this, Sublocality.SQLSelect4locality, localityPK.getKeyFields());
-        } else return new ArrayList();
+    public ArrayList<Sublocality> getSublocalitys4locality(ILocalityPK localityPK) throws CustomException {
+        return super.getEntities(EMsublocality.SQLSelect4locality, localityPK.getSQLprimarykey());
     }
     /**
      * @param routePK: parent Route for child object Sublocality Entity
      * @return child Sublocality Entity object
-     * @throws film.general.exception.CustomException
+     * @throws CustomException
      */
-    public ISublocality getRoute(IRoutePK routePK) throws CustomException {
-        if(!this.getLogginrequired() || this.getLogginrequired() && this.isAuthenticated()) {
-            SublocalityPK sublocalityPK = new SublocalityPK(routePK.getCountrycode(), routePK.getPostalcode(), routePK.getLocality(), routePK.getSublocality());
-            return this.getSublocality(sublocalityPK);
-        } else return null;
+    public Sublocality getRoute(IRoutePK routePK) throws CustomException {
+        SublocalityPK sublocalityPK = new SublocalityPK(routePK.getCountrycode(), routePK.getPostalcode(), routePK.getLocality(), routePK.getSublocality());
+        return this.getSublocality(sublocalityPK);
     }
 
 
     /**
      * get all Sublocality objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
+     * @param sortlist sql sort string
+     * @param sortoperator asc/desc
      * @return ArrayList of Sublocality objects
      * @throws DBException
      */
-    public ArrayList getSublocalitys(Object[][] sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
-        String sql =  Sublocality.SQLSelect;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public ArrayList<Sublocality> getSublocalitys(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
+        StringBuilder sql = new StringBuilder(EMsublocality.SQLSelect);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
         if(sortlist.length()>0) {
-            sql += " order by " + sortlist + " " + sortoperator;
+            sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return getMapper().loadEntityVector(this, sql, sqlparameters);
+        return (ArrayList<Sublocality>)super.getEntities(sql.toString(), sqlparameters);
     }
 
     /**
      * delete all Sublocality objects for sqlparameters
+     * @param sqlparameters SQLparameters object
+     * @param andoroperator "and"/"or"
      * @throws DBException
      */
-    public void delSublocality(String senderobject, Object[][] sqlparameters, String andoroperator) throws DBException {
-        String sql =  "Delete from " + Sublocality.table;
-        int l = sqlparameters.length;
-        if(sqlparameters.length>0) {
-            sql += " where ";
+    public void delSublocality(SQLparameters sqlparameters, String andoroperator) throws DBException {
+        StringBuilder sql = new StringBuilder("delete from ").append(Sublocality.table);
+        ArrayList<Object[]> parameters = sqlparameters.getParameters();
+        int l = parameters.size();
+        if(l>0) {
+            sql.append(" where ");
             for(int i=0; i<l; i++) {
-                sql += String.valueOf(sqlparameters[i][0]) + " = :" + String.valueOf(sqlparameters[i][0]) + ": ";
-                if(i<l-1) sql += " " + andoroperator + " ";
+                sql.append(String.valueOf(parameters.get(i)[0])).append(" = :").append(String.valueOf(parameters.get(i)[0])).append(": ");
+                if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(senderobject, sql, sqlparameters);
+        this.addStatement(sql.toString(), sqlparameters);
     }
 
 

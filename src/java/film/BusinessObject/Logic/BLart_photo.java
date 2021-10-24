@@ -8,17 +8,12 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
-import BusinessObject.GeneralObject;
-import data.interfaces.db.LogicEntity;
+import BusinessObject.BLtable;
 import film.BusinessObject.table.Bart_photo;
 import film.interfaces.logicentity.IArt_photo;
 import film.logicentity.Art_photo;
-import film.interfaces.BusinessObject.IBLart_photo;
 import general.exception.DBException;
 import general.exception.DataException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Business Logic Entity class BLart_photo
@@ -30,7 +25,7 @@ import java.sql.SQLException;
  *
  * @author Franky Laseure
  */
-public class BLart_photo extends Bart_photo implements IBLart_photo {
+public class BLart_photo extends Bart_photo {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -47,23 +42,19 @@ public class BLart_photo extends Bart_photo implements IBLart_photo {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLart_photo(GeneralEntityObject transactionobject) {
+    public BLart_photo(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity art_photo) throws SQLException {
-        
-    }
-    
     /**
      * try to insert Art_photo object in database
      * commit transaction
      * @param art_photo: Art_photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertArt_photo(IArt_photo art_photo) throws DBException, DataException {
         trans_insertArt_photo(art_photo);
         super.Commit2DB();
@@ -73,8 +64,8 @@ public class BLart_photo extends Bart_photo implements IBLart_photo {
      * try to insert Art_photo object in database
      * commit transaction
      * @param art_photo: Art_photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertArt_photo(IArt_photo art_photo) throws DBException, DataException {
         trans_insertArt_photo(art_photo);
@@ -85,9 +76,10 @@ public class BLart_photo extends Bart_photo implements IBLart_photo {
      * try to update Art_photo object in database
      * commit transaction
      * @param art_photo: Art_photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updateArt_photo(IArt_photo art_photo) throws DBException, DataException {
         trans_updateArt_photo(art_photo);
         super.Commit2DB();
@@ -97,8 +89,8 @@ public class BLart_photo extends Bart_photo implements IBLart_photo {
      * try to update Art_photo object in database
      * commit transaction
      * @param art_photo: Art_photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdateArt_photo(IArt_photo art_photo) throws DBException, DataException {
         trans_updateArt_photo(art_photo);
@@ -109,8 +101,9 @@ public class BLart_photo extends Bart_photo implements IBLart_photo {
      * try to delete Art_photo object in database
      * commit transaction
      * @param art_photo: Art_photo Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deleteArt_photo(IArt_photo art_photo) throws DBException {
         trans_deleteArt_photo(art_photo);
         super.Commit2DB();
@@ -120,7 +113,7 @@ public class BLart_photo extends Bart_photo implements IBLart_photo {
      * try to delete Art_photo object in database
      * commit transaction
      * @param art_photo: Art_photo Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeleteArt_photo(IArt_photo art_photo) throws DBException {
         trans_deleteArt_photo(art_photo);
@@ -131,8 +124,8 @@ public class BLart_photo extends Bart_photo implements IBLart_photo {
      * try to insert Art_photo object in database
      * do not commit transaction
      * @param art_photo: Art_photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertArt_photo(IArt_photo art_photo) throws DBException, DataException {
         super.checkDATA(art_photo);
@@ -143,8 +136,8 @@ public class BLart_photo extends Bart_photo implements IBLart_photo {
      * try to update Art_photo object in database
      * do not commit transaction
      * @param art_photo: Art_photo Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updateArt_photo(IArt_photo art_photo) throws DBException, DataException {
         super.checkDATA(art_photo);
@@ -155,7 +148,7 @@ public class BLart_photo extends Bart_photo implements IBLart_photo {
      * try to delete Art_photo object in database
      * do not commit transaction
      * @param art_photo: Art_photo Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deleteArt_photo(IArt_photo art_photo) throws DBException {
         super.deleteArt_photo((Art_photo)art_photo);

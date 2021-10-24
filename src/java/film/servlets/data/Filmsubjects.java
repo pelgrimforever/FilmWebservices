@@ -1,8 +1,8 @@
 /*
- * DataServlet.java
+ * Filmsubjects.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 4.1.2021 12:6
+ * Generated on 24.9.2021 14:50
  *
  */
 
@@ -114,11 +114,11 @@ public class Filmsubjects extends SecurityDataServlet {
                             break;
                         case IFilmsubjectsOperation.DELETE_Subject:
                             ISubjectPK subjectPK = (ISubjectPK)parser.getJavaObject("subjectpk");
-                            blfilmsubjects.delete4subject(this.getServletName(), subjectPK);
+                            blfilmsubjects.delete4subject(subjectPK);
                             break;
                         case IFilmsubjectsOperation.DELETE_Film:
                             IFilmPK filmPK = (IFilmPK)parser.getJavaObject("filmpk");
-                            blfilmsubjects.delete4film(this.getServletName(), filmPK);
+                            blfilmsubjects.delete4film(filmPK);
                             break;
 //Custom code, do not change this line
 //add here custom operations

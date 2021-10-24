@@ -8,13 +8,12 @@
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.GeneralEntityObject;
-import data.interfaces.db.LogicEntity;
+import BusinessObject.BLtable;
 import film.interfaces.logicentity.IPhototags;
 import film.logicentity.Phototags;
 import film.BusinessObject.table.Bphototags;
+import film.conversion.entity.EMphototags;
 import film.entity.pk.PhototagsPK;
-import film.interfaces.BusinessObject.IBLphototags;
 import film.interfaces.entity.pk.IPhotoPK;
 import film.interfaces.logicentity.IPhoto;
 import general.exception.CustomException;
@@ -22,8 +21,6 @@ import general.exception.DBException;
 import general.exception.DataException;
 import graphic.jpeg.Graphicfile;
 import graphic.jpeg.Tag;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -37,7 +34,7 @@ import java.util.HashMap;
  *
  * @author Franky Laseure
  */
-public class BLphototags extends Bphototags implements IBLphototags {
+public class BLphototags extends Bphototags {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
@@ -54,34 +51,29 @@ public class BLphototags extends Bphototags implements IBLphototags {
      * all transactions will commit at same time
      * @param transactionobject: GeneralObjects that holds the transaction queue
      */
-    public BLphototags(GeneralEntityObject transactionobject) {
+    public BLphototags(BLtable transactionobject) {
         super(transactionobject);
         this.setLogginrequired(isprivatetable);
     }
 
-    @Override
-    public void loadExtra(ResultSet dbresult, LogicEntity phototags) throws SQLException {
-        
-    }
-    
     /**
-     *
      * @param photoPK: foreign key for Photo
      * @return all Phototags Entity objects for Photo
-     * @throws :project:.general.exception.CustomException
+     * @throws general.exception.CustomException
      */
     @Override
     public ArrayList getPhototagss4photo(IPhotoPK photoPK) throws CustomException {
-            return getMapper().loadEntityVector(this, Phototags.SQLSelect4phototags_photo_sorted, photoPK.getKeyFields());
+        return this.getEntities(EMphototags.SQLSelect4phototags_photo_sorted, photoPK.getSQLprimarykey());
     }
 
     /**
      * try to insert Phototags object in database
      * commit transaction
      * @param phototags: Phototags Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void insertPhototags(IPhototags phototags) throws DBException, DataException {
         trans_insertPhototags(phototags);
         super.Commit2DB();
@@ -91,8 +83,8 @@ public class BLphototags extends Bphototags implements IBLphototags {
      * try to insert Phototags object in database
      * commit transaction
      * @param phototags: Phototags Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureinsertPhototags(IPhototags phototags) throws DBException, DataException {
         trans_insertPhototags(phototags);
@@ -103,9 +95,10 @@ public class BLphototags extends Bphototags implements IBLphototags {
      * try to update Phototags object in database
      * commit transaction
      * @param phototags: Phototags Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
+    @Override
     public void updatePhototags(IPhototags phototags) throws DBException, DataException {
         trans_updatePhototags(phototags);
         super.Commit2DB();
@@ -115,8 +108,8 @@ public class BLphototags extends Bphototags implements IBLphototags {
      * try to update Phototags object in database
      * commit transaction
      * @param phototags: Phototags Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void secureupdatePhototags(IPhototags phototags) throws DBException, DataException {
         trans_updatePhototags(phototags);
@@ -127,8 +120,9 @@ public class BLphototags extends Bphototags implements IBLphototags {
      * try to delete Phototags object in database
      * commit transaction
      * @param phototags: Phototags Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
+    @Override
     public void deletePhototags(IPhototags phototags) throws DBException {
         trans_deletePhototags(phototags);
         super.Commit2DB();
@@ -138,7 +132,7 @@ public class BLphototags extends Bphototags implements IBLphototags {
      * try to delete Phototags object in database
      * commit transaction
      * @param phototags: Phototags Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void securedeletePhototags(IPhototags phototags) throws DBException {
         trans_deletePhototags(phototags);
@@ -170,8 +164,8 @@ public class BLphototags extends Bphototags implements IBLphototags {
      * try to insert Phototags object in database
      * do not commit transaction
      * @param phototags: Phototags Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_insertPhototags(IPhototags phototags) throws DBException, DataException {
         super.checkDATA(phototags);
@@ -182,8 +176,8 @@ public class BLphototags extends Bphototags implements IBLphototags {
      * try to update Phototags object in database
      * do not commit transaction
      * @param phototags: Phototags Entity Object
-     * @throws film.general.exception.CustomException
-     * @throws film.general.exception.DataException
+     * @throws general.exception.DBException
+     * @throws general.exception.DataException
      */
     public void trans_updatePhototags(IPhototags phototags) throws DBException, DataException {
         super.checkDATA(phototags);
@@ -194,7 +188,7 @@ public class BLphototags extends Bphototags implements IBLphototags {
      * try to delete Phototags object in database
      * do not commit transaction
      * @param phototags: Phototags Entity Object
-     * @throws film.general.exception.CustomException
+     * @throws general.exception.DBException
      */
     public void trans_deletePhototags(IPhototags phototags) throws DBException {
         super.deletePhototags((Phototags)phototags);
