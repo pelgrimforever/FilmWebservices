@@ -14,6 +14,7 @@ import film.interfaces.logicentity.ISecurityprofile;
 import film.logicentity.Securityprofile;
 import film.BusinessObject.table.Bsecurityprofile;
 import film.conversion.entity.EMsecurityprofile;
+import film.entity.pk.SecurityprofilePK;
 import general.exception.DBException;
 import general.exception.DataException;
 import java.util.ArrayList;
@@ -50,10 +51,8 @@ public class BLsecurityprofile extends Bsecurityprofile {
         this.setLogginrequired(isprivatetable);
     }
 
-    public ArrayList getSecurityprofiles(String username) throws DBException {
-        Object[][] parameter = { { "siteusername", username } };
-        SQLparameters parameters = new SQLparameters(parameter);
-        return this.getEntities(EMsecurityprofile.SQLSelectAll, parameters);
+    public ArrayList getSecurityprofiles(String securityprofile) throws DBException {
+        return this.getEntities(EMsecurityprofile.SQLSelect1, new SecurityprofilePK(securityprofile).getSQLprimarykey());
     }
 
     /**

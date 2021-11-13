@@ -8,12 +8,15 @@
 
 package film.BusinessObject.security;
 
+import base.servlets.Servlethandler;
 import film.BusinessObject.Logic.BLsecurityprofile;
+import general.exception.CustomException;
 import general.exception.DBException;
+import general.exception.DatahandlerException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import sitesecurity.entity.pk.SiteuserPK;
-import sitesecurity.logicentity.Siteuser;
+import sitesecurity.interfaces.servlet.ISitegroupOperation;
 
 /**
  *
@@ -23,6 +26,9 @@ public class Security {
 //ProjectGenerator: NO AUTHOMATIC UPDATE
 
     private BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
+    
+    private static final String SERVER = "http://localhost:8080/";
+    private static final String SITEGROUP = "SitesecurityWebservices/sitesecurity.Sitegroup";
     
     public Security() {
     }
@@ -38,13 +44,16 @@ public class Security {
         return authenticated;
     }
 
-    public ArrayList getGroups(String siteusername) throws DBException {
+    public ArrayList getGroups(String siteusername) throws DBException, DatahandlerException, CustomException {
         ArrayList groups = new ArrayList();
+        Servlethandler handler = new Servlethandler(SERVER + SITEGROUP, ISitegroupOperation.OPERATIONTYPE_SELECT, ISitegroupOperation.SELECT_4SITEUSER);
+        handler.addjavaobject("siteuserpk", new SiteuserPK(siteusername));
         //groups = blgroup.getSitegroups(new SiteuserPK(siteusername));
-        return groups;
+        return (ArrayList)handler.post();
     }
 
     public ArrayList getProfiles(String siteusername) throws DBException {
+        blsecurityprofile.setAuthenticated(true);
         return blsecurityprofile.getSecurityprofiles(siteusername);
     }
 

@@ -8,14 +8,19 @@
 
 package film.servlets;
 
+import base.servlets.DataHandler;
+import base.servlets.Securitycheck;
 import film.BusinessObject.security.Security;
 import film.logic.Userprofile;
+import general.exception.CustomException;
 import general.exception.DBException;
+import general.exception.DatahandlerException;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import sitesecurity.logicentity.Sitegroup;
 
 /**
  *
@@ -36,17 +41,27 @@ public abstract class SecurityDataServlet extends DataServlet implements Context
             getAuthorisation(request);
             synchronized(getServletContext()) {
                 ServletContext context = getServletContext();
-                Security security = (Security)context.getAttribute(SECURITY);
+                DataHandler.SERVER = "http://localhost:8080/";
                 try {
-                    if(security.check(userID, password)) {
-                        authenticated = true;
-                        ArrayList sitegroups = security.getGroups(userID);
-                        ArrayList profiles = security.getProfiles(userID);
+                    authenticated = Securitycheck.checkLogin(userID, password);
+                }
+                catch(DatahandlerException e) {
+                }
+                if(authenticated) {
+                    Security security = (Security)context.getAttribute(SECURITY);
+                    try {
+                        ArrayList<Sitegroup> sitegroups = security.getGroups(userID);
+                        ArrayList profiles = new ArrayList();
+                        for(Sitegroup sitegroup: sitegroups) {
+                            profiles.addAll(security.getProfiles(sitegroup.getPrimaryKey().getGroupname()));
+                        }
                         userprofile = new Userprofile(sitegroups, profiles);
                         session.setAttribute("userprofile", userprofile);
                     }
-                }
-                catch(DBException e) {
+                    catch(DBException | DatahandlerException e) {
+                    }
+                    catch(CustomException e) {
+                    }
                 }
             }
         } else {
