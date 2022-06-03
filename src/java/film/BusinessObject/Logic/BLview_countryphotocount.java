@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * @author Franky Laseure
  */
 public class BLview_countryphotocount extends Bview_countryphotocount {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_countryphotocount as default Entity

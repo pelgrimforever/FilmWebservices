@@ -23,7 +23,7 @@ import java.sql.ResultSet;
  * @author Franky Laseure
  */
 public class BLraster_columns extends Braster_columns {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets Raster_columns as default Entity

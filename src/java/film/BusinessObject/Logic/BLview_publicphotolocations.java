@@ -21,7 +21,7 @@ import film.BusinessObject.view.Bview_publicphotolocations;
  * @author Franky Laseure
  */
 public class BLview_publicphotolocations extends Bview_publicphotolocations {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_publicphotolocations as default Entity

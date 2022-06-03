@@ -33,7 +33,7 @@ import java.util.ArrayList;
  * @author Franky Laseure
  */
 public class BLlocality extends Blocality {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data
 	
     /**

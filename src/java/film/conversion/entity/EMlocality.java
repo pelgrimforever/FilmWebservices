@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @author Franky Laseure
  */
 public class EMlocality extends EMlocality_default {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     
 public static final String OrderBy = " order by locality.countrycode, locality.postalcode, locality.locality";
 public static final String SQLWherecountryPK = "countrycode = :country.code:";

@@ -2,7 +2,7 @@
  * JSONPhoto.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
+ * Generated on 15.3.2022 18:7
  *
  */
  
@@ -137,8 +137,8 @@ public class JSONPhoto {
             if(photosearch.getPhototree7subjectsearch()!=null && photosearch.getPhototree7subjectsearch().used()) {
                 kss.put("phototree7subjectsearcher", JSONPhototree7subject.toJSON((Phototree7subjectsearch)photosearch.getPhototree7subjectsearch()));
             }
-            if(photosearch.getTree7subjectsearch()!=null && photosearch.getTree7subjectsearch().used()) {
-                kss.put("tree7subjectsearcher", JSONPhototree7subject.toJSON((Phototree7subjectsearch)photosearch.getTree7subjectsearch()));
+            if(photosearch.getRelTree7subjectsearch()!=null && photosearch.getRelTree7subjectsearch().used()) {
+                kss.put("tree7subjectsearcher", JSONPhototree7subject.toJSON((Phototree7subjectsearch)photosearch.getRelTree7subjectsearch()));
             }
             if(photosearch.getArt_photosearch()!=null && photosearch.getArt_photosearch().used()) {
                 kss.put("art_photosearcher", JSONArt_photo.toJSON((Art_photosearch)photosearch.getArt_photosearch()));
@@ -146,8 +146,8 @@ public class JSONPhoto {
             if(photosearch.getPhotosubjectssearch()!=null && photosearch.getPhotosubjectssearch().used()) {
                 kss.put("photosubjectssearcher", JSONPhotosubjects.toJSON((Photosubjectssearch)photosearch.getPhotosubjectssearch()));
             }
-            if(photosearch.getSubjectsearch()!=null && photosearch.getSubjectsearch().used()) {
-                kss.put("subjectsearcher", JSONPhotosubjects.toJSON((Photosubjectssearch)photosearch.getSubjectsearch()));
+            if(photosearch.getRelSubjectsearch()!=null && photosearch.getRelSubjectsearch().used()) {
+                kss.put("subjectsearcher", JSONPhotosubjects.toJSON((Photosubjectssearch)photosearch.getRelSubjectsearch()));
             }
             if(photosearch.getPhototagssearch()!=null && photosearch.getPhototagssearch().used()) {
                 kss.put("phototagssearcher", JSONPhototags.toJSON((Phototagssearch)photosearch.getPhototagssearch()));
@@ -302,7 +302,7 @@ public class JSONPhoto {
         if(keysearch!=null) {
             for(int i=0; i<keysearch.size(); i++) {
                 Tree7subjectsearch tree7subjectsearch = JSONTree7subject.toTree7subjectsearch((JSONObject)keysearch.get(i));
-                photosearch.tree7subject(tree7subjectsearch);
+                photosearch.reltree7subject(tree7subjectsearch);
             }
         }
         keysearch = (JSONArray)kss.get("art_photosearcher");
@@ -323,7 +323,7 @@ public class JSONPhoto {
         if(keysearch!=null) {
             for(int i=0; i<keysearch.size(); i++) {
                 Subjectsearch subjectsearch = JSONSubject.toSubjectsearch((JSONObject)keysearch.get(i));
-                photosearch.subject(subjectsearch);
+                photosearch.relsubject(subjectsearch);
             }
         }
         keysearch = (JSONArray)kss.get("phototagssearcher");

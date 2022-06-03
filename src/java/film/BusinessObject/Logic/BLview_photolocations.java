@@ -28,7 +28,7 @@ import java.util.ArrayList;
  * @author Franky Laseure
  */
 public class BLview_photolocations extends Bview_photolocations {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_photolocations as default Entity

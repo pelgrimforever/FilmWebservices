@@ -21,7 +21,7 @@ import film.BusinessObject.view.Bview_subjects_for_film;
  * @author Franky Laseure
  */
 public class BLview_subjects_for_film extends Bview_subjects_for_film {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_subjects_for_film as default Entity

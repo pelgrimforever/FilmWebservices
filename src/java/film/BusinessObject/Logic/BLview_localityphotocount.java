@@ -30,7 +30,7 @@ import java.util.Iterator;
  * @author Franky Laseure
  */
 public class BLview_localityphotocount extends Bview_localityphotocount {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_localityphotocount as default Entity

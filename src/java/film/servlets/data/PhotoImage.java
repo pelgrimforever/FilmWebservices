@@ -8,7 +8,6 @@
 
 package film.servlets.data;
 
-import base.interfaces.servlet.IDataServlet;
 import data.conversion.JSONConversion;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.JSONPhoto;
@@ -39,7 +38,7 @@ import org.json.simple.parser.ParseException;
  * @author Franky Laseure
  */
 @WebServlet(name="PhotoImage", urlPatterns={"/film.PhotoImage"})
-public class PhotoImage extends javax.servlet.http.HttpServlet implements IDataServlet, SingleThreadModel {
+public class PhotoImage extends javax.servlet.http.HttpServlet implements SingleThreadModel {
    
     /** 
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -61,29 +60,24 @@ public class PhotoImage extends javax.servlet.http.HttpServlet implements IDataS
             }
             JSONParser parser = new JSONParser();
             JSONObject json = (JSONObject)parser.parse(jsonstring.toString());        
-            JSONObject jsonoperation = (JSONObject)json.get("operation");
-            byte operationtype = JSONConversion.getbyte(jsonoperation, "type");
-            byte operation = JSONConversion.getbyte(jsonoperation, "operation");
+            byte operation = JSONConversion.getbyte(json, "operation");
             boolean loggedin = RSsecurity.check(json);
             blphoto.setAuthenticated(loggedin);
 
             IPhotoPK photoPK = (IPhotoPK)JSONPhoto.toPhotoPK((JSONObject)json.get("photopk"));
-            switch(operationtype) {
-                case DataServlet.OPERATIONTYPE_SELECT:
-                    switch(operation) {
-                        case IPhotoOperation.GETTHUMBNAIL:
-                            response.setContentType("image/jpeg");
-                            BufferedImage bi = ImageIO.read(blphoto.getThumbnail(photoPK));
-                            OutputStream out = response.getOutputStream();
-                            ImageIO.write(bi, "jpg", out);
-                            out.close();
-                        case IPhotoOperation.GETSMALL:
-                            response.setContentType("image/jpeg");
-                            BufferedImage bismall = ImageIO.read(blphoto.getSmall(photoPK));
-                            OutputStream outsmall = response.getOutputStream();
-                            ImageIO.write(bismall, "jpg", outsmall);
-                            outsmall.close();
-                    }
+            switch(operation) {
+                case IPhotoOperation.GETTHUMBNAIL:
+                    response.setContentType("image/jpeg");
+                    BufferedImage bi = ImageIO.read(blphoto.getThumbnail(photoPK));
+                    OutputStream out = response.getOutputStream();
+                    ImageIO.write(bi, "jpg", out);
+                    out.close();
+                case IPhotoOperation.GETSMALL:
+                    response.setContentType("image/jpeg");
+                    BufferedImage bismall = ImageIO.read(blphoto.getSmall(photoPK));
+                    OutputStream outsmall = response.getOutputStream();
+                    ImageIO.write(bismall, "jpg", outsmall);
+                    outsmall.close();
             }
         } 
         catch(ParseException e) {

@@ -38,7 +38,7 @@ import java.util.ArrayList;
  * @author Franky Laseure
  */
 public class BLtree7subject extends Btree7subject {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
     /**
@@ -87,7 +87,7 @@ public class BLtree7subject extends Btree7subject {
         Tree7subjectsearch search = new Tree7subjectsearch();
         Photosearch photosearch = new Photosearch();
         photosearch.addPrimarykey(photoPK);
-        search.photo(photosearch);
+        search.relphoto(photosearch);
         String orderby = Tree7subject.fieldnames[Tree7subject.TREE7ID-1];
         return addParents2Tree7subjects(super.search(search, orderby));
     }
@@ -104,7 +104,7 @@ public class BLtree7subject extends Btree7subject {
         filmsearch.addPrimarykey(filmPK);
         Photosearch photosearch = new Photosearch();
         photosearch.film(filmsearch);
-        search.photo(photosearch);
+        search.relphoto(photosearch);
         String orderby = Tree7subject.fieldnames[Tree7subject.TREE7ID-1];
         String sqlorderby = " order by " + orderby;
         search.build("");

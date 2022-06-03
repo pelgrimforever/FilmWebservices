@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @author Franky Laseure
  */
 public class EMview_backupstatus extends EMview_backupstatus_default {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     
     public static final String OrderBy = " order by id";
     public static final String WhereImagebackup = " imagebackupcount > 0 ";

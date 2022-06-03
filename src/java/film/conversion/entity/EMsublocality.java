@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @author Franky Laseure
  */
 public class EMsublocality extends EMsublocality_default {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     
     public static final String OrderBy = " order by sublocality.countrycode, sublocality.postalcode, sublocality.locality, sublocality.sublocality";
     

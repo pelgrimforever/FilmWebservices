@@ -21,7 +21,7 @@ import film.BusinessObject.view.Bview_publiccountryphotocount;
  * @author Franky Laseure
  */
 public class BLview_publiccountryphotocount extends Bview_publiccountryphotocount {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_publiccountryphotocount as default Entity

@@ -21,7 +21,7 @@ import film.BusinessObject.view.Bview_photo_firstlastdate;
  * @author Franky Laseure
  */
 public class BLview_photo_firstlastdate extends Bview_photo_firstlastdate {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_photo_firstlastdate as default Entity

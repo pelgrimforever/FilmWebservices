@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @author Franky Laseure
  */
 public class EMview_localityphotocount extends EMview_localityphotocount_default {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     
     public static final String SQLwherecountrycode = " view_localityphotocount.countrycode = :countrycode: ";
     public static final String SQLSelect4countrycode = "select view_localityphotocount.* from view_localityphotocount where " + SQLwherecountrycode;

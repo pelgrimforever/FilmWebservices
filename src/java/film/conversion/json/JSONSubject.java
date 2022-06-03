@@ -2,7 +2,7 @@
  * JSONSubject.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
+ * Generated on 15.3.2022 18:7
  *
  */
  
@@ -117,14 +117,14 @@ public class JSONSubject {
             if(subjectsearch.getFilmsubjectssearch()!=null && subjectsearch.getFilmsubjectssearch().used()) {
                 kss.put("filmsubjectssearcher", JSONFilmsubjects.toJSON((Filmsubjectssearch)subjectsearch.getFilmsubjectssearch()));
             }
-            if(subjectsearch.getFilmsearch()!=null && subjectsearch.getFilmsearch().used()) {
-                kss.put("filmsearcher", JSONFilmsubjects.toJSON((Filmsubjectssearch)subjectsearch.getFilmsearch()));
+            if(subjectsearch.getRelFilmsearch()!=null && subjectsearch.getRelFilmsearch().used()) {
+                kss.put("filmsearcher", JSONFilmsubjects.toJSON((Filmsubjectssearch)subjectsearch.getRelFilmsearch()));
             }
             if(subjectsearch.getPhotosubjectssearch()!=null && subjectsearch.getPhotosubjectssearch().used()) {
                 kss.put("photosubjectssearcher", JSONPhotosubjects.toJSON((Photosubjectssearch)subjectsearch.getPhotosubjectssearch()));
             }
-            if(subjectsearch.getPhotosearch()!=null && subjectsearch.getPhotosearch().used()) {
-                kss.put("photosearcher", JSONPhotosubjects.toJSON((Photosubjectssearch)subjectsearch.getPhotosearch()));
+            if(subjectsearch.getRelPhotosearch()!=null && subjectsearch.getRelPhotosearch().used()) {
+                kss.put("photosearcher", JSONPhotosubjects.toJSON((Photosubjectssearch)subjectsearch.getRelPhotosearch()));
             }
             json.put("keysearch", kss);
         }
@@ -202,7 +202,7 @@ public class JSONSubject {
         if(keysearch!=null) {
             for(int i=0; i<keysearch.size(); i++) {
                 Filmsearch filmsearch = JSONFilm.toFilmsearch((JSONObject)keysearch.get(i));
-                subjectsearch.film(filmsearch);
+                subjectsearch.relfilm(filmsearch);
             }
         }
         keysearch = (JSONArray)kss.get("photosubjectssearcher");
@@ -216,7 +216,7 @@ public class JSONSubject {
         if(keysearch!=null) {
             for(int i=0; i<keysearch.size(); i++) {
                 Photosearch photosearch = JSONPhoto.toPhotosearch((JSONObject)keysearch.get(i));
-                subjectsearch.photo(photosearch);
+                subjectsearch.relphoto(photosearch);
             }
         }
         return subjectsearch;

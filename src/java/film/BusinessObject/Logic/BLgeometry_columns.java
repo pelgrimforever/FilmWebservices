@@ -21,7 +21,7 @@ import film.BusinessObject.view.Bgeometry_columns;
  * @author Franky Laseure
  */
 public class BLgeometry_columns extends Bgeometry_columns {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets Geometry_columns as default Entity

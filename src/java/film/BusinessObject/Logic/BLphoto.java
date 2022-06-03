@@ -69,7 +69,7 @@ import film.logicview.Viewdescriptions;
  * @author Franky Laseure
  */
 public class BLphoto extends Bphoto {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     public final static String THUMBNAILPATH = "thumbnail" + File.separator;
     public final static String SMALLPATH = "small" + File.separator;
@@ -1151,15 +1151,15 @@ public class BLphoto extends Bphoto {
      * copy given photo location in this photo
      * update location and dependent parameters
      * @param photo: photo to update
-     * @param photopk: photo primary key containing the location to use
+     * @param source_photoPK: photo primary key containing the location to use
      * @return 
      * @throws DBException
      * @throws DataException 
      */
-    public boolean copyPhotoGeolocation(IPhoto photo, IPhotoPK photopk) throws DBException, DataException, CustomException {
+    public boolean copyPhotoGeolocation(IPhoto photo, IPhotoPK source_photoPK) throws DBException, DataException, CustomException {
         boolean success = false;
         Photo updphoto = this.getPhoto(photo.getPrimaryKey());
-        Photo source = this.getPhoto(photopk);
+        Photo source = this.getPhoto(source_photoPK);
         if(source!=null && source.getLocation()!=null && updphoto!=null) {
             updphoto.setLocation(source.getLocation());
             updphoto.setLocationradius(source.getLocationradius());

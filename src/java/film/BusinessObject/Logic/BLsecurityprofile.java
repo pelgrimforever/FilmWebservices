@@ -30,7 +30,7 @@ import java.util.ArrayList;
  * @author Franky Laseure
  */
 public class BLsecurityprofile extends Bsecurityprofile {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data
 	
     /**
@@ -55,6 +55,12 @@ public class BLsecurityprofile extends Bsecurityprofile {
         return this.getEntities(EMsecurityprofile.SQLSelect1, new SecurityprofilePK(securityprofile).getSQLprimarykey());
     }
 
+    public ArrayList getSecurityprofiles_for_user(String username) throws DBException {
+        Object[][] parameters = { { "siteusername", username } };
+        SQLparameters sqlparameters = new SQLparameters(parameters);
+        return this.getEntities(EMsecurityprofile.SQLSelectUsername, sqlparameters);
+    }
+    
     /**
      * try to insert Securityprofile object in database
      * commit transaction

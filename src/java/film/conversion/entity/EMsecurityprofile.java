@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @author Franky Laseure
  */
 public class EMsecurityprofile extends EMsecurityprofile_default {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     
     public static final String SQLWhereUsername = "securityuserprofile.siteusername = :siteusername:";
     public static final String SQLSelectUsername = "select securityprofile.* from securityprofile inner join securityuserprofile on securityprofile.userprofile = securityuserprofile.userprofile where " + SQLWhereUsername;

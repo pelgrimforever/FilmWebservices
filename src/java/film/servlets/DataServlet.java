@@ -2,14 +2,14 @@
  * DataServlet.java
  *
  * Created on Dec 23, 2012, 6:30 PM
- * Generated on 24.9.2021 14:50
+ * Generated on 1.5.2022 20:24
  *
  */
 
 package film.servlets;
 
 import film.HTTPtools.fileUpload.Requesthandler;
-import base.interfaces.servlet.IDataServlet;
+import base.interfaces.servlet.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -23,12 +23,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.codec.binary.Base64;
 
 /**
- * Servlettemplate is the superclass for all servlets generated in this project
+ * DataServlet is the superclass for all servlets generated in this project
  * Contains standard variables and a default html output
  *
  * @author Franky Laseure
  */
- public abstract class DataServlet extends javax.servlet.http.HttpServlet implements IDataServlet, SingleThreadModel {
+ public abstract class DataServlet extends javax.servlet.http.HttpServlet implements SingleThreadModel {
 
     //Respnose content type
     protected static final String CONTENT_TYPE = "text/html";
@@ -134,8 +134,7 @@ import org.apache.commons.codec.binary.Base64;
 
     protected void getOperationalVariables(HttpServletRequest request) throws IOException {
         this.parser = new Requesthandler(request);
-        this.operationtype = parser.getByteParameter(this.VAR_OPERATIONTYPE);
-        this.operation = parser.getByteParameter(this.VAR_OPERATION);
+        this.operation = parser.getByteParameter(HTTPOperationconstants.VAR_OPERATION);
     }
 
     /* (non-Javadoc)

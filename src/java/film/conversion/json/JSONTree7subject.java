@@ -2,7 +2,7 @@
  * JSONTree7subject.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
+ * Generated on 15.3.2022 18:7
  *
  */
  
@@ -120,8 +120,8 @@ public class JSONTree7subject {
             if(tree7subjectsearch.getPhototree7subjectsearch()!=null && tree7subjectsearch.getPhototree7subjectsearch().used()) {
                 kss.put("phototree7subjectsearcher", JSONPhototree7subject.toJSON((Phototree7subjectsearch)tree7subjectsearch.getPhototree7subjectsearch()));
             }
-            if(tree7subjectsearch.getPhotosearch()!=null && tree7subjectsearch.getPhotosearch().used()) {
-                kss.put("photosearcher", JSONPhototree7subject.toJSON((Phototree7subjectsearch)tree7subjectsearch.getPhotosearch()));
+            if(tree7subjectsearch.getRelPhotosearch()!=null && tree7subjectsearch.getRelPhotosearch().used()) {
+                kss.put("photosearcher", JSONPhototree7subject.toJSON((Phototree7subjectsearch)tree7subjectsearch.getRelPhotosearch()));
             }
             json.put("keysearch", kss);
         }
@@ -192,7 +192,7 @@ public class JSONTree7subject {
         if(keysearch!=null) {
             for(int i=0; i<keysearch.size(); i++) {
                 Photosearch photosearch = JSONPhoto.toPhotosearch((JSONObject)keysearch.get(i));
-                tree7subjectsearch.photo(photosearch);
+                tree7subjectsearch.relphoto(photosearch);
             }
         }
         return tree7subjectsearch;

@@ -21,7 +21,7 @@ import film.BusinessObject.view.Bview_publiclocalityphotocount;
  * @author Franky Laseure
  */
 public class BLview_publiclocalityphotocount extends Bview_publiclocalityphotocount {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_publiclocalityphotocount as default Entity

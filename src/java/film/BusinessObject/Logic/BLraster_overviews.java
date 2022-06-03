@@ -23,7 +23,7 @@ import java.sql.ResultSet;
  * @author Franky Laseure
  */
 public class BLraster_overviews extends Braster_overviews {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets Raster_overviews as default Entity

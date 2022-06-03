@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @author Franky Laseure
  */
 public class EMroute extends EMroute_default {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     
     public static final String OrderBy = " order by route.countrycode, route.postalcode, route.locality, route.sublocality, route.routecode";
     public static final String SQLWherelocalityPK = "countrycode = :locality.countrycode: and postalcode = :locality.postalcode: and locality = :locality.locality:";

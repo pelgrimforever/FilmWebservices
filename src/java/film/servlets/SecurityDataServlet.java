@@ -11,6 +11,7 @@ package film.servlets;
 import base.servlets.DataHandler;
 import base.servlets.Securitycheck;
 import film.BusinessObject.security.Security;
+import film.interfaces.logicentity.ISecurityprofile;
 import film.logic.Userprofile;
 import general.exception.CustomException;
 import general.exception.DBException;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import sitesecurity.interfaces.logicentity.ISitegroup;
 import sitesecurity.logicentity.Sitegroup;
 
 /**
@@ -27,7 +29,7 @@ import sitesecurity.logicentity.Sitegroup;
  * @author pelgrim
  */
 public abstract class SecurityDataServlet extends DataServlet implements Contextparameters {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 
     protected Userprofile userprofile = null;
     
@@ -50,11 +52,8 @@ public abstract class SecurityDataServlet extends DataServlet implements Context
                 if(authenticated) {
                     Security security = (Security)context.getAttribute(SECURITY);
                     try {
-                        ArrayList<Sitegroup> sitegroups = security.getGroups(userID);
-                        ArrayList profiles = new ArrayList();
-                        for(Sitegroup sitegroup: sitegroups) {
-                            profiles.addAll(security.getProfiles(sitegroup.getPrimaryKey().getGroupname()));
-                        }
+                        ArrayList<ISitegroup> sitegroups = security.getGroups(userID);
+                        ArrayList<ISecurityprofile> profiles = security.getProfiles(userID);
                         userprofile = new Userprofile(sitegroups, profiles);
                         session.setAttribute("userprofile", userprofile);
                     }

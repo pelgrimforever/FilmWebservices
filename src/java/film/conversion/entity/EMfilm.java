@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @author Franky Laseure
  */
 public class EMfilm extends EMfilm_default {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     
         private static final String SQLWherePublic = " public = :public: ";
 	public static final String SQLSelectAll = EMfilm_default.SQLSelectAll + OrderBy;

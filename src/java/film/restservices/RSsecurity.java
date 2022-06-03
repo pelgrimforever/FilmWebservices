@@ -1,7 +1,7 @@
 /*
  * RSsecurity.java
  *
- * Generated on 24.9.2021 14:50
+ * Generated on 15.3.2022 18:7
  *
  */
 
@@ -18,6 +18,7 @@ import org.json.simple.JSONObject;
  * @author Franky Laseure
  */
 public class RSsecurity {
+//Metacoder: NO AUTHOMATIC UPDATE
     
     public static boolean check(JSONObject json) throws DatahandlerException {
 //Custom code, do not change this line   

@@ -21,7 +21,7 @@ import film.BusinessObject.view.Bview_locationtree;
  * @author Franky Laseure
  */
 public class BLview_locationtree extends Bview_locationtree {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_locationtree as default Entity

@@ -26,7 +26,7 @@ import general.exception.DataException;
  * @author Franky Laseure
  */
 public class BLcreator extends Bcreator {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
 	
     /**
@@ -95,7 +95,7 @@ public class BLcreator extends Bcreator {
      * @throws general.exception.DataException
      */
     public void secureupdateCreator(ICreator creator) throws DBException, DataException {
-        this.deleteEntity(creator);
+        this.updateEntity(creator);
         super.Commit2DB();
     }
     

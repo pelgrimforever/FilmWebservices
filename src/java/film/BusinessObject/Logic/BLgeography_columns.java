@@ -21,7 +21,7 @@ import film.BusinessObject.view.Bgeography_columns;
  * @author Franky Laseure
  */
 public class BLgeography_columns extends Bgeography_columns {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets Geography_columns as default Entity

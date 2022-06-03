@@ -21,7 +21,7 @@ import film.BusinessObject.view.Bview_photodatespublic;
  * @author Franky Laseure
  */
 public class BLview_photodatespublic extends Bview_photodatespublic {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_photodatespublic as default Entity

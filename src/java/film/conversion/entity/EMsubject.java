@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @author Franky Laseure
  */
 public class EMsubject extends EMsubject_default {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
     
         public static final String OrderBy = " order by subject";
 	public static final String SQLWherecat1cat2 = "cat1 = :cat1: and cat2 = :cat2:";

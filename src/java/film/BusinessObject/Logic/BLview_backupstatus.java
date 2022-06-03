@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * @author Franky Laseure
  */
 public class BLview_backupstatus extends Bview_backupstatus {
-//ProjectGenerator: NO AUTHOMATIC UPDATE
+//Metacoder: NO AUTHOMATIC UPDATE
 	
     /**
      * Constructor, sets View_backupstatus as default Entity

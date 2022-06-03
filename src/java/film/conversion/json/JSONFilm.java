@@ -2,7 +2,7 @@
  * JSONFilm.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
+ * Generated on 15.3.2022 18:7
  *
  */
  
@@ -118,8 +118,8 @@ public class JSONFilm {
             if(filmsearch.getFilmsubjectssearch()!=null && filmsearch.getFilmsubjectssearch().used()) {
                 kss.put("filmsubjectssearcher", JSONFilmsubjects.toJSON((Filmsubjectssearch)filmsearch.getFilmsubjectssearch()));
             }
-            if(filmsearch.getSubjectsearch()!=null && filmsearch.getSubjectsearch().used()) {
-                kss.put("subjectsearcher", JSONFilmsubjects.toJSON((Filmsubjectssearch)filmsearch.getSubjectsearch()));
+            if(filmsearch.getRelSubjectsearch()!=null && filmsearch.getRelSubjectsearch().used()) {
+                kss.put("subjectsearcher", JSONFilmsubjects.toJSON((Filmsubjectssearch)filmsearch.getRelSubjectsearch()));
             }
             if(filmsearch.getPhotosearch()!=null && filmsearch.getPhotosearch().used()) {
                 kss.put("photosearcher", JSONPhoto.toJSON((Photosearch)filmsearch.getPhotosearch()));
@@ -217,7 +217,7 @@ public class JSONFilm {
         if(keysearch!=null) {
             for(int i=0; i<keysearch.size(); i++) {
                 Subjectsearch subjectsearch = JSONSubject.toSubjectsearch((JSONObject)keysearch.get(i));
-                filmsearch.subject(subjectsearch);
+                filmsearch.relsubject(subjectsearch);
             }
         }
         keysearch = (JSONArray)kss.get("photosearcher");
