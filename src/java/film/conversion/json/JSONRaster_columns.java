@@ -1,9 +1,6 @@
 /*
- * JSONRaster_columns.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONRaster_columns {
@@ -36,10 +32,6 @@ public class JSONRaster_columns {
         return jsonraster_columnss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IRaster_columns raster_columns) {
         JSONObject json = new JSONObject();
         json.put("r_table_catalog", raster_columns.getR_table_catalog());
@@ -82,11 +74,6 @@ public class JSONRaster_columns {
         return raster_columns;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Raster_columnssearch parameters
-     * @return 
-     */
     public static Raster_columnssearch toRaster_columnssearch(JSONObject json) {
         Raster_columnssearch raster_columnssearch = new Raster_columnssearch();
         raster_columnssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

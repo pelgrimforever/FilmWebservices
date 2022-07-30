@@ -33,7 +33,6 @@ public class View_photodates_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLview_photodates blview_photodates = new BLview_photodates();
         View_photodates_usecases view_photodatesusecases = new View_photodates_usecases(authenticated);
         try {
             switch(this.operation) {

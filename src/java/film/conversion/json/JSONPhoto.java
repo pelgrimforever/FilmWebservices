@@ -1,9 +1,6 @@
 /*
- * JSONPhoto.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 15.3.2022 18:7
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONPhoto {
@@ -41,10 +37,6 @@ public class JSONPhoto {
         return jsonphotos;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IPhotoPK photoPK) {
         JSONObject json = null;
         if(photoPK!=null) {
@@ -55,10 +47,6 @@ public class JSONPhoto {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IPhoto photo) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(photo.getPrimaryKey()));
@@ -91,10 +79,6 @@ public class JSONPhoto {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Photosearch photosearch) {
         JSONObject json = new JSONObject();
         if(photosearch.used()) {
@@ -157,11 +141,6 @@ public class JSONPhoto {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Photosearch toPhotosearch(JSONObject json) {
         Photosearch photosearch = new Photosearch();
         photosearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

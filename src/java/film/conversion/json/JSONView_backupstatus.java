@@ -1,9 +1,6 @@
 /*
- * JSONView_backupstatus.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_backupstatus {
@@ -36,10 +32,6 @@ public class JSONView_backupstatus {
         return jsonview_backupstatuss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_backupstatus view_backupstatus) {
         JSONObject json = new JSONObject();
         json.put("id", view_backupstatus.getId());
@@ -60,11 +52,6 @@ public class JSONView_backupstatus {
         return view_backupstatus;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_backupstatussearch parameters
-     * @return 
-     */
     public static View_backupstatussearch toView_backupstatussearch(JSONObject json) {
         View_backupstatussearch view_backupstatussearch = new View_backupstatussearch();
         view_backupstatussearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

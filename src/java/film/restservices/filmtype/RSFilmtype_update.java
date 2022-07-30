@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.filmtype;
@@ -11,6 +11,7 @@ import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IFilmtypesearch;
@@ -18,10 +19,9 @@ import film.interfaces.servlet.IFilmtypeOperation;
 import film.logicentity.Filmtype;
 import film.searchentity.Filmtypesearch;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,13 +48,15 @@ import org.json.simple.parser.ParseException;
 @Path("rsfilmtype_update")
 public class RSFilmtype_update extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Filmtype_usecases filmtypeusecases = new Filmtype_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations
@@ -80,7 +82,7 @@ public class RSFilmtype_update extends RS_json_login {
 
     private void update_filmtype(Filmtype_usecases filmtypeusecases, JSONObject json) throws ParseException, CustomException {
         IFilmtype filmtype = (IFilmtype)JSONFilmtype.toFilmtype((JSONObject)json.get("filmtype"));
-        filmtypeusecases.secureupdateFilmtype(filmtype);
+        filmtypeusecases.updateFilmtype(filmtype);
         setReturnstatus("OK");
     }
 }

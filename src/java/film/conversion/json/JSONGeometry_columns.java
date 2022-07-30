@@ -1,9 +1,6 @@
 /*
- * JSONGeometry_columns.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONGeometry_columns {
@@ -36,10 +32,6 @@ public class JSONGeometry_columns {
         return jsongeometry_columnss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IGeometry_columns geometry_columns) {
         JSONObject json = new JSONObject();
         json.put("f_table_catalog", geometry_columns.getF_table_catalog());
@@ -66,11 +58,6 @@ public class JSONGeometry_columns {
         return geometry_columns;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Geometry_columnssearch parameters
-     * @return 
-     */
     public static Geometry_columnssearch toGeometry_columnssearch(JSONObject json) {
         Geometry_columnssearch geometry_columnssearch = new Geometry_columnssearch();
         geometry_columnssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

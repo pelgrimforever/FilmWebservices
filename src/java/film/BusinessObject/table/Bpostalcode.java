@@ -1,218 +1,142 @@
 /*
- * Bpostalcode.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-import db.SQLMapperFactory;
-import db.SQLparameters;
-import data.gis.shape.*;
-import data.json.piJson;
-import data.json.psqlJsonobject;
-import db.SQLMapper_pgsql;
-import data.interfaces.db.Filedata;
-import film.BusinessObject.Logic.*;
-import film.conversion.json.JSONPostalcode;
+import db.*;
+import data.interfaces.db.*;
 import film.conversion.entity.EMpostalcode;
+import film.BusinessObject.Logic.*;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.searchentity.IPostalcodesearch;
 import film.logicentity.Postalcode;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import org.postgresql.geometric.PGpoint;
-import org.postgis.PGgeometry;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
- * Business Entity class Bpostalcode
- *
- * Superclass for manipulating data- and database objects
- * for Entity Postalcode and direct related data
- * This class is overwritten each time the code generator runs
- * and is not meant to be changed
- *
  * @author Franky Laseure
  */
-public abstract class Bpostalcode extends BLtable {
+public abstract class Bpostalcode extends TableBusinessrules {
 
-    /**
-     * Constructor, sets Postalcode as default Entity
-     */
-    public Bpostalcode() {
-        super(new Postalcode(), new EMpostalcode());
+    public Bpostalcode(SQLreader sqlreader) {
+        super(new TableIO(sqlreader, new EMpostalcode()));
     }
 
-    /**
-     * Constructor, sets Postalcode as default Entity
-     * sets transaction queue from given GeneralEntityObject implementation
-     * all transactions will commit at same time
-     * @param transactionobject: GeneralEntityObjects that holds the transaction queue
-     */
-    public Bpostalcode(BLtable transactionobject) {
-        super(transactionobject, new Postalcode(), new EMpostalcode());
+    public Bpostalcode(TableBusinessrules businessrules) {
+        super(new TableIO(businessrules.getTableio(), new EMpostalcode()));
+        this.tableio.setAuthenticated(tableio!=null && tableio.isAuthenticated());
     }
 
-    /**
-     * create new empty Postalcode object
-     * @return empty IPostalcode
-     */
     public IPostalcode newPostalcode() {
     	return new Postalcode();
     }
     
-    /**
-     * create new empty Postalcode object
-     * create new primary key with given parameters
-     * @param countrycode primary key field
-     * @param postalcode primary key field
-     * @return IPostalcode with primary key
-     */
     public IPostalcode newPostalcode(java.lang.String countrycode, java.lang.String postalcode) {
         return new Postalcode(countrycode, postalcode);
     }
 
-    /**
-     * create new empty Postalcode object with given primary key
-     * @param postalcodePK: primary key for Postalcode
-     * @return IPostalcode with primary key
-     */
     public IPostalcode newPostalcode(IPostalcodePK postalcodePK) {
         return new Postalcode((PostalcodePK)postalcodePK);
     }
 
-    /**
-     * create new empty primary key
-     * @return empty PostalcodePK
-     */
     public IPostalcodePK newPostalcodePK() {
         return new PostalcodePK();
     }
 
-    /**
-     * create new primary key with given parameters
-     * @param countrycode primary key field
-     * @param postalcode primary key field
-     * @return new IPostalcodePK
-     */
     public IPostalcodePK newPostalcodePK(java.lang.String countrycode, java.lang.String postalcode) {
         return new PostalcodePK(countrycode, postalcode);
     }
 
-    /**
-     * get all Postalcode objects from database
-     * @return ArrayList of Postalcode objects
-     * @throws DBException
-     */
     public ArrayList<Postalcode> getPostalcodes() throws DBException {
-        return (ArrayList<Postalcode>)super.getEntities(EMpostalcode.SQLSelectAll);
+        return (ArrayList<Postalcode>)tableio.getEntities(EMpostalcode.SQLSelectAll);
     }
 
-    /**
-     * search Postalcode for primary key
-     * @param postalcodePK: Postalcode primary key
-     * @return Postalcode object
-     * @throws DBException
-     */
     public Postalcode getPostalcode(IPostalcodePK postalcodePK) throws DBException {
-        return (Postalcode)super.getEntity((PostalcodePK)postalcodePK);
+        return (Postalcode)tableio.getEntity((PostalcodePK)postalcodePK);
     }
 
-    /**
-     * search postalcode with IPostalcodesearch parameters
-     * @param search IPostalcodesearch
-     * @return ArrayList of Postalcode
-     * @throws DBException 
-     */
     public ArrayList<Postalcode> searchpostalcodes(IPostalcodesearch search) throws DBException {
-        return (ArrayList<Postalcode>)this.search(search);
+        return (ArrayList<Postalcode>)tableio.search(search);
     }
 
-    /**
-     * search postalcode with IPostalcodesearch parameters, order by orderby sql clause
-     * @param search IPostalcodesearch
-     * @param orderby sql order by string
-     * @return ArrayList of Postalcode
-     * @throws DBException 
-     */
     public ArrayList<Postalcode> searchpostalcodes(IPostalcodesearch search, String orderby) throws DBException {
-        return (ArrayList<Postalcode>)this.search(search, orderby);
+        return (ArrayList<Postalcode>)tableio.search(search, orderby);
     }
 
-    /**
-     * Search postalcode in database for postalcodePK:
-     * @param postalcodePK: Postalcode Primary Key, only valid for the initialized Entity
-     * @return true if found in database
-     * @throws DBException
-     */
     public boolean getPostalcodeExists(IPostalcodePK postalcodePK) throws DBException {
-        return super.getEntityExists((PostalcodePK)postalcodePK);
+        return tableio.getEntityExists((PostalcodePK)postalcodePK);
     }
 
-    /**
-     * try to insert Postalcode in database
-     * @param postalcode Postalcode object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertPostalcode(IPostalcode postalcode) throws DBException, DataException {
-        super.insertEntity(postalcode);
+    public Postalcode getEntity(String sql) throws DBException {
+        return (Postalcode)tableio.getEntity(sql);
+    }
+    
+    public Postalcode getEntity(String sql, SQLparameters parameters) throws DBException {
+        return (Postalcode)tableio.getEntity(sql, parameters);
+    }
+    
+    public ArrayList<Postalcode> getEntities(String sql) throws DBException {
+        return tableio.getEntities(sql);
+    }
+    
+    public ArrayList<Postalcode> getEntities(String sql, SQLparameters parameters) throws DBException {
+        return tableio.getEntities(sql, parameters);
     }
 
-    /**
-     * check if PostalcodePK exists
-     * insert if not, update if found
-     * do not commit transaction
-     * @param postalcode Postalcode object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertupdatePostalcode(IPostalcode postalcode) throws DBException, DataException {
+    public long count() throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+    
+    public long count(String sql, SQLparameters parameters) throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+
+    public ArrayList<Postalcode> search(Tablesearcher search) throws DBException {
+        return tableio.search(search);
+    }
+
+    public ArrayList<Postalcode> search(Tablesearcher search, String orderby) throws DBException {
+        return tableio.search(search, orderby);
+    }
+
+    public long searchcount(Tablesearcher search) throws DBException {
+        return tableio.searchcount(search);
+    }
+
+    public void insertPostalcode(SQLTqueue transactionqueue, IPostalcode postalcode) throws DBException, DataException {
+        tableio.insertEntity(transactionqueue, postalcode);
+    }
+
+    public void insertupdatePostalcode(SQLTqueue transactionqueue, IPostalcode postalcode) throws DBException, DataException {
+    	checkDATA(postalcode);
         if(this.getPostalcodeExists(postalcode.getPrimaryKey())) {
-            super.updateEntity(postalcode);
+            tableio.updateEntity(transactionqueue, postalcode);
         } else {
-            super.insertEntity(postalcode);
+            tableio.insertEntity(transactionqueue, postalcode);
         }
     }
 
-    /**
-     * try to update Postalcode in database
-     * @param postalcode Postalcode object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void updatePostalcode(IPostalcode postalcode) throws DBException, DataException {
-        super.updateEntity(postalcode);
+    public void updatePostalcode(SQLTqueue transactionqueue, IPostalcode postalcode) throws DBException, DataException {
+    	checkDATA(postalcode);
+        tableio.updateEntity(transactionqueue, postalcode);
     }
 
-    /**
-     * try to delete Postalcode in database
-     * @param postalcode Postalcode object
-     * @throws DBException
-     */
-    public void deletePostalcode(IPostalcode postalcode) throws DBException {
-        cascadedeletePostalcode(postalcode.getPrimaryKey());
-        super.deleteEntity(postalcode);
+    public void deletePostalcode(SQLTqueue transactionqueue, IPostalcode postalcode) throws DBException {
+        cascadedeletePostalcode(transactionqueue, postalcode.getPrimaryKey());
+        tableio.deleteEntity(transactionqueue, postalcode);
     }
 
-    /**
-     * check data rules in Postalcode, throw DataException with customized message if rules do not apply
-     * @param postalcode Postalcode object
-     * @throws DataException
-     * @throws DBException
-     */
-    public void checkDATA(IPostalcode postalcode) throws DataException, DBException {
+    private void checkDATA(IPostalcode postalcode) throws DataException, DBException {
         StringBuffer message = new StringBuffer();
         //Primary key
         //Primary key
@@ -237,51 +161,25 @@ public abstract class Bpostalcode extends BLtable {
         }
     }
         
-    /**
-     * delete all records in tables where postalcodePK is used in a primary key
-     * @param postalcodePK: Postalcode primary key
-     */
-    public void cascadedeletePostalcode(IPostalcodePK postalcodePK) {
+    public void cascadedeletePostalcode(SQLTqueue transactionqueue, IPostalcodePK postalcodePK) {
         BLlocality bllocality = new BLlocality(this);
-        bllocality.delete4postalcode(postalcodePK);
+        bllocality.setAuthenticated(isAuthenticated());
+        bllocality.delete4postalcode(transactionqueue, postalcodePK);
     }
 
-    /**
-     * @param arealevel3PK: foreign key for Arealevel3
-     * @delete all Postalcode Entity objects for Arealevel3 in database
-     */
-    public void delete4arealevel3(IArealevel3PK arealevel3PK) {
-        super.addStatement(EMpostalcode.SQLDelete4arealevel3, arealevel3PK.getSQLprimarykey());
+    public void delete4arealevel3(SQLTqueue transactionqueue, IArealevel3PK arealevel3PK) {
+        tableio.addStatement(transactionqueue, EMpostalcode.SQLDelete4arealevel3, arealevel3PK.getSQLprimarykey());
     }
 
-    /**
-     * @param arealevel3PK: foreign key for Arealevel3
-     * @return all Postalcode Entity objects for Arealevel3
-     * @throws CustomException
-     */
     public ArrayList<Postalcode> getPostalcodes4arealevel3(IArealevel3PK arealevel3PK) throws CustomException {
-        return super.getEntities(EMpostalcode.SQLSelect4arealevel3, arealevel3PK.getSQLprimarykey());
+        return tableio.getEntities(EMpostalcode.SQLSelect4arealevel3, arealevel3PK.getSQLprimarykey());
     }
-    /**
-     * @param localityPK: parent Locality for child object Postalcode Entity
-     * @return child Postalcode Entity object
-     * @throws CustomException
-     */
     public Postalcode getLocality(ILocalityPK localityPK) throws CustomException {
         PostalcodePK postalcodePK = new PostalcodePK(localityPK.getCountrycode(), localityPK.getPostalcode());
         return this.getPostalcode(postalcodePK);
     }
 
 
-    /**
-     * get all Postalcode objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @param sortlist sql sort string
-     * @param sortoperator asc/desc
-     * @return ArrayList of Postalcode objects
-     * @throws DBException
-     */
     public ArrayList<Postalcode> getPostalcodes(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
         StringBuilder sql = new StringBuilder(EMpostalcode.SQLSelect);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
@@ -296,16 +194,10 @@ public abstract class Bpostalcode extends BLtable {
         if(sortlist.length()>0) {
             sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return (ArrayList<Postalcode>)super.getEntities(sql.toString(), sqlparameters);
+        return (ArrayList<Postalcode>)tableio.getEntities(sql.toString(), sqlparameters);
     }
 
-    /**
-     * delete all Postalcode objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @throws DBException
-     */
-    public void delPostalcode(SQLparameters sqlparameters, String andoroperator) throws DBException {
+    public void delPostalcode(SQLTqueue transactionqueue, SQLparameters sqlparameters, String andoroperator) throws DBException {
         StringBuilder sql = new StringBuilder("delete from ").append(Postalcode.table);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
         int l = parameters.size();
@@ -316,7 +208,7 @@ public abstract class Bpostalcode extends BLtable {
                 if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(sql.toString(), sqlparameters);
+        tableio.addStatement(transactionqueue, sql.toString(), sqlparameters);
     }
 
 

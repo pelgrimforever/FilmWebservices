@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.tree7subject;
@@ -68,7 +68,7 @@ public class Tree7subject_insert extends SecurityDataServlet {
 
     private void insert_tree7subject(Tree7subject_usecases tree7subjectusecases) throws CustomException {
         ITree7subject tree7subject = (ITree7subject)parser.getJavaObject("tree7subject");
-        tree7subjectusecases.secureinsertTree7subject(tree7subject);
+        tree7subjectusecases.insertTree7subject(tree7subject);
     }
     
     @Override

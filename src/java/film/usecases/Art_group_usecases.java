@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Art_group;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Art_group_usecases {
 
     private boolean loggedin = false;
-    private BLart_group blart_group = new BLart_group();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLart_group blart_group = new BLart_group(sqlreader);
     
     public Art_group_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Art_group_usecases {
     }
     
     public boolean getArt_groupExists(IArt_groupPK art_groupPK) throws DBException {
-        return blart_group.getEntityExists(art_groupPK);
+        return blart_group.getArt_groupExists(art_groupPK);
     }
     
     public Art_group get_art_group_by_primarykey(IArt_groupPK art_groupPK) throws DBException {
@@ -65,16 +71,23 @@ public class Art_group_usecases {
         return blart_group.searchcount(art_groupsearch);
     }
 
-    public void secureinsertArt_group(IArt_group art_group) throws DBException, DataException {
-        blart_group.secureinsertArt_group(art_group);
+    public void insertArt_group(IArt_group art_group) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_group.insertArt_group(tq, art_group);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateArt_group(IArt_group art_group) throws DBException, DataException {
-        blart_group.secureupdateArt_group(art_group);
+    public void updateArt_group(IArt_group art_group) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_group.updateArt_group(tq, art_group);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteArt_group(IArt_group art_group) throws DBException, DataException {
-        blart_group.securedeleteArt_group(art_group);
+    public void deleteArt_group(IArt_group art_group) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_group.deleteArt_group(tq, art_group);
+        sqlwriter.Commit2DB(tq);
     }
+
 }
 

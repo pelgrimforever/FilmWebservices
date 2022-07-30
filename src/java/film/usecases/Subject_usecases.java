@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Subject;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Subject_usecases {
 
     private boolean loggedin = false;
-    private BLsubject blsubject = new BLsubject();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLsubject blsubject = new BLsubject(sqlreader);
     
     public Subject_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Subject_usecases {
     }
     
     public boolean getSubjectExists(ISubjectPK subjectPK) throws DBException {
-        return blsubject.getEntityExists(subjectPK);
+        return blsubject.getSubjectExists(subjectPK);
     }
     
     public Subject get_subject_by_primarykey(ISubjectPK subjectPK) throws DBException {
@@ -85,16 +91,41 @@ public class Subject_usecases {
         return blsubject.searchcount(subjectsearch);
     }
 
-    public void secureinsertSubject(ISubject subject) throws DBException, DataException {
-        blsubject.secureinsertSubject(subject);
+    public void insertSubject(ISubject subject) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsubject.insertSubject(tq, subject);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateSubject(ISubject subject) throws DBException, DataException {
-        blsubject.secureupdateSubject(subject);
+    public void updateSubject(ISubject subject) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsubject.updateSubject(tq, subject);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteSubject(ISubject subject) throws DBException, DataException {
-        blsubject.securedeleteSubject(subject);
+    public void deleteSubject(ISubject subject) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsubject.deleteSubject(tq, subject);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Subjectcatcat1(ISubjectcatPK subjectcatCat1PK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blsubject.delete4subjectcatCat1(tq, subjectcatCat1PK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public void delete_all_containing_Tree7subject(ITree7subjectPK tree7subjectPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blsubject.delete4tree7subject(tq, tree7subjectPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public void delete_all_containing_Subjectcatcat2(ISubjectcatPK subjectcatCat2PK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blsubject.delete4subjectcatCat2(tq, subjectcatCat2PK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

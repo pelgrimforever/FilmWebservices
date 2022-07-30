@@ -1,16 +1,13 @@
 /*
- * BLphoto.java
- *
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
- *
  */
 
 package film.BusinessObject.Logic;
 
-import BusinessObject.BLtable;
 import BusinessObject.BusinessLogic;
 import static BusinessObject.BusinessLogic.FILEROOT;
+import BusinessObject.Filewriter;
 import data.gis.shape.piPoint;
 import data.gis.shape.piPolyline;
 import data.google.geocode.Googleaddresscomponent;
@@ -54,18 +51,16 @@ import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import javax.imageio.ImageIO;
 import data.interfaces.db.Tablesearcher;
+import db.SQLTqueue;
 import db.SQLparameters;
+import db.SQLreader;
+import db.TableBusinessrules;
+import file.Filereader;
 import film.conversion.entity.EMphoto;
 import film.logicview.Viewdescriptions;
+import static java.lang.StrictMath.log;
 
 /**
- * Business Logic Entity class BLphoto
- *
- * Class for manipulating data- and database objects
- * for Entity Photo and direct related data
- * This class is only generated once
- * Implement here all additional business logic
- *
  * @author Franky Laseure
  */
 public class BLphoto extends Bphoto {
@@ -76,64 +71,42 @@ public class BLphoto extends Bphoto {
     public final static String CROPPEDPATH = "cropped" + File.separator;
     public final static String FILEEXTENTION = "jpg";
 
-    //path to store temporary photo files to work with the photo website
-    //not used anymore
-    //public final static String TEMPdestinationpath = "../docroot/photos/temp/";
-    //public final static String TEMPonlinepath = "temp/";
-
     public final static int SMALL_WIDTH = 800;
     public final static int SMALL_HEIGHT = 600;
     public final static int THUMBNAIL_WIDTH = 200;
     public final static int THUMBNAIL_HEIGHT = 200;
 
     private Object[][] publiconly = { { "public", true } };
-    private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
+    private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data
+    private Filereader filereader = new Filereader();
+    private Filewriter filewriter = new Filewriter();
     
-    /**
-     * Constructor, sets Photo as default Entity
-     */
-    public BLphoto() {
-        this.setLogginrequired(isprivatetable);
+    public BLphoto(SQLreader sqlreader) {
+        super(sqlreader);
+        setLogginrequired(isprivatetable);
     }
 
-    /**
-     * Constructor, sets Photo as default Entity
- sets transaction queue from given BusinessLogic implementation
- all transactions will commit at same time
-     * @param transactionobject: GeneralObjects that holds the transaction queue
-     */
-    public BLphoto(BLtable transactionobject) {
-        super(transactionobject);
-        this.setLogginrequired(isprivatetable);
-        this.setAuthenticated(transactionobject.isAuthenticated());
+    public BLphoto(TableBusinessrules businessrules) {
+        super(businessrules);
+        tableio.setLogginrequired(isprivatetable);
+        this.setAuthenticated(businessrules.isAuthenticated());
     }
 
     public boolean hasAccess(Userprofile userprofile, IPhotoPK photoPK) throws DBException {
         boolean hasaccess = userprofile!=null && userprofile.privateaccess();
         if(!hasaccess) {
-            Photo photo = (Photo)super.getEntity((PhotoPK)photoPK);
+            Photo photo = super.getPhoto(photoPK);
             hasaccess = photo.getPublic();
         }
         return hasaccess;
     }
 
-    /**
-     * count all records of table
-     * @return records amount
-     * @throws DBException 
-     */
     @Override
     public long count() throws DBException {
         String searchsql = "select count(*) as count from photo where public";
         return this.count(searchsql, null);
     }
 
-    /**
-     * count all records of table
-     * @param loggedin
-     * @return records amount
-     * @throws DBException 
-     */
     public long count(boolean loggedin) throws DBException {
         if(loggedin) {
             String searchsql = "select count(*) as count from photo";
@@ -143,21 +116,10 @@ public class BLphoto extends Bphoto {
         }
     }
 
-    /**
-     * get all Photo objects from database
-     * @return ArrayList of Photo objects
-     * @throws DBException
-     */
     public ArrayList getPhotos() throws DBException {
         return getPhotos(this.isAuthenticated());
     }
     
-    /**
-     * get all Photo objects from database
-     * @param privateaccess
-     * @return ArrayList of Photo objects
-     * @throws DBException
-     */
     public ArrayList getPhotos(boolean privateaccess) throws DBException {
         if(privateaccess)
             return this.getEntities(EMphoto.SQLSelect4photo_sorted);
@@ -167,50 +129,18 @@ public class BLphoto extends Bphoto {
         }
     }
 
-    /**
-     * search Photo for primary key
-     * @param photoPK: Photo primary key
-     * @return Photo object
-     * @throws DBException
-     */
-    @Override
-    public Photo getPhoto(IPhotoPK photoPK) throws DBException {
-        return (Photo)super.getEntity((PhotoPK)photoPK);
-    }
-
-    /**
-     * search Photo for primary key
-     * @param userprofile
-     * @param photoPK: Photo primary key
-     * @return Photo object
-     * @throws DBException
-     */
     public Photo getPhoto(Userprofile userprofile, IPhotoPK photoPK) throws DBException {
-        Photo returnphoto = (Photo)super.getEntity((PhotoPK)photoPK);
+        Photo returnphoto = (Photo)super.getPhoto(photoPK);
         if(!userprofile.privateaccess() && !returnphoto.getPublic()) returnphoto = null;
         return returnphoto;
     }
 
-    /**
-     * get Photo for primary key, return null if access is not allowed
-     * @param hasprivateaccess: has private access ?
-     * @param photoPK: photo primary key
-     * @return Photo object
-     * @throws DBException 
-     */
     public Photo getPhoto(boolean hasprivateaccess, IPhotoPK photoPK) throws DBException {
         Photo returnphoto = getPhoto(photoPK);
         if(!(hasprivateaccess || returnphoto.getPublic())) returnphoto = null;
         return returnphoto;
     }
     
-    /**
-     * search public photos with search parameters
-     * if no search is used, return empty list
-     * @param search: IPhotosearch object
-     * @return ArrayList of Photo entities
-     * @throws DBException
-     */
     public ArrayList search(IPhotosearch search) throws DBException {
         if(search.used()) {
             String sqlorderby = EMphoto.OrderByDateTime;
@@ -228,48 +158,30 @@ public class BLphoto extends Bphoto {
 
     public void addThumbnailsBase64(ArrayList photos) throws DBException, CustomException {
         Photo photo;
-        try {
-            for(int i=0; i<photos.size(); i++) {
-                photo = (Photo)photos.get(i);
-                if(photo.getPublic() || this.isAuthenticated()) {
+        for(int i=0; i<photos.size(); i++) {
+            photo = (Photo)photos.get(i);
+            if(photo.getPublic() || this.isAuthenticated()) {
+                try {
                     BufferedImage bi = ImageIO.read(getThumbnail(photo.getPrimaryKey()));
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     ImageIO.write(bi, "jpg", baos);
                     photo.setImagebase64("data:image/jpeg;base64," + Base64.getEncoder().encodeToString(baos.toByteArray()));
                 }
+                catch(IOException e) {
+                }
             }
-        }
-        catch(IOException e) {
-            throw new CustomException(e);
         }
     }
     
-    /**
-     * perform photos search with search parameters
-     * return only the amount of records found
-     * @param search: IPhotosearch object
-     * @return number of found records
-     * @throws DBException 
-     */
     public long searchcount(IPhotosearch search) throws DBException {
         long count = 0;
         if(search.used()) {
-            search.build("");
-            String searchsql = EMphoto.SQLSelectAll + search.getJoin() + " where (" + search.getSql() + ")";
-            if(!this.isAuthenticated()) searchsql += " and public";        
-            searchsql = "select count(distinct tablecount.*) as count from (" + searchsql + ") as tablecount";
-            count = this.count(searchsql, search.getParameters());
+            if(!this.isAuthenticated()) search.publicf_(true);
+            count = super.searchcount(search);
         }
         return count;
     }
     
-    /**
-     * search Photos for a given location
-     * @param hasprivateaccess: has private access ?
-     * @param location: location point
-     * @return ArrayList of Photos
-     * @throws DBException 
-     */
     public ArrayList getPhoto4Location(boolean hasprivateaccess, piPoint location) throws DBException {
         ArrayList photos;
         Object[][] parameter = { { "location", location } };
@@ -283,12 +195,6 @@ public class BLphoto extends Bphoto {
         return photos;
     }
     
-    /**
-     * search Photos for given locations
-     * @param locations: location points
-     * @return ArrayList of Photos
-     * @throws DBException 
-     */
     public ArrayList getPhoto4Locations(ArrayList<piPoint> locations) throws DBException {
         ArrayList photos;
         SQLparameters parameters = new SQLparameters();
@@ -317,13 +223,6 @@ public class BLphoto extends Bphoto {
         return this.getEntities(sql.toString(), parameters);
     }
     
-    /**
-     * search Photos for a given date
-     * @param hasprivateaccess: has private access ?
-     * @param date: date
-     * @return ArrayList of Photos
-     * @throws DBException 
-     */
     public ArrayList getPhoto4Date(boolean hasprivateaccess, Date date) throws DBException {
         ArrayList photos;
         Object[][] parameter = { { "photodate", date } };
@@ -337,13 +236,6 @@ public class BLphoto extends Bphoto {
         return photos;
     }
     
-    /**
-     * @param hasprivateaccess: boolean, access to private photos
-     * @param filmPK: foreign key for Film
-     * @param loadthumbnails: boolean, load thumbnail pictures in ArrayList for found photo objects
-     * @return all Photo Entity objects for Film
-     * @throws general.exception.CustomException
-     */
     public ArrayList getPhotos4photo_film(boolean hasprivateaccess, IFilmPK filmPK, boolean loadthumbnails) throws CustomException {
         SQLparameters parameters = filmPK.getSQLprimarykey();
         ArrayList photos;
@@ -359,14 +251,6 @@ public class BLphoto extends Bphoto {
             return photos;
     }
 
-    /**
-     *
-     * @param userprofile
-     * @param filmPK: foreign key for Film
-     * @param loadthumbnails
-     * @return all Photo Entity objects for Film
-     * @throws general.exception.CustomException
-     */
     public ArrayList getPhotos4photo_film_edit(Userprofile userprofile, IFilmPK filmPK, boolean loadthumbnails) throws CustomException {
         ArrayList photos = new ArrayList();
         if(userprofile!=null && userprofile.isEditor()) {
@@ -375,51 +259,22 @@ public class BLphoto extends Bphoto {
         return photos;
     }
 
-    /**
-     *
-     * @param filmPK: foreign key for Film
-     * @return all Photo Entity objects for Film where imagebackup
-     * @throws general.exception.CustomException
-     */
     public ArrayList getPhotos4photo_film_imagebackup(IFilmPK filmPK) throws CustomException {
         return this.getEntities(EMphoto.SQLSelect4photo_film_imagebackup, filmPK.getSQLprimarykey());
     }
 
-    /**
-     *
-     * @param filmPK: foreign key for Film
-     * @return all Photo Entity objects for Film where backup
-     * @throws general.exception.CustomException
-     */
     public ArrayList getPhotos4photo_film_backup(IFilmPK filmPK) throws CustomException {
         return this.getEntities(EMphoto.SQLSelect4photo_film_backup, filmPK.getSQLprimarykey());
     }
 
-    /**
-     *
-     * @param photoPK: Photo Primary Key
-     * @param subpath: sub directory of Photo Image Path
-     * @return Photo directory
-     */
     public String getImagePath(IPhotoPK photoPK, String subpath) {
         return BLfilm.getRootImagePath(photoPK.getFilmPK()).append(subpath).toString();
     }
 
-    /**
-     *
-     * @param photoPK: Photo Primary Key
-     * @return Photo Filename
-     */
     protected String getFilename(IPhotoPK photoPK) {
         return new StringBuffer(Photo.getFileName(photoPK)).append(".").append(FILEEXTENTION).toString();
     }
 
-    /**
-     *
-     * @param photoPK: Photo Primary Key
-     * @param format: format suffix in filename (C, P, COMPOSITION, ...)
-     * @return Photo Filename
-     */
     private String getFilename(IPhotoPK photoPK, String format) {
         if(format.length()==1) {
             return new StringBuffer(Photo.getFileName(photoPK)).append(format).append(".").append(FILEEXTENTION).toString();
@@ -428,24 +283,12 @@ public class BLphoto extends Bphoto {
         }
     }
 
-    /**
-     *
-     * @param photoPK: Photo primary key
-     * @return Thumbnail image for this photo
-     * @throws DBException
-     */
     public Filedata getThumbnailfiledata(IPhotoPK photoPK) throws DBException {
         String filepath = getImagePath(photoPK, THUMBNAILPATH);
         String filename = getFilename(photoPK);
-        return super.getFiledata(filepath, filename);
+        return filereader.getFiledata(filepath, filename);
     }
 
-    /**
-     * returns the image file if authenticated or public
-     * @param photoPK
-     * @return image file, thumbnail size
-     * @throws DBException 
-     */
     public File getThumbnail(IPhotoPK photoPK) throws DBException {
         Photo photo = this.getPhoto(photoPK);
         if(isAuthenticated() || photo.getPublic()) {
@@ -457,12 +300,6 @@ public class BLphoto extends Bphoto {
         }
     }
     
-    /**
-     * returns the image file if authenticated or public
-     * @param photoPK
-     * @return image file, small size
-     * @throws DBException 
-     */
     public File getSmall(IPhotoPK photoPK) throws DBException {
         Photo photo = this.getPhoto(photoPK);
         if(isAuthenticated() || photo.getPublic()) {
@@ -474,94 +311,48 @@ public class BLphoto extends Bphoto {
         }
     }
     
-    /**
-     *
-     * @param photoPK: Photo primary key
-     * @param format: format suffix in filename (C, P, COMPOSITION, ...)
-     * @return Thumbnail image for this photo
-     * @throws DBException
-     */
     public Filedata getThumbnailfiledata(IPhotoPK photoPK, String format) throws DBException {
         String filepath = getImagePath(photoPK, THUMBNAILPATH);
         String filename = getFilename(photoPK, format);
-        return super.getFiledata(filepath, filename);
+        return filereader.getFiledata(filepath, filename);
     }
 
-    /**
-     *
-     * @param photoPK Photo primary key
-     * @return Small image path
-     * @throws DBException
-     */
     private String getSmallfilepath(IPhotoPK photoPK) {
         String filepath = getImagePath(photoPK, SMALLPATH);
         String filename = getFilename(photoPK);
         return FILEROOT + filepath + filename;
     }
 
-    /**
-     * @param photoPK: Photo primary key
-     * @return Small image for this photo
-     * @throws DBException
-     */
     public Filedata getSmallfiledata(IPhotoPK photoPK) throws DBException {
         String filepath = getImagePath(photoPK, SMALLPATH);
         String filename = getFilename(photoPK);
-        return super.getFiledata(filepath, filename);
+        return filereader.getFiledata(filepath, filename);
     }
 
-    /**
-     * @param photoPK: Photo primary key
-     * @param format: format suffix in filename (C, P, COMPOSITION, ...)
-     * @return Small image for this photo
-     * @throws DBException
-     */
     public Filedata getSmallfiledata(IPhotoPK photoPK, String format) throws DBException {
         String filepath = getImagePath(photoPK, SMALLPATH);
         String filename = getFilename(photoPK, format);
-        return super.getFiledata(filepath, filename);
+        return filereader.getFiledata(filepath, filename);
     }
 
-    /**
-     * @param photoPK: Photo primary key
-     * @return Cropped image for this photo
-     * @throws DBException
-     */
     public Filedata getCroppedfiledata(IPhotoPK photoPK) throws DBException {
         String filepath = getImagePath(photoPK, CROPPEDPATH);
         String filename = getFilename(photoPK);
-        return super.getFiledata(filepath, filename);
+        return filereader.getFiledata(filepath, filename);
     }
 
-    /**
-     * @param photoPK: Photo primary key
-     * @param format: format suffix in filename (C, P, COMPOSITION, ...)
-     * @return Cropped image for this photo
-     * @throws DBException
-     */
     public Filedata getCroppedfiledata(IPhotoPK photoPK, String format) throws DBException {
         String filepath = getImagePath(photoPK, CROPPEDPATH);
         String filename = getFilename(photoPK, format);
-        return super.getFiledata(filepath, filename);
+        return filereader.getFiledata(filepath, filename);
     }
 
-    /**
-     * @param photoPK: Photo primary key
-     * @return Cropped image for this photo
-     * @throws DBException
-     */
     public Filedata getRootfiledata(IPhotoPK photoPK) throws DBException {
         String filepath = BLfilm.getRootImagePath(photoPK.getFilmPK()).toString();
         String filename = getFilename(photoPK);
-        return super.getFiledata(filepath, filename);
+        return filereader.getFiledata(filepath, filename);
     }
 
-    /**
-     * Search all descriptions that contain searchtext
-     * @param searchtext: searchtext
-     * @return ArrayList of description Strings
-     * @throws DBException 
-     */
     public ArrayList getDescriptions(String searchtext) throws DBException {
         String search = ":*:" + searchtext + ":*:";
         Object[][] parameter = { { "description", search } };
@@ -572,8 +363,9 @@ public class BLphoto extends Bphoto {
             parameters.add(publiconly);
         }
         sql += EMphoto.OrderByDescription;
-        BLviewdescriptions blviewdescriptions = new BLviewdescriptions();
-        ArrayList<Viewdescriptions> descriptions = blviewdescriptions.getEntities(sql, parameters);
+        BLviewdescriptions blviewdescriptions = new BLviewdescriptions(tableio.getSQLreader());
+        blviewdescriptions.setAuthenticated(true);
+        ArrayList<Viewdescriptions> descriptions = blviewdescriptions.getViewio().getEntities(sql, parameters);
         ArrayList<String> descriptionsarray = new ArrayList<String>();
         for(Viewdescriptions descriptionview: descriptions) {
             descriptionsarray.add(descriptionview.getDescription());
@@ -581,26 +373,11 @@ public class BLphoto extends Bphoto {
         return descriptionsarray;
     }
     
-    /**
-     * get photos where location or date/time is not in database
-     * @return ArrayList of Photo objects
-     * @throws DBException 
-     */
     public ArrayList getPhotoDataErrors() throws DBException {
         return this.getEntities(EMphoto.SQLSelectDataError);
     }
     
-    /**
-     * Backup Image files
-     * Delete images in root and cropped directory to save server diskspace
-     * only keep files in small and thumbnail
-     * @param film
-     * @param photo
-     * @param backupdir
-     * @throws DBException
-     * @throws CustomException
-     */
-    public void backupImages(IFilm film, IPhoto photo, String backupdir) throws DBException, CustomException {
+    public void backupImages(SQLTqueue transactionqueue, IFilm film, IPhoto photo, String backupdir) throws DBException, CustomException {
         String rootfilename = null;
         String croppedfilename = null;
         String croppedfilename_format = null;
@@ -611,21 +388,21 @@ public class BLphoto extends Bphoto {
         //Root image must be present
         Filedata rootimage = getRootfiledata(photoPK);
         rootfilename = rootimage.getFilename();
-        saveFileAbsolutepath(rootimage, backupdir + BLfilm.getRootImagePath(photoPK.getFilmPK()).toString());
+        filewriter.saveFileAbsolutepath(rootimage, backupdir + BLfilm.getRootImagePath(photoPK.getFilmPK()).toString());
         Filedata image;
         //cropped image must be present for APS, CON, DIA
         try {
             image = getCroppedfiledata(photoPK);
             croppedfilename = image.getFilename();
-            saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, CROPPEDPATH));
+            filewriter.saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, CROPPEDPATH));
         }
         catch(Exception e) {
             //cropped file not found, create
             if(!filmtype.equals("APS") && !filmtype.equals("CON") && !filmtype.equals("DIA")) {
                 String croppedpath = getImagePath(photo.getPrimaryKey(), CROPPEDPATH);
-                saveFile(rootimage, croppedpath);
+                filewriter.saveFile(rootimage, croppedpath);
                 croppedpath = getImagePath(photoPK, CROPPEDPATH);
-                saveFileAbsolutepath(rootimage, backupdir + getImagePath(photoPK, CROPPEDPATH));
+                filewriter.saveFileAbsolutepath(rootimage, backupdir + getImagePath(photoPK, CROPPEDPATH));
             } else {
                 throw new DBException(e);
             }
@@ -633,7 +410,7 @@ public class BLphoto extends Bphoto {
         //small & thumbnail image, create in all cases when it does not exists
         try {
             image = getSmallfiledata(photoPK);
-            saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, SMALLPATH));
+            filewriter.saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, SMALLPATH));
         }
         catch(Exception e) {
             //get cropped file, transform to small and save
@@ -656,7 +433,7 @@ public class BLphoto extends Bphoto {
         }
         try {
             image = getThumbnailfiledata(photoPK);
-            saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, THUMBNAILPATH));
+            filewriter.saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, THUMBNAILPATH));
         }
         catch(Exception e) {
             //get cropped file, transform to small and save
@@ -679,53 +456,45 @@ public class BLphoto extends Bphoto {
         }
         if(!photo.getFormat().equals("H")) {
             image = getCroppedfiledata(photoPK, photo.getFormat());
-            log.finer("get cropped image for format " + photo.getFormat() + ": " + image.getFilename());
             croppedfilename_format = image.getFilename();
-            saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, CROPPEDPATH));
+            filewriter.saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, CROPPEDPATH));
             image = getSmallfiledata(photoPK, photo.getFormat());
-            log.finer("get small image for format " + photo.getFormat() + ": " + image.getFilename());
-            saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, SMALLPATH));
+            filewriter.saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, SMALLPATH));
             image = getThumbnailfiledata(photoPK, photo.getFormat());
-            log.finer("get thumbnail image for format " + photo.getFormat() + ": " + image.getFilename());
-            saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, THUMBNAILPATH));
+            filewriter.saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, THUMBNAILPATH));
         }
         if(photo.getComposition()) {
             //check if file with COMPOSITION extention exists
             try {
                 image = getCroppedfiledata(photoPK, "COMPOSITION");
                 croppedfilename_composition = image.getFilename();
-                saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, CROPPEDPATH));
+                filewriter.saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, CROPPEDPATH));
             } catch(DBException e) {}
             try {
                 image = getSmallfiledata(photoPK, "COMPOSITION");
-                saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, SMALLPATH));
+                filewriter.saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, SMALLPATH));
             } catch(DBException e) {}
             try {
                 image = getThumbnailfiledata(photoPK, "COMPOSITION");
-                saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, THUMBNAILPATH));
+                filewriter.saveFileAbsolutepath(image, backupdir + getImagePath(photoPK, THUMBNAILPATH));
             } catch(DBException e) {}
         }
         photo.setImagebackup(false);
-        updatePhoto(photo);
+        updatePhoto(transactionqueue, photo);
 
         //delete files when database is updated
         String filepath = BLfilm.getRootImagePath(photoPK.getFilmPK()).toString();
-        super.deleteFile(filepath, rootfilename);
+        filewriter.deleteFile(filepath, rootfilename);
         filepath = getImagePath(photoPK, CROPPEDPATH);
-        super.deleteFile(filepath, croppedfilename);
+        filewriter.deleteFile(filepath, croppedfilename);
         if(croppedfilename_format!=null) {
-            super.deleteFile(filepath, croppedfilename_format);
+            filewriter.deleteFile(filepath, croppedfilename_format);
         }
         if(croppedfilename_composition!=null) {
-            super.deleteFile(filepath, croppedfilename_composition);
+            filewriter.deleteFile(filepath, croppedfilename_composition);
         }
     }
 
-    /**
-     *
-     * @param photos: ArrayList of Photo objects
-     * @return ArrayList of Photo Objects with thumbnail image data as Filedata Objects
-     */
     private ArrayList loadThumbnailImages(ArrayList photos) {
         Photo photo;
         StringBuffer filepath;
@@ -743,52 +512,13 @@ public class BLphoto extends Bphoto {
         return photos;
     }
 
-    /**
-     * try to insert Photo object in database
-     * commit transaction
-     * @param photo: Photo Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    @Override
-    public void insertPhoto(IPhoto photo) throws DBException, DataException {
-        trans_insertPhoto(photo);
-        super.Commit2DB();
-    }
-    
-    /**
-     * try to insert Photo object in database
-     * commit transaction
-     * @param photo: Photo Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void secureinsertPhoto(IPhoto photo) throws DBException, DataException {
-        trans_insertPhoto(photo);
-        super.Commit2DB();
-    }
-    
-    /**
-     * Check if write permissions on server disk are still ok
-     * if not, a Data Exception is thrown
-     * @throws DataException 
-     */
     public void checkwritepermissions() throws DataException {
-        //check writing permissions on disk
         File checkpermissionsfile = new File(BusinessLogic.FILEROOT + BLfilm.PHOTOSUBROOT);
-        if(!checkpermissionsfile.canWrite()) {
+        if(!checkpermissionsfile.canWrite())
             throw new DataException("No write permission on server disk");
-        }
     }
     
-    /**
-     * try to insert Photo object in database, based on root and cropped photo file data
-     * commit transaction
-     * @param root: root Photo file
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void uploadPhotoImage_Root(Filedata root) throws DBException, DataException {
+    public void uploadPhotoImage_Root(SQLTqueue transactionqueue, Filedata root) throws DBException, DataException {
         checkwritepermissions(); //DataException is thrown when not ok
         String filename = root.getFilename();
         filename = filename.substring(0, filename.indexOf("."));
@@ -798,24 +528,14 @@ public class BLphoto extends Bphoto {
         photo.setPublic(false);
         photo.setFormat("H");
         if(this.getPhoto(photo.getPrimaryKey())==null) {
-            trans_insertPhoto(photo);
-            super.Commit2DB();
+            insertPhoto(transactionqueue, photo);
         }
         String rootpath = BLfilm.getRootImagePath(photo.getPrimaryKey().getFilmPK()).toString();
         String newfilename = filename + "." + FILEEXTENTION;
-        saveFileAs(root, rootpath, newfilename);
+        filewriter.saveFileAs(root, rootpath, newfilename);
     }
 
-    /**
-     * try to insert Photo object in database, based on root and cropped photo file data
-     * commit transaction
-     * @param root: root Photo file
-     * @param photoproperties
-     * @return 
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public String uploadPhotoImage_CONRoot(Filedata root, HashMap photoproperties) throws DBException, DataException {
+    public String uploadPhotoImage_CONRoot(SQLTqueue transactionqueue, Filedata root, HashMap photoproperties) throws DBException, DataException {
         checkwritepermissions(); //DataException is thrown when not ok
         String filmid = (String)photoproperties.get("filmid");
         int photoid = 0;
@@ -829,16 +549,15 @@ public class BLphoto extends Bphoto {
         photo.setPublic(false);
         photo.setFormat("H");
         if(this.getPhoto(photo.getPrimaryKey())==null) {
-            trans_insertPhoto(photo);
-            super.Commit2DB();
+            insertPhoto(transactionqueue, photo);
         }
         String rootpath = BLfilm.getRootImagePath(photo.getPrimaryKey().getFilmPK()).toString();
         String newfilename = filename + "." + FILEEXTENTION;
-        saveFileAs(root, rootpath, newfilename);
+        filewriter.saveFileAs(root, rootpath, newfilename);
         return newfilename;
     }
 
-    public void uploadPhotoImage_CONCropped(Filedata cropped, HashMap photoproperties) throws DBException, DataException {
+    public void uploadPhotoImage_CONCropped(SQLTqueue transactionqueue, Filedata cropped, HashMap photoproperties) throws DBException, DataException {
         checkwritepermissions(); //DataException is thrown when not ok
         String filmid = (String)photoproperties.get("filmid");
         String usedfilename = (String)photoproperties.get("usedfilename");
@@ -849,12 +568,11 @@ public class BLphoto extends Bphoto {
         photo.setPublic(false);
         photo.setFormat("H");
         if(this.getPhoto(photo.getPrimaryKey())==null) {
-            trans_insertPhoto(photo);
-            super.Commit2DB();
+            insertPhoto(transactionqueue, photo);
         }
         String croppedpath = getImagePath(photo.getPrimaryKey(), CROPPEDPATH);
         String newfilename = filename + "." + FILEEXTENTION;
-        saveFileAs(cropped, croppedpath, newfilename);
+        filewriter.saveFileAs(cropped, croppedpath, newfilename);
         Graphicfile gf = null;
         try {
             gf = cropped.getGraphicfile();
@@ -872,9 +590,10 @@ public class BLphoto extends Bphoto {
         }
     }
 
-    public String uploadPhotoImage(String senderobject, Filedata photofile, HashMap photoproperties) throws DBException, DataException {
+    public String uploadPhotoImage(SQLTqueue transactionqueue, String senderobject, Filedata photofile, HashMap photoproperties) throws DBException, DataException {
         checkwritepermissions(); //DataException is thrown when not ok
         BLphototags blphototags = new BLphototags(this);
+        blphototags.setAuthenticated(true);
         //photofilename is the filename on disk and sent back as result
         String photofilename = null;
         //get Photo properties
@@ -932,7 +651,8 @@ public class BLphoto extends Bphoto {
             film.setPublic(false);
             film.setFilmtypePK(new FilmtypePK(uploadtype));
             BLfilm blfilm = new BLfilm(this);
-            blfilm.trans_insertFilm(film);
+            blfilm.setAuthenticated(true);
+            blfilm.insertFilm(transactionqueue, film);
             photo = new Photo(filmgroupid + groupid, 0);
         } else {
             photo = new Photo(lastphotofortype.getPrimaryKey().getFilm(), lastphotofortype.getPrimaryKey().getId()+1);
@@ -946,20 +666,21 @@ public class BLphoto extends Bphoto {
         photo.setPhotodate(photodate);
         photo.setPhototime(phototime);
         if(this.getPhoto(photo.getPrimaryKey())==null) {
-            trans_insertPhoto(photo);
+            insertPhoto(transactionqueue, photo);
             BLphototree7subject blphototree7subject = new BLphototree7subject(this);
-            blphototree7subject.linkPhoto_with_Subjects(senderobject, photo.getPrimaryKey(), subjects);
+            blphototree7subject.setAuthenticated(true);
+            blphototree7subject.linkPhoto_with_Subjects(transactionqueue, senderobject, photo.getPrimaryKey(), subjects);
             //BLphotosubjects blphotosubjects = new BLphotosubjects(this);
             //blphotosubjects.linkPhoto_with_Subjects(photo.getPrimaryKey(), subjects);
             String rootpath = BLfilm.getRootImagePath(photo.getPrimaryKey().getFilmPK()).toString();
             String newfilename = filename + "." + FILEEXTENTION;
-            saveFileAs(photofile, rootpath, newfilename);
+            filewriter.saveFileAs(photofile, rootpath, newfilename);
 
             //save Cropped, Small and Thumbnail
             try {
                 //load image as jpeg
                 //Graphicfile gf = new Graphicfile(FILEROOT + rootpath + newfilename);
-                blphototags.insertGraphicfileMetatags(gf, photo);
+                blphototags.insertGraphicfileMetatags(transactionqueue, gf, photo);
                 //check if rotation is x * 90° or not
                 //if so, simple rotation method used
                 //if not, complex rotation method used
@@ -987,7 +708,6 @@ public class BLphoto extends Bphoto {
                 gf.resize(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT);
                 String thumbnailpath = FILEROOT + getImagePath(photo.getPrimaryKey(), THUMBNAILPATH);
                 gf.saveImage(thumbnailpath, newfilename);
-                super.Commit2DB();
                 //send back used filename
                 photofilename = newfilename;
             }
@@ -1020,7 +740,7 @@ public class BLphoto extends Bphoto {
      * @throws general.exception.DBException
      * @throws general.exception.DataException
      */
-    public void uploadPhotoImage_Cropped(Filedata cropped) throws DBException, DataException {
+    public void uploadPhotoImage_Cropped(SQLTqueue transactionqueue, Filedata cropped) throws DBException, DataException {
         checkwritepermissions(); //DataException is thrown when not ok
         String filename = cropped.getFilename();
         filename = filename.substring(0, filename.indexOf("."));
@@ -1033,11 +753,10 @@ public class BLphoto extends Bphoto {
         Photo photo = this.getPhoto(photoPK);
         if(filename.endsWith("COMPOSITION")) photo.setComposition(true);
         if(!lastcharacter.equals("H")) photo.setFormat(lastcharacter);
-        this.trans_updatePhoto(photo);
-        super.Commit2DB();
+        updatePhoto(transactionqueue, photo);
         String croppedpath = getImagePath(photoPK, CROPPEDPATH);
         String newfilename = filename + "." + FILEEXTENTION;
-        saveFileAs(cropped, croppedpath, newfilename);
+        filewriter.saveFileAs(cropped, croppedpath, newfilename);
 
         //save Small and Thumbnail
         try {
@@ -1057,65 +776,21 @@ public class BLphoto extends Bphoto {
         }
     }
 
-    /**
-     * try to update Photo object in database
-     * commit transaction
-     * @param photo: Photo Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    @Override
-    public void updatePhoto(IPhoto photo) throws DBException, DataException {
-        trans_updatePhoto(photo);
-        super.Commit2DB();
-    }
-
-    /**
-     * try to update Photo object in database
-     * commit transaction
-     * @param photo: Photo Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void secureupdatePhoto(IPhoto photo) throws DBException, DataException {
-        trans_updatePhoto(photo);
-        super.Commit2DB();
-    }
-
-    /**
-     * update location and dependent parameters
-     * @param photo
-     * @throws DBException
-     * @throws DataException 
-     */
-    public void updateGeolocation(IPhoto photo) throws DBException, DataException {
-        log.fine("updateGeolocation start");
+    public void updateGeolocation(SQLTqueue transactionqueue, IPhoto photo) throws DBException, DataException {
         if(photo.getReversegeocode()!=null && photo.getReversegeocode().length()>0 && 
                 (photo.isReversegeocodeUpdated() || photo.isLocationUpdated())) {   
-            log.fine("ReverseGEOcode for " + photo.getPrimaryKey().getFilm() + " " + photo.getPrimaryKey().getId() + ": " + photo.getReversegeocode());
-            log.fine("updateGeolocation authorized");
             //get photo from database and only update location parameters
             Photo dbphoto = this.getPhoto(photo.getPrimaryKey());
             dbphoto.setLocation(photo.getLocation());
             dbphoto.setReversegeocode(photo.getReversegeocode());
             dbphoto.setExactlocation(photo.getExactlocation());
-            google_processreversegeocode(dbphoto);
+            google_processreversegeocode(transactionqueue, dbphoto);
             //processreversegeocode(dbphoto);
-            trans_updatePhoto(dbphoto);
-            log.fine("trans_updatePhoto performed");
-            super.Commit2DB();
+            updatePhoto(transactionqueue, dbphoto);
         }
     }
     
-    /**
-     * copy previous used location in this photo series
-     * update location and dependent parameters
-     * @param photo
-     * @return 
-     * @throws DBException
-     * @throws DataException 
-     */
-    public boolean updateCopyPrevGeolocation(IPhoto photo) throws DBException, DataException, CustomException {
+    public boolean updateCopyPrevGeolocation(SQLTqueue transactionqueue, IPhoto photo) throws DBException, DataException, CustomException {
         boolean success = false;
         ArrayList<Photo> photos = getPhotos4photo_film(this.isAuthenticated(), photo.getPrimaryKey().getFilmPK(), false);
         int arraylength = photos.size();
@@ -1140,23 +815,13 @@ public class BLphoto extends Bphoto {
             updphoto.setFormattedaddress(prevphoto.getFormattedaddress());
             updphoto.setRoutePK(prevphoto.getRoutePK());
             updphoto.setStreetnumber(prevphoto.getStreetnumber());
-            trans_updatePhoto(updphoto);
-            super.Commit2DB();
+            updatePhoto(transactionqueue, updphoto);
             success = true;
         }
         return success;
     }
     
-    /**
-     * copy given photo location in this photo
-     * update location and dependent parameters
-     * @param photo: photo to update
-     * @param source_photoPK: photo primary key containing the location to use
-     * @return 
-     * @throws DBException
-     * @throws DataException 
-     */
-    public boolean copyPhotoGeolocation(IPhoto photo, IPhotoPK source_photoPK) throws DBException, DataException, CustomException {
+    public boolean copyPhotoGeolocation(SQLTqueue transactionqueue, IPhoto photo, IPhotoPK source_photoPK) throws DBException, DataException, CustomException {
         boolean success = false;
         Photo updphoto = this.getPhoto(photo.getPrimaryKey());
         Photo source = this.getPhoto(source_photoPK);
@@ -1168,131 +833,52 @@ public class BLphoto extends Bphoto {
             updphoto.setFormattedaddress(source.getFormattedaddress());
             updphoto.setRoutePK(source.getRoutePK());
             updphoto.setStreetnumber(source.getStreetnumber());
-            trans_updatePhoto(updphoto);
-            super.Commit2DB();
+            updatePhoto(transactionqueue, updphoto);
             success = true;
         }
         return success;
     }
     
-    /**
-     * try to update Photo object in database
-     * commit transaction
-     * @param senderobject
-     * @param userprofile
-     * @param photo: Photo Entity Object
-     * @param subjects
-     * @param tree7subjects
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void updatePhoto(String senderobject, Userprofile userprofile, IPhoto photo, ArrayList subjects, ArrayList tree7subjects) throws DBException, DataException {
+    public void updatePhoto(SQLTqueue transactionqueue, String senderobject, Userprofile userprofile, IPhoto photo, ArrayList subjects, ArrayList tree7subjects) throws DBException, DataException {
         //check if user is allowed to edit
         if(userprofile.isEditor()) {
             //check if user is allowed to manage this film (privateaccess check)
             if(getPhoto(userprofile, photo.getPrimaryKey())!=null) {
-                trans_updatePhoto(photo);
+                updatePhoto(transactionqueue, photo);
                 BLphotosubjects blphotosubjects = new BLphotosubjects(this);
-                blphotosubjects.linkPhoto_with_Subjects(senderobject, photo.getPrimaryKey(), subjects);
+                blphotosubjects.setAuthenticated(true);
+                blphotosubjects.linkPhoto_with_Subjects(transactionqueue, senderobject, photo.getPrimaryKey(), subjects);
                 BLphototree7subject blphototree7subject = new BLphototree7subject(this);
-                blphototree7subject.linkPhoto_with_Subjects(senderobject, photo.getPrimaryKey(), tree7subjects);
-                super.Commit2DB();
+                blphototree7subject.setAuthenticated(true);
+                blphototree7subject.linkPhoto_with_Subjects(transactionqueue, senderobject, photo.getPrimaryKey(), tree7subjects);
             }
         }
     }
 
-    public void updatePhoto(String senderobject, Userprofile userprofile, IPhoto photo, ArrayList tree7subjects) throws DBException, DataException {
+    public void updatePhoto(SQLTqueue transactionqueue, String senderobject, Userprofile userprofile, IPhoto photo, ArrayList tree7subjects) throws DBException, DataException {
         //check if user is allowed to edit
         if(userprofile.isEditor()) {
             //check if user is allowed to manage this film (privateaccess check)
             if(getPhoto(userprofile, photo.getPrimaryKey())!=null) {
                 if(photo.getReversegeocode()!=null && photo.getReversegeocode().length()>0 && 
                         (photo.isReversegeocodeUpdated() || photo.isLocationUpdated())) {   
-                    processreversegeocode(photo);
+                    processreversegeocode(transactionqueue, photo);
                 }
-                trans_updatePhoto(photo);
+                updatePhoto(transactionqueue, photo);
                 BLphototree7subject blphototree7subject = new BLphototree7subject(this);
-                blphototree7subject.linkPhoto_with_Subjects(senderobject, photo.getPrimaryKey(), tree7subjects);
-                super.Commit2DB();
+                blphototree7subject.setAuthenticated(true);
+                blphototree7subject.linkPhoto_with_Subjects(transactionqueue, senderobject, photo.getPrimaryKey(), tree7subjects);
             }
         }
     }
     
-    /**
-     * try to delete Photo object in database
-     * commit transaction
-     * @param photo: Photo Entity Object
-     * @throws general.exception.DBException
-     */
-    @Override
-    public void deletePhoto(IPhoto photo) throws DBException {
-        trans_deletePhoto(photo);
-        super.Commit2DB();
-    }
-
-    /**
-     * try to delete Photo object in database
-     * commit transaction
-     * @param photo: Photo Entity Object
-     * @throws general.exception.DBException
-     */
-    public void securedeletePhoto(IPhoto photo) throws DBException {
-        trans_deletePhoto(photo);
-        super.Commit2DB();
-    }
-
-    /**
-     * try to insert Photo object in database
-     * do not commit transaction
-     * @param photo: Photo Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void trans_insertPhoto(IPhoto photo) throws DBException, DataException {
-        super.checkDATA(photo);
-        super.insertPhoto((Photo)photo);
-    }
-    
-    /**
-     * try to update Photo object in database
-     * do not commit transaction
-     * @param photo: Photo Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void trans_updatePhoto(IPhoto photo) throws DBException, DataException {
-        super.checkDATA(photo);
-        photo.setBackup(true);
-        super.updatePhoto((Photo)photo);
-    }
-    
-    /**
-     * try to delete Photo object in database
-     * do not commit transaction
-     * @param photo: Photo Entity Object
-     * @throws general.exception.DBException
-     */
-    public void trans_deletePhoto(IPhoto photo) throws DBException {
-        super.deletePhoto((Photo)photo);
-    }
-
-    public void setBackedup(String senderobject, IFilmPK filmpk) throws DBException {
+    public void setBackedup(SQLTqueue transactionqueue, String senderobject, IFilmPK filmpk) throws DBException {
         Object[][] parameter = { { "backup", false } };
         SQLparameters parameters = new SQLparameters(parameter);
         parameters.add(filmpk.getSQLprimarykey());
-        addStatement(EMphoto.SQLUpdateBackup4Film, parameters);
-        Commit2DB();
+        addStatement(transactionqueue, EMphoto.SQLUpdateBackup4Film, parameters);
     }
 
-    /**
-     * search database table with search parameters
-     * if no search is used, return empty list
-     * @param userprofile: Userprofile of logged in user
-     * @param search: Tablesearcher object
-     * @param loadthumbnails: boolean, load thumbnail pictures in ArrayList for found photo objects
-     * @return ArrayList of found entities
-     * @throws DBException
-     */
     public ArrayList search(Userprofile userprofile, Tablesearcher search, boolean loadthumbnails) throws DBException {
         ArrayList photos = new ArrayList();
         if(userprofile!=null && userprofile.privateaccess()) {
@@ -1312,20 +898,29 @@ public class BLphoto extends Bphoto {
         return photos;
     }
     
-    /**
-     * translate openstreetmaps reverse geocoding result into database fields
-     * @param photo: photo data with new reverse geocode data
-     * @throws DBException
-     * @throws DataException 
-     */
-    private void processreversegeocode(IPhoto photo) throws DBException, DataException {
+    private void processreversegeocode(SQLTqueue transactionqueue, IPhoto photo) throws DBException, DataException {
         StringBuilder datalog = new StringBuilder("Reverse geocode for ").append(photo.getPrimaryKey().getFilm()).append("-").append(photo.getPrimaryKey().getId());
         try {
+            BLcountry blcountry = new BLcountry(this);
+            blcountry.setAuthenticated(true);
+            BLarealevel1 blarealevel1 = new BLarealevel1(this);
+            blarealevel1.setAuthenticated(true);
+            BLarealevel2 blarealevel2 = new BLarealevel2(this);
+            blarealevel2.setAuthenticated(true);
+            BLarealevel3 blarealevel3 = new BLarealevel3(this);
+            blarealevel3.setAuthenticated(true);
+            BLpostalcode blpostalcode = new BLpostalcode(this);
+            blpostalcode.setAuthenticated(true);
+            BLlocality bllocality = new BLlocality(this);
+            bllocality.setAuthenticated(true);
+            BLsublocality blsublocality = new BLsublocality(this);
+            blsublocality.setAuthenticated(true);
+            BLroute blroute = new BLroute(this);
+            blroute.setAuthenticated(true);
             OSMgeocode geocode = new OSMgeocode(photo.getReversegeocode());
 
             piPolyline bounds;
             piPolyline viewport;
-            log.finer("country " + geocode.getCountry() + " " + geocode.getCountrycode());
             datalog.append("\r\n").append("country ").append(geocode.getCountrycode()).append(" ").append(geocode.getCountry());
             Country country = new Country(geocode.getCountrycode());
             country.setName(geocode.getCountry());
@@ -1334,10 +929,8 @@ public class BLphoto extends Bphoto {
                 country.setHasarealevel2(compal2!=null);
                 country.setHasarealevel3(compal3!=null);
 */
-            BLcountry blcountry = new BLcountry(this);
-            blcountry.insertcheckCountry(country);
+            blcountry.insertcheckCountry(transactionqueue, country);
 
-            log.finer("al1 state " + geocode.getState());
             //Arealevel1 -> state
             datalog.append("\r\n").append("Arealevel1 state ").append(geocode.getState());
             Arealevel1 al1 = null;
@@ -1347,10 +940,8 @@ public class BLphoto extends Bphoto {
             al1.setName(geocode.getState());
             al1.setLocation(geocode.getLocation().extractpiPoint());
 
-            BLarealevel1 blarealevel1 = new BLarealevel1(this);
-            blarealevel1.insertcheckArealevel1(al1);
+            blarealevel1.insertcheckArealevel1(transactionqueue, al1);
 
-            log.finer("al2 county " + geocode.getCounty());
             //Arealevel2 -> county
             datalog.append("\r\n").append("Arealevel2 county ").append(geocode.getCounty());
             String countyname = geocode.getCounty();
@@ -1365,10 +956,8 @@ public class BLphoto extends Bphoto {
             al2.setName(countyname);
             al2.setLocation(geocode.getLocation().extractpiPoint());
 
-            BLarealevel2 blarealevel2 = new BLarealevel2(this);
-            blarealevel2.insertcheckArealevel2(al2);
+            blarealevel2.insertcheckArealevel2(transactionqueue, al2);
 
-            log.finer("al3 city " + geocode.getCity());
             //Arealevel3 -> city
             String city = geocode.getCity();
             if(city==null) {
@@ -1383,10 +972,8 @@ public class BLphoto extends Bphoto {
                     city));
             al3.setName(city);
             al3.setLocation(geocode.getLocation().extractpiPoint());
-            BLarealevel3 blarealevel3 = new BLarealevel3(this);
-            blarealevel3.insertcheckArealevel3(al3);
+            blarealevel3.insertcheckArealevel3(transactionqueue, al3);
 
-            log.finer("postalcode " + geocode.getPostcode());
             datalog.append("\r\n").append("Postalcode ").append(geocode.getPostcode());
             Postalcode postalcode = null;
             postalcode = new Postalcode(
@@ -1395,14 +982,8 @@ public class BLphoto extends Bphoto {
             postalcode.setArealevel3PK(al3.getPrimaryKey());
             postalcode.setLocation(geocode.getLocation().extractpiPoint());
             bounds = new piPolyline(postalcode.getLocation().getSrid());
-            BLpostalcode blpostalcode = new BLpostalcode(this);
-            blpostalcode.insertcheckPostalcode(postalcode);
+            blpostalcode.insertcheckPostalcode(transactionqueue, postalcode);
 
-            log.finer("Locality town " + geocode.getTown());
-            log.finer("Locality village " + geocode.getVillage());
-            log.finer("Locality suburb " + geocode.getSuburb());
-            log.finer("Locality citydisctrict " + geocode.getCitydistrict());
-            log.finer("Locality statedisctrict " + geocode.getStatedistrict());
             datalog.append("\r\n").append("Locality town ").append(geocode.getTown());
             datalog.append("\r\n").append("Locality village ").append(geocode.getSuburb());
             datalog.append("\r\n").append("Locality suburb ").append(geocode.getSuburb());
@@ -1428,10 +1009,8 @@ public class BLphoto extends Bphoto {
                     localityname);
             locality.setLocation(geocode.getLocation().extractpiPoint());
             bounds = new piPolyline(locality.getLocation().getSrid());
-            BLlocality bllocality = new BLlocality(this);
-            bllocality.insertcheckLocality(locality);
+            bllocality.insertcheckLocality(transactionqueue, locality);
 
-            log.finer("Sublocality neighbourhood " + geocode.getNeighbourhood());
             datalog.append("\r\n").append("Sublocality neighbourhood ").append(geocode.getNeighbourhood());
             Sublocality sublocality = null;
             String sublocalityname = geocode.getNeighbourhood();
@@ -1442,11 +1021,8 @@ public class BLphoto extends Bphoto {
                     locality.getPrimaryKey().getLocality(),
                     sublocalityname);
             sublocality.setLocation(geocode.getLocation().extractpiPoint());
-            BLsublocality blsublocality = new BLsublocality(this);
-            blsublocality.insertcheckSublocality(sublocality);
+            blsublocality.insertcheckSublocality(transactionqueue, sublocality);
 
-            log.finer("Route road " + geocode.getRoad());
-            log.finer("Route footway " + geocode.getFootway());
             datalog.append("\r\n").append("Route road ").append(geocode.getRoad());
             datalog.append("\r\n").append("Route footway ").append(geocode.getFootway());
             String routename = geocode.getRoad();
@@ -1461,34 +1037,40 @@ public class BLphoto extends Bphoto {
             route.getPrimaryKey().setRoutecode(routename);
             route.setName(routename);
             route.setLocation(geocode.getLocation().extractpiPoint());
-            BLroute blroute = new BLroute(this);
-            blroute.insertcheckRoute(route);
+            blroute.insertcheckRoute(transactionqueue, route);
 
-            log.finer("Streetnumber housenumber " + geocode.getHousenumber());
             photo.setRoutePK(route.getPrimaryKey());
             if(geocode.getHousenumber()!=null) {
                 datalog.append("\r\n").append("Streetnumber housenumber ").append(geocode.getHousenumber());
                 photo.setStreetnumber(geocode.getHousenumber());
             }
-            log.finer("Reversegeocoding complete");
         }
         catch(NullPointerException e) {
             datalog.append("\r\n").append(photo.getReversegeocode());
             datalog.append("\r\n").append(e.getMessage());
-            log.warning(datalog.toString());
             throw new DataException(datalog.toString());
         }
     }
 
-    /**
-     * translate google reverse geocoding result into database fields
-     * @param photo: photo data with new reverse geocode data
-     * @throws DBException
-     * @throws DataException 
-     */
-    private void google_processreversegeocode(IPhoto photo) throws DBException, DataException {
+    private void google_processreversegeocode(SQLTqueue transactionqueue, IPhoto photo) throws DBException, DataException {
         StringBuilder datalog = new StringBuilder("Reverse geocode for ").append(photo.getPrimaryKey().getFilm()).append("-").append(photo.getPrimaryKey().getId());
         try {
+            BLcountry blcountry = new BLcountry(this);
+            blcountry.setAuthenticated(true);
+            BLarealevel1 blarealevel1 = new BLarealevel1(this);
+            blarealevel1.setAuthenticated(true);
+            BLarealevel2 blarealevel2 = new BLarealevel2(this);
+            blarealevel2.setAuthenticated(true);
+            BLarealevel3 blarealevel3 = new BLarealevel3(this);
+            blarealevel3.setAuthenticated(true);
+            BLpostalcode blpostalcode = new BLpostalcode(this);
+            blpostalcode.setAuthenticated(true);
+            BLlocality bllocality = new BLlocality(this);
+            bllocality.setAuthenticated(true);
+            BLsublocality blsublocality = new BLsublocality(this);
+            blsublocality.setAuthenticated(true);
+            BLroute blroute = new BLroute(this);
+            blroute.setAuthenticated(true);
             Googlegeocode geocode = new Googlegeocode(photo.getReversegeocode());
             if(geocode.getStatus().equals(Googlegeocodestatus.STATUS_OK)) {
                 Googleaddresscomponent compcountry = geocode.getCountry();
@@ -1541,11 +1123,7 @@ public class BLphoto extends Bphoto {
                     country.setHasarealevel3(compal3!=null);
                 }
                 if(country!=null) {
-                    BLcountry blcountry = new BLcountry(this);
-                    blcountry.insertcheckCountry(country);
-                    //log.finer("Country check: " + country.getPrimaryKey().getKeystring());
-                } else {
-                    log.warning("Country nog defined in " + photo.getReversegeocode());
+                    blcountry.insertcheckCountry(transactionqueue, country);
                 }
 
                 Arealevel1 al1 = null;
@@ -1576,9 +1154,7 @@ public class BLphoto extends Bphoto {
                     al1.setViewport(viewport);
                     al1.setApproximate(compal1.getIsApproximate());
                 }
-                BLarealevel1 blarealevel1 = new BLarealevel1(this);
-                blarealevel1.insertcheckArealevel1(al1);
-                //log.finer("Area Level 1 check: " + al1.getPrimaryKey().getKeystring());
+                blarealevel1.insertcheckArealevel1(transactionqueue, al1);
 
                 Arealevel2 al2 = null;
                 if(compal2==null) {
@@ -1610,8 +1186,7 @@ public class BLphoto extends Bphoto {
                     al2.setViewport(viewport);
                     al2.setApproximate(compal2.getIsApproximate());
                 }
-                BLarealevel2 blarealevel2 = new BLarealevel2(this);
-                blarealevel2.insertcheckArealevel2(al2);
+                blarealevel2.insertcheckArealevel2(transactionqueue, al2);
                 //log.finer("Area Level 2 check: " + al2.getPrimaryKey().getKeystring());
 
                 Arealevel3 al3 = null;
@@ -1646,8 +1221,7 @@ public class BLphoto extends Bphoto {
                     al3.setViewport(viewport);
                     al3.setApproximate(compal3.getIsApproximate());
                 }
-                BLarealevel3 blarealevel3 = new BLarealevel3(this);
-                blarealevel3.insertcheckArealevel3(al3);
+                blarealevel3.insertcheckArealevel3(transactionqueue, al3);
                 //log.finer("Area Level 3 check: " + al3.getPrimaryKey().getKeystring());
 
                 Postalcode postalcode = null;
@@ -1686,8 +1260,7 @@ public class BLphoto extends Bphoto {
                     postalcode.setViewport(viewport);
                     postalcode.setApproximate(comppostalcode.getIsApproximate());
                 }
-                BLpostalcode blpostalcode = new BLpostalcode(this);
-                blpostalcode.insertcheckPostalcode(postalcode);
+                blpostalcode.insertcheckPostalcode(transactionqueue, postalcode);
                 //log.finer("Postal Code check: " + postalcode.getPrimaryKey().getKeystring());
 
                 Locality locality = null;
@@ -1719,8 +1292,7 @@ public class BLphoto extends Bphoto {
                     locality.setApproximate(complocality.getIsApproximate());
                     locality.setHassublocality(compsublocality!=null);
                 }
-                BLlocality bllocality = new BLlocality(this);
-                bllocality.insertcheckLocality(locality);
+                bllocality.insertcheckLocality(transactionqueue, locality);
                 //log.finer("Locality check: " + locality.getPrimaryKey().getKeystring());
 
                 Sublocality sublocality = null;
@@ -1753,8 +1325,7 @@ public class BLphoto extends Bphoto {
                     sublocality.setViewport(viewport);
                     sublocality.setApproximate(compsublocality.getIsApproximate());
                 }
-                BLsublocality blsublocality = new BLsublocality(this);
-                blsublocality.insertcheckSublocality(sublocality);
+                blsublocality.insertcheckSublocality(transactionqueue, sublocality);
                 //log.finer("Sublocality check: " + sublocality.getPrimaryKey().getKeystring());
 
                 Route route = new Route(new RoutePK());
@@ -1780,8 +1351,7 @@ public class BLphoto extends Bphoto {
                 } else {
                     route.getPrimaryKey().setRoutecode(sublocality.getPrimaryKey().getSublocality());
                 }
-                BLroute blroute = new BLroute(this);
-                blroute.insertcheckRoute(route);
+                blroute.insertcheckRoute(transactionqueue, route);
                 //log.finer("Route check: " + route.getPrimaryKey().getKeystring());
 
                 photo.setRoutePK(route.getPrimaryKey());
@@ -1791,13 +1361,11 @@ public class BLphoto extends Bphoto {
             } else {
                 photo.setReversegeocode(null);
                 datalog.append("\r\n").append(geocode.getStatus());
-                log.warning(datalog.toString());
                 throw new DataException(geocode.getStatus());
             }
         }
         catch(NullPointerException e) {
             datalog.append("\r\n").append(photo.getReversegeocode());
-            log.warning(datalog.toString());
             throw new DataException(datalog.toString());
         }
     }

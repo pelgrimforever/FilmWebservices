@@ -1,9 +1,6 @@
 /*
- * JSONView_countryphotocount.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_countryphotocount {
@@ -36,10 +32,6 @@ public class JSONView_countryphotocount {
         return jsonview_countryphotocounts;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_countryphotocount view_countryphotocount) {
         JSONObject json = new JSONObject();
         json.put("code", view_countryphotocount.getCode());
@@ -58,11 +50,6 @@ public class JSONView_countryphotocount {
         return view_countryphotocount;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_countryphotocountsearch parameters
-     * @return 
-     */
     public static View_countryphotocountsearch toView_countryphotocountsearch(JSONObject json) {
         View_countryphotocountsearch view_countryphotocountsearch = new View_countryphotocountsearch();
         view_countryphotocountsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

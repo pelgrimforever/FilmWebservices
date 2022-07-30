@@ -1,25 +1,16 @@
-/*
- * BLviewdescriptions.java
- *
- */
-
 package film.BusinessObject.Logic;
 
-import BusinessObject.BLview;
+import db.SQLreader;
+import db.ViewBusinessrules;
+import db.ViewIO;
 import film.conversion.entity.EMviewdescriptions;
-import film.logicview.Viewdescriptions;
 
 /**
- * Business Logic for viewdescriptions
  * @author Franky Laseure
  */
-public class BLviewdescriptions extends BLview {
+public class BLviewdescriptions extends ViewBusinessrules {
 	
-    /**
-     * Constructor
-     */
-    public BLviewdescriptions() {
-        super(new Viewdescriptions(), new EMviewdescriptions());
+    public BLviewdescriptions(SQLreader sqlreader) {
+        super(new ViewIO(sqlreader, new EMviewdescriptions()));
     }
-    
 }

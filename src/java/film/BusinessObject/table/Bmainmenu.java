@@ -1,216 +1,142 @@
 /*
- * Bmainmenu.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-import db.SQLMapperFactory;
-import db.SQLparameters;
-import data.gis.shape.*;
-import data.json.piJson;
-import data.json.psqlJsonobject;
-import db.SQLMapper_pgsql;
-import data.interfaces.db.Filedata;
-import film.BusinessObject.Logic.*;
-import film.conversion.json.JSONMainmenu;
+import db.*;
+import data.interfaces.db.*;
 import film.conversion.entity.EMmainmenu;
+import film.BusinessObject.Logic.*;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.searchentity.IMainmenusearch;
 import film.logicentity.Mainmenu;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import org.postgresql.geometric.PGpoint;
-import org.postgis.PGgeometry;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
- * Business Entity class Bmainmenu
- *
- * Superclass for manipulating data- and database objects
- * for Entity Mainmenu and direct related data
- * This class is overwritten each time the code generator runs
- * and is not meant to be changed
- *
  * @author Franky Laseure
  */
-public abstract class Bmainmenu extends BLtable {
+public abstract class Bmainmenu extends TableBusinessrules {
 
-    /**
-     * Constructor, sets Mainmenu as default Entity
-     */
-    public Bmainmenu() {
-        super(new Mainmenu(), new EMmainmenu());
+    public Bmainmenu(SQLreader sqlreader) {
+        super(new TableIO(sqlreader, new EMmainmenu()));
     }
 
-    /**
-     * Constructor, sets Mainmenu as default Entity
-     * sets transaction queue from given GeneralEntityObject implementation
-     * all transactions will commit at same time
-     * @param transactionobject: GeneralEntityObjects that holds the transaction queue
-     */
-    public Bmainmenu(BLtable transactionobject) {
-        super(transactionobject, new Mainmenu(), new EMmainmenu());
+    public Bmainmenu(TableBusinessrules businessrules) {
+        super(new TableIO(businessrules.getTableio(), new EMmainmenu()));
+        this.tableio.setAuthenticated(tableio!=null && tableio.isAuthenticated());
     }
 
-    /**
-     * create new empty Mainmenu object
-     * @return empty IMainmenu
-     */
     public IMainmenu newMainmenu() {
     	return new Mainmenu();
     }
     
-    /**
-     * create new empty Mainmenu object
-     * create new primary key with given parameters
-     * @param mainmenu primary key field
-     * @return IMainmenu with primary key
-     */
     public IMainmenu newMainmenu(java.lang.String mainmenu) {
         return new Mainmenu(mainmenu);
     }
 
-    /**
-     * create new empty Mainmenu object with given primary key
-     * @param mainmenuPK: primary key for Mainmenu
-     * @return IMainmenu with primary key
-     */
     public IMainmenu newMainmenu(IMainmenuPK mainmenuPK) {
         return new Mainmenu((MainmenuPK)mainmenuPK);
     }
 
-    /**
-     * create new empty primary key
-     * @return empty MainmenuPK
-     */
     public IMainmenuPK newMainmenuPK() {
         return new MainmenuPK();
     }
 
-    /**
-     * create new primary key with given parameters
-     * @param mainmenu primary key field
-     * @return new IMainmenuPK
-     */
     public IMainmenuPK newMainmenuPK(java.lang.String mainmenu) {
         return new MainmenuPK(mainmenu);
     }
 
-    /**
-     * get all Mainmenu objects from database
-     * @return ArrayList of Mainmenu objects
-     * @throws DBException
-     */
     public ArrayList<Mainmenu> getMainmenus() throws DBException {
-        return (ArrayList<Mainmenu>)super.getEntities(EMmainmenu.SQLSelectAll);
+        return (ArrayList<Mainmenu>)tableio.getEntities(EMmainmenu.SQLSelectAll);
     }
 
-    /**
-     * search Mainmenu for primary key
-     * @param mainmenuPK: Mainmenu primary key
-     * @return Mainmenu object
-     * @throws DBException
-     */
     public Mainmenu getMainmenu(IMainmenuPK mainmenuPK) throws DBException {
-        return (Mainmenu)super.getEntity((MainmenuPK)mainmenuPK);
+        return (Mainmenu)tableio.getEntity((MainmenuPK)mainmenuPK);
     }
 
-    /**
-     * search mainmenu with IMainmenusearch parameters
-     * @param search IMainmenusearch
-     * @return ArrayList of Mainmenu
-     * @throws DBException 
-     */
     public ArrayList<Mainmenu> searchmainmenus(IMainmenusearch search) throws DBException {
-        return (ArrayList<Mainmenu>)this.search(search);
+        return (ArrayList<Mainmenu>)tableio.search(search);
     }
 
-    /**
-     * search mainmenu with IMainmenusearch parameters, order by orderby sql clause
-     * @param search IMainmenusearch
-     * @param orderby sql order by string
-     * @return ArrayList of Mainmenu
-     * @throws DBException 
-     */
     public ArrayList<Mainmenu> searchmainmenus(IMainmenusearch search, String orderby) throws DBException {
-        return (ArrayList<Mainmenu>)this.search(search, orderby);
+        return (ArrayList<Mainmenu>)tableio.search(search, orderby);
     }
 
-    /**
-     * Search mainmenu in database for mainmenuPK:
-     * @param mainmenuPK: Mainmenu Primary Key, only valid for the initialized Entity
-     * @return true if found in database
-     * @throws DBException
-     */
     public boolean getMainmenuExists(IMainmenuPK mainmenuPK) throws DBException {
-        return super.getEntityExists((MainmenuPK)mainmenuPK);
+        return tableio.getEntityExists((MainmenuPK)mainmenuPK);
     }
 
-    /**
-     * try to insert Mainmenu in database
-     * @param mainmenu Mainmenu object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertMainmenu(IMainmenu mainmenu) throws DBException, DataException {
-        super.insertEntity(mainmenu);
+    public Mainmenu getEntity(String sql) throws DBException {
+        return (Mainmenu)tableio.getEntity(sql);
+    }
+    
+    public Mainmenu getEntity(String sql, SQLparameters parameters) throws DBException {
+        return (Mainmenu)tableio.getEntity(sql, parameters);
+    }
+    
+    public ArrayList<Mainmenu> getEntities(String sql) throws DBException {
+        return tableio.getEntities(sql);
+    }
+    
+    public ArrayList<Mainmenu> getEntities(String sql, SQLparameters parameters) throws DBException {
+        return tableio.getEntities(sql, parameters);
     }
 
-    /**
-     * check if MainmenuPK exists
-     * insert if not, update if found
-     * do not commit transaction
-     * @param mainmenu Mainmenu object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertupdateMainmenu(IMainmenu mainmenu) throws DBException, DataException {
+    public long count() throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+    
+    public long count(String sql, SQLparameters parameters) throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+
+    public ArrayList<Mainmenu> search(Tablesearcher search) throws DBException {
+        return tableio.search(search);
+    }
+
+    public ArrayList<Mainmenu> search(Tablesearcher search, String orderby) throws DBException {
+        return tableio.search(search, orderby);
+    }
+
+    public long searchcount(Tablesearcher search) throws DBException {
+        return tableio.searchcount(search);
+    }
+
+    public void insertMainmenu(SQLTqueue transactionqueue, IMainmenu mainmenu) throws DBException, DataException {
+        tableio.insertEntity(transactionqueue, mainmenu);
+    }
+
+    public void insertupdateMainmenu(SQLTqueue transactionqueue, IMainmenu mainmenu) throws DBException, DataException {
+    	checkDATA(mainmenu);
         if(this.getMainmenuExists(mainmenu.getPrimaryKey())) {
-            super.updateEntity(mainmenu);
+            tableio.updateEntity(transactionqueue, mainmenu);
         } else {
-            super.insertEntity(mainmenu);
+            tableio.insertEntity(transactionqueue, mainmenu);
         }
     }
 
-    /**
-     * try to update Mainmenu in database
-     * @param mainmenu Mainmenu object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void updateMainmenu(IMainmenu mainmenu) throws DBException, DataException {
-        super.updateEntity(mainmenu);
+    public void updateMainmenu(SQLTqueue transactionqueue, IMainmenu mainmenu) throws DBException, DataException {
+    	checkDATA(mainmenu);
+        tableio.updateEntity(transactionqueue, mainmenu);
     }
 
-    /**
-     * try to delete Mainmenu in database
-     * @param mainmenu Mainmenu object
-     * @throws DBException
-     */
-    public void deleteMainmenu(IMainmenu mainmenu) throws DBException {
-        cascadedeleteMainmenu(mainmenu.getPrimaryKey());
-        super.deleteEntity(mainmenu);
+    public void deleteMainmenu(SQLTqueue transactionqueue, IMainmenu mainmenu) throws DBException {
+        cascadedeleteMainmenu(transactionqueue, mainmenu.getPrimaryKey());
+        tableio.deleteEntity(transactionqueue, mainmenu);
     }
 
-    /**
-     * check data rules in Mainmenu, throw DataException with customized message if rules do not apply
-     * @param mainmenu Mainmenu object
-     * @throws DataException
-     * @throws DBException
-     */
-    public void checkDATA(IMainmenu mainmenu) throws DataException, DBException {
+    private void checkDATA(IMainmenu mainmenu) throws DataException, DBException {
         StringBuffer message = new StringBuffer();
         //Primary key
         if(mainmenu.getPopuplabel()!=null && mainmenu.getPopuplabel().length()>IMainmenu.SIZE_POPUPLABEL) {
@@ -227,35 +153,18 @@ public abstract class Bmainmenu extends BLtable {
         }
     }
         
-    /**
-     * delete all records in tables where mainmenuPK is used in a primary key
-     * @param mainmenuPK: Mainmenu primary key
-     */
-    public void cascadedeleteMainmenu(IMainmenuPK mainmenuPK) {
+    public void cascadedeleteMainmenu(SQLTqueue transactionqueue, IMainmenuPK mainmenuPK) {
         BLmenu blmenu = new BLmenu(this);
-        blmenu.delete4mainmenu(mainmenuPK);
+        blmenu.setAuthenticated(isAuthenticated());
+        blmenu.delete4mainmenu(transactionqueue, mainmenuPK);
     }
 
-    /**
-     * @param menuPK: parent Menu for child object Mainmenu Entity
-     * @return child Mainmenu Entity object
-     * @throws CustomException
-     */
     public Mainmenu getMenu(IMenuPK menuPK) throws CustomException {
         MainmenuPK mainmenuPK = new MainmenuPK(menuPK.getMainmenu());
         return this.getMainmenu(mainmenuPK);
     }
 
 
-    /**
-     * get all Mainmenu objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @param sortlist sql sort string
-     * @param sortoperator asc/desc
-     * @return ArrayList of Mainmenu objects
-     * @throws DBException
-     */
     public ArrayList<Mainmenu> getMainmenus(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
         StringBuilder sql = new StringBuilder(EMmainmenu.SQLSelect);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
@@ -270,16 +179,10 @@ public abstract class Bmainmenu extends BLtable {
         if(sortlist.length()>0) {
             sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return (ArrayList<Mainmenu>)super.getEntities(sql.toString(), sqlparameters);
+        return (ArrayList<Mainmenu>)tableio.getEntities(sql.toString(), sqlparameters);
     }
 
-    /**
-     * delete all Mainmenu objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @throws DBException
-     */
-    public void delMainmenu(SQLparameters sqlparameters, String andoroperator) throws DBException {
+    public void delMainmenu(SQLTqueue transactionqueue, SQLparameters sqlparameters, String andoroperator) throws DBException {
         StringBuilder sql = new StringBuilder("delete from ").append(Mainmenu.table);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
         int l = parameters.size();
@@ -290,7 +193,7 @@ public abstract class Bmainmenu extends BLtable {
                 if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(sql.toString(), sqlparameters);
+        tableio.addStatement(transactionqueue, sql.toString(), sqlparameters);
     }
 
 

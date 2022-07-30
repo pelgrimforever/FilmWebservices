@@ -2,23 +2,25 @@
  * WSArealevel3.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  *
  */
 
 package film.webservices;
 
+import base.restservices.RS_json_login;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
+import film.interfaces.searchentity.IArealevel3search;
 import film.interfaces.webservice.WSIArealevel3;
 import film.logicentity.Arealevel3;
 import film.searchentity.Arealevel3search;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import general.exception.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.jws.WebMethod;
@@ -27,14 +29,17 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import film.usecases.custom.Security_usecases;
 
 /**
  *
  * @author Franky Laseure
  */
 @WebService(endpointInterface = "film.interfaces.webservice.WSIArealevel3")
-public class WSArealevel3 implements WSIArealevel3 {
+public class WSArealevel3 extends RS_json_login implements WSIArealevel3 {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     private JSONArray toJSONArray(ArrayList arealevel3s) {
         JSONArray jsonarealevel3s = new JSONArray();
         Iterator arealevel3sI = arealevel3s.iterator();
@@ -44,152 +49,168 @@ public class WSArealevel3 implements WSIArealevel3 {
         return jsonarealevel3s;
     }
 
-    /**
-     * Web service operation
-     */
     //@WebMethod(operationName = "getArealevel3s")
     @Override
     public String getArealevel3s() {
         try {
-            BLarealevel3 blarealevel3 = new BLarealevel3();
-            ArrayList arealevel3s = blarealevel3.getAll();
-            JSONArray jsonarealevel3s = toJSONArray(arealevel3s);
-            return jsonarealevel3s.toJSONString();
+            Arealevel3_usecases arealevel3usecases = new Arealevel3_usecases(loggedin);
+            return get_all_arealevel3(arealevel3usecases);
         }
-        catch(DBException e) {
+        catch(CustomException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "search")
     @Override
-    public String search(String json) {
-        BLarealevel3 blarealevel3 = new BLarealevel3();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Arealevel3 arealevel3;
+    public String search(String jsonstring) {
         try {
-            Arealevel3search arealevel3search = JSONArealevel3.toArealevel3search((JSONObject)parser.parse(json));
-            ArrayList arealevel3s = blarealevel3.search(arealevel3search);
-            JSONArray jsonarealevel3s = toJSONArray(arealevel3s);
-            result = jsonarealevel3s.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Arealevel3_usecases arealevel3usecases = new Arealevel3_usecases(loggedin);
+            return search_arealevel3(arealevel3usecases, json);
         }
-        catch(ParseException e) {
-            result = "";
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-            result = "";
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "getArealevel3")
     @Override
-    public String getArealevel3(String json) {
-        BLarealevel3 blarealevel3 = new BLarealevel3();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Arealevel3 arealevel3;
+    public String getArealevel3(String jsonstring) {
         try {
-            Arealevel3PK arealevel3PK = JSONArealevel3.toArealevel3PK((JSONObject)parser.parse(json));
-            arealevel3 = blarealevel3.getArealevel3(arealevel3PK);
-            if(arealevel3!=null) {
-                result = JSONArealevel3.toJSON(arealevel3).toJSONString();
-            }
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Arealevel3_usecases arealevel3usecases = new Arealevel3_usecases(loggedin);
+            return get_arealevel3_with_primarykey(arealevel3usecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "insertArealevel3")
     @Override
-    public void insertArealevel3(String json) {
-        BLarealevel3 blarealevel3 = new BLarealevel3();
-        JSONParser parser = new JSONParser();
+    public void insertArealevel3(String jsonstring) {
         try {
-            IArealevel3 arealevel3 = JSONArealevel3.toArealevel3((JSONObject)parser.parse(json));
-            blarealevel3.insertArealevel3(arealevel3);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Arealevel3_usecases arealevel3usecases = new Arealevel3_usecases(loggedin);
+            insert_arealevel3(arealevel3usecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "updateArealevel3")
     @Override
-    public void updateArealevel3(String json) {
-        BLarealevel3 blarealevel3 = new BLarealevel3();
-        JSONParser parser = new JSONParser();
+    public void updateArealevel3(String jsonstring) {
         try {
-            IArealevel3 arealevel3 = JSONArealevel3.toArealevel3((JSONObject)parser.parse(json));
-            blarealevel3.updateArealevel3(arealevel3);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Arealevel3_usecases arealevel3usecases = new Arealevel3_usecases(loggedin);
+            update_arealevel3(arealevel3usecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "deleteArealevel3")
     @Override
-    public void deleteArealevel3(String json) {
-        BLarealevel3 blarealevel3 = new BLarealevel3();
-        JSONParser parser = new JSONParser();
+    public void deleteArealevel3(String jsonstring) {
         try {
-            IArealevel3 arealevel3 = JSONArealevel3.toArealevel3((JSONObject)parser.parse(json));
-            blarealevel3.deleteArealevel3(arealevel3);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Arealevel3_usecases arealevel3usecases = new Arealevel3_usecases(loggedin);
+            delete_arealevel3(arealevel3usecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getArealevel3s4arealevel2")
     @Override
-    public String getArealevel3s4arealevel2(String json) {
-        BLarealevel3 blarealevel3 = new BLarealevel3();
-        JSONParser parser = new JSONParser();
-        Arealevel3 arealevel3;
+    public String getArealevel3s4arealevel2(String jsonstring) {
         try {
-            IArealevel2PK arealevel2PK = JSONArealevel2.toArealevel2PK((JSONObject)parser.parse(json));
-            ArrayList arealevel3s = blarealevel3.getArealevel3s4arealevel2(arealevel2PK);
-            JSONArray jsonarealevel3s = toJSONArray(arealevel3s);
-            return jsonarealevel3s.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Arealevel3_usecases arealevel3usecases = new Arealevel3_usecases(loggedin);
+            return get_arealevel3_with_foreignkey_arealevel2(arealevel3usecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4arealevel2")
     @Override
-    public void delete4arealevel2(String json) {
-        BLarealevel3 blarealevel3 = new BLarealevel3();
-        JSONParser parser = new JSONParser();
-        Arealevel3 arealevel3;
+    public void delete4arealevel2(String jsonstring) {
         try {
-            IArealevel2PK arealevel2PK = JSONArealevel2.toArealevel2PK((JSONObject)parser.parse(json));
-            blarealevel3.delete4arealevel2(arealevel2PK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Arealevel3_usecases arealevel3usecases = new Arealevel3_usecases(loggedin);
+            delete_arealevel3(arealevel3usecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
+
+    private String count_records(Arealevel3_usecases arealevel3usecases) throws ParseException, CustomException {
+        JSONObject jsoncount = new JSONObject();
+        jsoncount.put("recordcount", arealevel3usecases.count());
+        return jsoncount.toJSONString();
+    }
+    
+    private String get_all_arealevel3(Arealevel3_usecases arealevel3usecases) throws ParseException, CustomException {
+    	return JSONArealevel3.toJSONArray(arealevel3usecases.get_all()).toJSONString();
+    }
+    
+    private String get_arealevel3_with_primarykey(Arealevel3_usecases arealevel3usecases, JSONObject json) throws ParseException, CustomException {
+        IArealevel3PK arealevel3PK = (IArealevel3PK)JSONArealevel3.toArealevel3PK((JSONObject)json.get("arealevel3pk"));
+	return JSONArealevel3.toJSON(arealevel3usecases.get_arealevel3_by_primarykey(arealevel3PK)).toJSONString();
+    }
+    
+    private String get_arealevel3_with_foreignkey_arealevel2(Arealevel3_usecases arealevel3usecases, JSONObject json) throws ParseException, CustomException {
+        IArealevel2PK arealevel2PK = (IArealevel2PK)JSONArealevel2.toArealevel2PK((JSONObject)json.get("arealevel2pk"));
+        return JSONArealevel3.toJSONArray(arealevel3usecases.get_arealevel3_with_foreignkey_arealevel2(arealevel2PK)).toJSONString();
+    }
+    
+    private String search_arealevel3(Arealevel3_usecases arealevel3usecases, JSONObject json) throws ParseException, CustomException {
+        IArealevel3search search = (IArealevel3search)JSONArealevel3.toArealevel3search((JSONObject)json.get("search"));
+        return JSONArealevel3.toJSONArray(arealevel3usecases.search_arealevel3(search)).toJSONString();
+    }
+    
+    private String search_arealevel3_count(Arealevel3_usecases arealevel3usecases, JSONObject json) throws ParseException, CustomException {
+        IArealevel3search arealevel3search = (IArealevel3search)JSONArealevel3.toArealevel3search((JSONObject)json.get("search"));
+        JSONObject jsonsearchcount = new JSONObject();
+        jsonsearchcount.put("recordcount", arealevel3usecases.search_arealevel3_count(arealevel3search));
+        return jsonsearchcount.toJSONString();
+    }
+
+    private void insert_arealevel3(Arealevel3_usecases arealevel3usecases, JSONObject json) throws ParseException, CustomException {
+        IArealevel3 arealevel3 = (IArealevel3)JSONArealevel3.toArealevel3((JSONObject)json.get("arealevel3"));
+        arealevel3usecases.insertArealevel3(arealevel3);
+        setReturnstatus("OK");
+    }
+
+    private void update_arealevel3(Arealevel3_usecases arealevel3usecases, JSONObject json) throws ParseException, CustomException {
+        IArealevel3 arealevel3 = (IArealevel3)JSONArealevel3.toArealevel3((JSONObject)json.get("arealevel3"));
+        arealevel3usecases.updateArealevel3(arealevel3);
+        setReturnstatus("OK");
+    }
+
+    private void delete_arealevel3(Arealevel3_usecases arealevel3usecases, JSONObject json) throws ParseException, CustomException {
+        IArealevel3 arealevel3 = (IArealevel3)JSONArealevel3.toArealevel3((JSONObject)json.get("arealevel3"));
+        arealevel3usecases.deleteArealevel3(arealevel3);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Arealevel2(Arealevel3_usecases arealevel3usecases, JSONObject json) throws ParseException, CustomException {
+        IArealevel2PK arealevel2PK = (IArealevel2PK)JSONArealevel2.toArealevel2PK((JSONObject)json.get("arealevel2pk"));
+        arealevel3usecases.delete_all_containing_Arealevel2(arealevel2PK);
+        setReturnstatus("OK");
+    }
 
 }
 

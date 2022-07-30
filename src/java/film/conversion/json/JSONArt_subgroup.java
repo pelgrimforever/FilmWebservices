@@ -1,9 +1,6 @@
 /*
- * JSONArt_subgroup.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONArt_subgroup {
@@ -41,10 +37,6 @@ public class JSONArt_subgroup {
         return jsonart_subgroups;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IArt_subgroupPK art_subgroupPK) {
         JSONObject json = null;
         if(art_subgroupPK!=null) {
@@ -54,10 +46,6 @@ public class JSONArt_subgroup {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IArt_subgroup art_subgroup) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(art_subgroup.getPrimaryKey()));
@@ -69,10 +57,6 @@ public class JSONArt_subgroup {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Art_subgroupsearch art_subgroupsearch) {
         JSONObject json = new JSONObject();
         if(art_subgroupsearch.used()) {
@@ -111,11 +95,6 @@ public class JSONArt_subgroup {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Art_subgroupsearch toArt_subgroupsearch(JSONObject json) {
         Art_subgroupsearch art_subgroupsearch = new Art_subgroupsearch();
         art_subgroupsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

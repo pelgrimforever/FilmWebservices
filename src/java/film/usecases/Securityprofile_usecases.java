@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Securityprofile;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Securityprofile_usecases {
 
     private boolean loggedin = false;
-    private BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLsecurityprofile blsecurityprofile = new BLsecurityprofile(sqlreader);
     
     public Securityprofile_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Securityprofile_usecases {
     }
     
     public boolean getSecurityprofileExists(ISecurityprofilePK securityprofilePK) throws DBException {
-        return blsecurityprofile.getEntityExists(securityprofilePK);
+        return blsecurityprofile.getSecurityprofileExists(securityprofilePK);
     }
     
     public Securityprofile get_securityprofile_by_primarykey(ISecurityprofilePK securityprofilePK) throws DBException {
@@ -69,16 +75,23 @@ public class Securityprofile_usecases {
         return blsecurityprofile.searchcount(securityprofilesearch);
     }
 
-    public void secureinsertSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
-        blsecurityprofile.secureinsertSecurityprofile(securityprofile);
+    public void insertSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsecurityprofile.insertSecurityprofile(tq, securityprofile);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
-        blsecurityprofile.secureupdateSecurityprofile(securityprofile);
+    public void updateSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsecurityprofile.updateSecurityprofile(tq, securityprofile);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
-        blsecurityprofile.securedeleteSecurityprofile(securityprofile);
+    public void deleteSecurityprofile(ISecurityprofile securityprofile) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsecurityprofile.deleteSecurityprofile(tq, securityprofile);
+        sqlwriter.Commit2DB(tq);
     }
+
 }
 

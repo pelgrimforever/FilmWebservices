@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Mainmenu;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Mainmenu_usecases {
 
     private boolean loggedin = false;
-    private BLmainmenu blmainmenu = new BLmainmenu();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLmainmenu blmainmenu = new BLmainmenu(sqlreader);
     
     public Mainmenu_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Mainmenu_usecases {
     }
     
     public boolean getMainmenuExists(IMainmenuPK mainmenuPK) throws DBException {
-        return blmainmenu.getEntityExists(mainmenuPK);
+        return blmainmenu.getMainmenuExists(mainmenuPK);
     }
     
     public Mainmenu get_mainmenu_by_primarykey(IMainmenuPK mainmenuPK) throws DBException {
@@ -69,16 +75,23 @@ public class Mainmenu_usecases {
         return blmainmenu.searchcount(mainmenusearch);
     }
 
-    public void secureinsertMainmenu(IMainmenu mainmenu) throws DBException, DataException {
-        blmainmenu.secureinsertMainmenu(mainmenu);
+    public void insertMainmenu(IMainmenu mainmenu) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blmainmenu.insertMainmenu(tq, mainmenu);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateMainmenu(IMainmenu mainmenu) throws DBException, DataException {
-        blmainmenu.secureupdateMainmenu(mainmenu);
+    public void updateMainmenu(IMainmenu mainmenu) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blmainmenu.updateMainmenu(tq, mainmenu);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteMainmenu(IMainmenu mainmenu) throws DBException, DataException {
-        blmainmenu.securedeleteMainmenu(mainmenu);
+    public void deleteMainmenu(IMainmenu mainmenu) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blmainmenu.deleteMainmenu(tq, mainmenu);
+        sqlwriter.Commit2DB(tq);
     }
+
 }
 

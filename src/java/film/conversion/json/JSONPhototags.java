@@ -1,9 +1,6 @@
 /*
- * JSONPhototags.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONPhototags {
@@ -41,10 +37,6 @@ public class JSONPhototags {
         return jsonphototagss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IPhototagsPK phototagsPK) {
         JSONObject json = null;
         if(phototagsPK!=null) {
@@ -56,10 +48,6 @@ public class JSONPhototags {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IPhototags phototags) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(phototags.getPrimaryKey()));
@@ -70,10 +58,6 @@ public class JSONPhototags {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Phototagssearch phototagssearch) {
         JSONObject json = new JSONObject();
         if(phototagssearch.used()) {
@@ -112,11 +96,6 @@ public class JSONPhototags {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Phototagssearch toPhototagssearch(JSONObject json) {
         Phototagssearch phototagssearch = new Phototagssearch();
         phototagssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

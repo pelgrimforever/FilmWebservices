@@ -2,7 +2,7 @@
  * Requesthandler.java
  *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  *
  */
 
@@ -451,7 +451,7 @@ public class Requesthandler {
             return Byte.valueOf(number);
         }
         catch(NumberFormatException e) {
-            return new Byte("0");
+            return 0;
         }
     }
 
@@ -492,7 +492,7 @@ public class Requesthandler {
             return Long.valueOf(number);
         }
         catch(NumberFormatException e) {
-            return new Long(0);
+            return 0l;
         }
     }
 
@@ -507,7 +507,7 @@ public class Requesthandler {
             return Float.valueOf(number);
         }
         catch(NumberFormatException e) {
-            return new Float(0);
+            return 0f;
         }
     }
 

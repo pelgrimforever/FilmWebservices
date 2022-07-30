@@ -1,16 +1,19 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.gis.shape.piPoint;
 import film.interfaces.searchentity.*;
 import film.logicview.*;
 import film.BusinessObject.Logic.*;
 import film.entity.pk.*;
-import film.logicview.View_publiccountryphotocount;
+import film.logicentity.*;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -23,7 +26,8 @@ import org.json.simple.parser.ParseException;
 public class View_publiccountryphotocount_usecases {
 
     private boolean loggedin = false;
-    private BLview_publiccountryphotocount blview_publiccountryphotocount = new BLview_publiccountryphotocount();
+    private SQLreader sqlreader = new SQLreader();
+    private BLview_publiccountryphotocount blview_publiccountryphotocount = new BLview_publiccountryphotocount(sqlreader);
     
     public View_publiccountryphotocount_usecases() {
         this(false);

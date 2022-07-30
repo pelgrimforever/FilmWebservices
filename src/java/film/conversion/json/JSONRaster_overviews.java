@@ -1,9 +1,6 @@
 /*
- * JSONRaster_overviews.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONRaster_overviews {
@@ -36,10 +32,6 @@ public class JSONRaster_overviews {
         return jsonraster_overviewss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IRaster_overviews raster_overviews) {
         JSONObject json = new JSONObject();
         json.put("o_table_catalog", raster_overviews.getO_table_catalog());
@@ -70,11 +62,6 @@ public class JSONRaster_overviews {
         return raster_overviews;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Raster_overviewssearch parameters
-     * @return 
-     */
     public static Raster_overviewssearch toRaster_overviewssearch(JSONObject json) {
         Raster_overviewssearch raster_overviewssearch = new Raster_overviewssearch();
         raster_overviewssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

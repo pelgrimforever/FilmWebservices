@@ -1,9 +1,6 @@
 /*
- * JSONArealevel2.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONArealevel2 {
@@ -41,10 +37,6 @@ public class JSONArealevel2 {
         return jsonarealevel2s;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IArealevel2PK arealevel2PK) {
         JSONObject json = null;
         if(arealevel2PK!=null) {
@@ -56,10 +48,6 @@ public class JSONArealevel2 {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IArealevel2 arealevel2) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(arealevel2.getPrimaryKey()));
@@ -79,10 +67,6 @@ public class JSONArealevel2 {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Arealevel2search arealevel2search) {
         JSONObject json = new JSONObject();
         if(arealevel2search.used()) {
@@ -124,11 +108,6 @@ public class JSONArealevel2 {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Arealevel2search toArealevel2search(JSONObject json) {
         Arealevel2search arealevel2search = new Arealevel2search();
         arealevel2search.setANDORoperator(JSONConversion.getbyte(json, "andor"));

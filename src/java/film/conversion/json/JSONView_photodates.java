@@ -1,9 +1,6 @@
 /*
- * JSONView_photodates.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_photodates {
@@ -36,10 +32,6 @@ public class JSONView_photodates {
         return jsonview_photodatess;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_photodates view_photodates) {
         JSONObject json = new JSONObject();
         if(view_photodates.getPhotodate()!=null) {
@@ -58,11 +50,6 @@ public class JSONView_photodates {
         return view_photodates;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_photodatessearch parameters
-     * @return 
-     */
     public static View_photodatessearch toView_photodatessearch(JSONObject json) {
         View_photodatessearch view_photodatessearch = new View_photodatessearch();
         view_photodatessearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

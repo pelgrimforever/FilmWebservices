@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.art_subgroup;
@@ -11,6 +11,7 @@ import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IArt_subgroupsearch;
@@ -18,10 +19,9 @@ import film.interfaces.servlet.IArt_subgroupOperation;
 import film.logicentity.Art_subgroup;
 import film.searchentity.Art_subgroupsearch;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,13 +48,15 @@ import org.json.simple.parser.ParseException;
 @Path("rsart_subgroup_update")
 public class RSArt_subgroup_update extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Art_subgroup_usecases art_subgroupusecases = new Art_subgroup_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations
@@ -80,7 +82,7 @@ public class RSArt_subgroup_update extends RS_json_login {
 
     private void update_art_subgroup(Art_subgroup_usecases art_subgroupusecases, JSONObject json) throws ParseException, CustomException {
         IArt_subgroup art_subgroup = (IArt_subgroup)JSONArt_subgroup.toArt_subgroup((JSONObject)json.get("art_subgroup"));
-        art_subgroupusecases.secureupdateArt_subgroup(art_subgroup);
+        art_subgroupusecases.updateArt_subgroup(art_subgroup);
         setReturnstatus("OK");
     }
 }

@@ -1,220 +1,142 @@
 /*
- * Bsubject.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-import db.SQLMapperFactory;
-import db.SQLparameters;
-import data.gis.shape.*;
-import data.json.piJson;
-import data.json.psqlJsonobject;
-import db.SQLMapper_pgsql;
-import data.interfaces.db.Filedata;
-import film.BusinessObject.Logic.*;
-import film.conversion.json.JSONSubject;
+import db.*;
+import data.interfaces.db.*;
 import film.conversion.entity.EMsubject;
+import film.BusinessObject.Logic.*;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.searchentity.ISubjectsearch;
 import film.logicentity.Subject;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import org.postgresql.geometric.PGpoint;
-import org.postgis.PGgeometry;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
- * Business Entity class Bsubject
- *
- * Superclass for manipulating data- and database objects
- * for Entity Subject and direct related data
- * This class is overwritten each time the code generator runs
- * and is not meant to be changed
- *
  * @author Franky Laseure
  */
-public abstract class Bsubject extends BLtable {
+public abstract class Bsubject extends TableBusinessrules {
 
-    /**
-     * Constructor, sets Subject as default Entity
-     */
-    public Bsubject() {
-        super(new Subject(), new EMsubject());
+    public Bsubject(SQLreader sqlreader) {
+        super(new TableIO(sqlreader, new EMsubject()));
     }
 
-    /**
-     * Constructor, sets Subject as default Entity
-     * sets transaction queue from given GeneralEntityObject implementation
-     * all transactions will commit at same time
-     * @param transactionobject: GeneralEntityObjects that holds the transaction queue
-     */
-    public Bsubject(BLtable transactionobject) {
-        super(transactionobject, new Subject(), new EMsubject());
+    public Bsubject(TableBusinessrules businessrules) {
+        super(new TableIO(businessrules.getTableio(), new EMsubject()));
+        this.tableio.setAuthenticated(tableio!=null && tableio.isAuthenticated());
     }
 
-    /**
-     * create new empty Subject object
-     * @return empty ISubject
-     */
     public ISubject newSubject() {
     	return new Subject();
     }
     
-    /**
-     * create new empty Subject object
-     * create new primary key with given parameters
-     * @param cat1 primary key field
-     * @param cat2 primary key field
-     * @param id primary key field
-     * @return ISubject with primary key
-     */
     public ISubject newSubject(java.lang.String cat1, java.lang.String cat2, int id) {
         return new Subject(cat1, cat2, id);
     }
 
-    /**
-     * create new empty Subject object with given primary key
-     * @param subjectPK: primary key for Subject
-     * @return ISubject with primary key
-     */
     public ISubject newSubject(ISubjectPK subjectPK) {
         return new Subject((SubjectPK)subjectPK);
     }
 
-    /**
-     * create new empty primary key
-     * @return empty SubjectPK
-     */
     public ISubjectPK newSubjectPK() {
         return new SubjectPK();
     }
 
-    /**
-     * create new primary key with given parameters
-     * @param cat1 primary key field
-     * @param cat2 primary key field
-     * @param id primary key field
-     * @return new ISubjectPK
-     */
     public ISubjectPK newSubjectPK(java.lang.String cat1, java.lang.String cat2, int id) {
         return new SubjectPK(cat1, cat2, id);
     }
 
-    /**
-     * get all Subject objects from database
-     * @return ArrayList of Subject objects
-     * @throws DBException
-     */
     public ArrayList<Subject> getSubjects() throws DBException {
-        return (ArrayList<Subject>)super.getEntities(EMsubject.SQLSelectAll);
+        return (ArrayList<Subject>)tableio.getEntities(EMsubject.SQLSelectAll);
     }
 
-    /**
-     * search Subject for primary key
-     * @param subjectPK: Subject primary key
-     * @return Subject object
-     * @throws DBException
-     */
     public Subject getSubject(ISubjectPK subjectPK) throws DBException {
-        return (Subject)super.getEntity((SubjectPK)subjectPK);
+        return (Subject)tableio.getEntity((SubjectPK)subjectPK);
     }
 
-    /**
-     * search subject with ISubjectsearch parameters
-     * @param search ISubjectsearch
-     * @return ArrayList of Subject
-     * @throws DBException 
-     */
     public ArrayList<Subject> searchsubjects(ISubjectsearch search) throws DBException {
-        return (ArrayList<Subject>)this.search(search);
+        return (ArrayList<Subject>)tableio.search(search);
     }
 
-    /**
-     * search subject with ISubjectsearch parameters, order by orderby sql clause
-     * @param search ISubjectsearch
-     * @param orderby sql order by string
-     * @return ArrayList of Subject
-     * @throws DBException 
-     */
     public ArrayList<Subject> searchsubjects(ISubjectsearch search, String orderby) throws DBException {
-        return (ArrayList<Subject>)this.search(search, orderby);
+        return (ArrayList<Subject>)tableio.search(search, orderby);
     }
 
-    /**
-     * Search subject in database for subjectPK:
-     * @param subjectPK: Subject Primary Key, only valid for the initialized Entity
-     * @return true if found in database
-     * @throws DBException
-     */
     public boolean getSubjectExists(ISubjectPK subjectPK) throws DBException {
-        return super.getEntityExists((SubjectPK)subjectPK);
+        return tableio.getEntityExists((SubjectPK)subjectPK);
     }
 
-    /**
-     * try to insert Subject in database
-     * @param subject Subject object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertSubject(ISubject subject) throws DBException, DataException {
-        super.insertEntity(subject);
+    public Subject getEntity(String sql) throws DBException {
+        return (Subject)tableio.getEntity(sql);
+    }
+    
+    public Subject getEntity(String sql, SQLparameters parameters) throws DBException {
+        return (Subject)tableio.getEntity(sql, parameters);
+    }
+    
+    public ArrayList<Subject> getEntities(String sql) throws DBException {
+        return tableio.getEntities(sql);
+    }
+    
+    public ArrayList<Subject> getEntities(String sql, SQLparameters parameters) throws DBException {
+        return tableio.getEntities(sql, parameters);
     }
 
-    /**
-     * check if SubjectPK exists
-     * insert if not, update if found
-     * do not commit transaction
-     * @param subject Subject object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertupdateSubject(ISubject subject) throws DBException, DataException {
+    public long count() throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+    
+    public long count(String sql, SQLparameters parameters) throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+
+    public ArrayList<Subject> search(Tablesearcher search) throws DBException {
+        return tableio.search(search);
+    }
+
+    public ArrayList<Subject> search(Tablesearcher search, String orderby) throws DBException {
+        return tableio.search(search, orderby);
+    }
+
+    public long searchcount(Tablesearcher search) throws DBException {
+        return tableio.searchcount(search);
+    }
+
+    public void insertSubject(SQLTqueue transactionqueue, ISubject subject) throws DBException, DataException {
+        tableio.insertEntity(transactionqueue, subject);
+    }
+
+    public void insertupdateSubject(SQLTqueue transactionqueue, ISubject subject) throws DBException, DataException {
+    	checkDATA(subject);
         if(this.getSubjectExists(subject.getPrimaryKey())) {
-            super.updateEntity(subject);
+            tableio.updateEntity(transactionqueue, subject);
         } else {
-            super.insertEntity(subject);
+            tableio.insertEntity(transactionqueue, subject);
         }
     }
 
-    /**
-     * try to update Subject in database
-     * @param subject Subject object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void updateSubject(ISubject subject) throws DBException, DataException {
-        super.updateEntity(subject);
+    public void updateSubject(SQLTqueue transactionqueue, ISubject subject) throws DBException, DataException {
+    	checkDATA(subject);
+        tableio.updateEntity(transactionqueue, subject);
     }
 
-    /**
-     * try to delete Subject in database
-     * @param subject Subject object
-     * @throws DBException
-     */
-    public void deleteSubject(ISubject subject) throws DBException {
-        cascadedeleteSubject(subject.getPrimaryKey());
-        super.deleteEntity(subject);
+    public void deleteSubject(SQLTqueue transactionqueue, ISubject subject) throws DBException {
+        cascadedeleteSubject(transactionqueue, subject.getPrimaryKey());
+        tableio.deleteEntity(transactionqueue, subject);
     }
 
-    /**
-     * check data rules in Subject, throw DataException with customized message if rules do not apply
-     * @param subject Subject object
-     * @throws DataException
-     * @throws DBException
-     */
-    public void checkDATA(ISubject subject) throws DataException, DBException {
+    private void checkDATA(ISubject subject) throws DataException, DBException {
         StringBuffer message = new StringBuffer();
         //foreign key Subject.Cat1 - Subjectcat.Cat
         //foreign key Subject.Cat2 - Subjectcat.Cat
@@ -233,95 +155,47 @@ public abstract class Bsubject extends BLtable {
         }
     }
         
-    /**
-     * delete all records in tables where subjectPK is used in a primary key
-     * @param subjectPK: Subject primary key
-     */
-    public void cascadedeleteSubject(ISubjectPK subjectPK) {
+    public void cascadedeleteSubject(SQLTqueue transactionqueue, ISubjectPK subjectPK) {
         BLfilmsubjects blfilmsubjects = new BLfilmsubjects(this);
-        blfilmsubjects.delete4subject(subjectPK);
+        blfilmsubjects.setAuthenticated(isAuthenticated());
+        blfilmsubjects.delete4subject(transactionqueue, subjectPK);
         BLphotosubjects blphotosubjects = new BLphotosubjects(this);
-        blphotosubjects.delete4subject(subjectPK);
+        blphotosubjects.setAuthenticated(isAuthenticated());
+        blphotosubjects.delete4subject(transactionqueue, subjectPK);
     }
 
-    /**
-     * @param subjectcatPK: foreign key for Subjectcat
-     * @delete all Subject Entity objects for Subjectcat in database
-     */
-    public void delete4subjectcatCat1(ISubjectcatPK subjectcatPK) {
-        super.addStatement(EMsubject.SQLDelete4subjectcatCat1, subjectcatPK.getSQLprimarykey());
+    public void delete4subjectcatCat1(SQLTqueue transactionqueue, ISubjectcatPK subjectcatPK) {
+        tableio.addStatement(transactionqueue, EMsubject.SQLDelete4subjectcatCat1, subjectcatPK.getSQLprimarykey());
     }
 
-    /**
-     * @param subjectcatPK: foreign key for Subjectcat
-     * @return all Subject Entity objects for Subjectcat
-     * @throws CustomException
-     */
     public ArrayList<Subject> getSubjects4subjectcatCat1(ISubjectcatPK subjectcatPK) throws CustomException {
-        return super.getEntities(EMsubject.SQLSelect4subjectcatCat1, subjectcatPK.getSQLprimarykey());
+        return tableio.getEntities(EMsubject.SQLSelect4subjectcatCat1, subjectcatPK.getSQLprimarykey());
     }
-    /**
-     * @param tree7subjectPK: foreign key for Tree7subject
-     * @delete all Subject Entity objects for Tree7subject in database
-     */
-    public void delete4tree7subject(ITree7subjectPK tree7subjectPK) {
-        super.addStatement(EMsubject.SQLDelete4tree7subject, tree7subjectPK.getSQLprimarykey());
+    public void delete4tree7subject(SQLTqueue transactionqueue, ITree7subjectPK tree7subjectPK) {
+        tableio.addStatement(transactionqueue, EMsubject.SQLDelete4tree7subject, tree7subjectPK.getSQLprimarykey());
     }
 
-    /**
-     * @param tree7subjectPK: foreign key for Tree7subject
-     * @return all Subject Entity objects for Tree7subject
-     * @throws CustomException
-     */
     public ArrayList<Subject> getSubjects4tree7subject(ITree7subjectPK tree7subjectPK) throws CustomException {
-        return super.getEntities(EMsubject.SQLSelect4tree7subject, tree7subjectPK.getSQLprimarykey());
+        return tableio.getEntities(EMsubject.SQLSelect4tree7subject, tree7subjectPK.getSQLprimarykey());
     }
-    /**
-     * @param subjectcatPK: foreign key for Subjectcat
-     * @delete all Subject Entity objects for Subjectcat in database
-     */
-    public void delete4subjectcatCat2(ISubjectcatPK subjectcatPK) {
-        super.addStatement(EMsubject.SQLDelete4subjectcatCat2, subjectcatPK.getSQLprimarykey());
+    public void delete4subjectcatCat2(SQLTqueue transactionqueue, ISubjectcatPK subjectcatPK) {
+        tableio.addStatement(transactionqueue, EMsubject.SQLDelete4subjectcatCat2, subjectcatPK.getSQLprimarykey());
     }
 
-    /**
-     * @param subjectcatPK: foreign key for Subjectcat
-     * @return all Subject Entity objects for Subjectcat
-     * @throws CustomException
-     */
     public ArrayList<Subject> getSubjects4subjectcatCat2(ISubjectcatPK subjectcatPK) throws CustomException {
-        return super.getEntities(EMsubject.SQLSelect4subjectcatCat2, subjectcatPK.getSQLprimarykey());
+        return tableio.getEntities(EMsubject.SQLSelect4subjectcatCat2, subjectcatPK.getSQLprimarykey());
     }
-    /**
-     * @param filmsubjectsPK: parent Filmsubjects for child object Subject Entity
-     * @return child Subject Entity object
-     * @throws CustomException
-     */
     public Subject getFilmsubjects(IFilmsubjectsPK filmsubjectsPK) throws CustomException {
         SubjectPK subjectPK = new SubjectPK(filmsubjectsPK.getCat1(), filmsubjectsPK.getCat2(), filmsubjectsPK.getSubject());
         return this.getSubject(subjectPK);
     }
 
-    /**
-     * @param photosubjectsPK: parent Photosubjects for child object Subject Entity
-     * @return child Subject Entity object
-     * @throws CustomException
-     */
     public Subject getPhotosubjects(IPhotosubjectsPK photosubjectsPK) throws CustomException {
         SubjectPK subjectPK = new SubjectPK(photosubjectsPK.getCat1(), photosubjectsPK.getCat2(), photosubjectsPK.getSubject());
         return this.getSubject(subjectPK);
     }
 
 
-    /**
-     * get all Subject objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @param sortlist sql sort string
-     * @param sortoperator asc/desc
-     * @return ArrayList of Subject objects
-     * @throws DBException
-     */
     public ArrayList<Subject> getSubjects(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
         StringBuilder sql = new StringBuilder(EMsubject.SQLSelect);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
@@ -336,16 +210,10 @@ public abstract class Bsubject extends BLtable {
         if(sortlist.length()>0) {
             sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return (ArrayList<Subject>)super.getEntities(sql.toString(), sqlparameters);
+        return (ArrayList<Subject>)tableio.getEntities(sql.toString(), sqlparameters);
     }
 
-    /**
-     * delete all Subject objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @throws DBException
-     */
-    public void delSubject(SQLparameters sqlparameters, String andoroperator) throws DBException {
+    public void delSubject(SQLTqueue transactionqueue, SQLparameters sqlparameters, String andoroperator) throws DBException {
         StringBuilder sql = new StringBuilder("delete from ").append(Subject.table);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
         int l = parameters.size();
@@ -356,7 +224,7 @@ public abstract class Bsubject extends BLtable {
                 if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(sql.toString(), sqlparameters);
+        tableio.addStatement(transactionqueue, sql.toString(), sqlparameters);
     }
 
 

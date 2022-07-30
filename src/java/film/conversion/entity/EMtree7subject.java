@@ -1,12 +1,10 @@
 /*
- * EMtree7subject.java
- *
  * Created on Okt 8, 2021
  * Generated on 20.9.2021 18:6
- *
  */
 package film.conversion.entity;
 
+import data.interfaces.db.Entity;
 import data.interfaces.db.LogicEntity;
 import film.conversion.entity.def.EMtree7subject_default;
 import film.logicentity.Tree7subject;
@@ -14,8 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * EMtree7subject
- * Custom transformation from ResultSet to Logic Entity
  * @author Franky Laseure
  */
 public class EMtree7subject extends EMtree7subject_default {
@@ -38,14 +34,8 @@ public class EMtree7subject extends EMtree7subject_default {
             + "order by usedcount desc "
             + "limit 20";
 
-    /**
-     * Map ResultSet Field values to Tree7subject
-     * @param dbresult: Database ResultSet
-     * @return Tree7subject
-     * @throws java.sql.SQLException
-     */
     @Override
-    public Object mapResultSet2Entity(ResultSet dbresult) throws SQLException {
+    public Entity mapResultSet2Entity(ResultSet dbresult) throws SQLException {
         Tree7subject tree7subject = (Tree7subject)super.mapResultSet2Entity(dbresult);
         return tree7subject;
     }    

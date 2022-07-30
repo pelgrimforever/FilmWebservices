@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.arealevel1;
@@ -61,7 +61,7 @@ public class Arealevel1_update extends SecurityDataServlet {
 
     private void update_arealevel1(Arealevel1_usecases arealevel1usecases) throws CustomException {
         IArealevel1 arealevel1 = (IArealevel1)parser.getJavaObject("arealevel1");
-        arealevel1usecases.secureupdateArealevel1(arealevel1);
+        arealevel1usecases.updateArealevel1(arealevel1);
     }
     
     @Override

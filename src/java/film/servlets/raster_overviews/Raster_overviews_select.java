@@ -1,11 +1,10 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 17.4.2022 17:53
+ * Generated on 28.6.2022 19:49
  */
 
 package film.servlets.raster_overviews;
 
-import film.BusinessObject.Logic.BLraster_overviews;
 import general.exception.CustomException;
 import data.interfaces.db.Filedata;
 import film.interfaces.logicview.IRaster_overviews;
@@ -33,7 +32,6 @@ public class Raster_overviews_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLraster_overviews blraster_overviews = new BLraster_overviews();
         Raster_overviews_usecases raster_overviewsusecases = new Raster_overviews_usecases(authenticated);
         try {
             switch(this.operation) {

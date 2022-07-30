@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 29.6.2022 11:37
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Photo;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Photo_usecases {
 
     private boolean loggedin = false;
-    private BLphoto blphoto = new BLphoto();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLphoto blphoto = new BLphoto(sqlreader);
     
     public Photo_usecases() {
         this(false);
@@ -110,39 +116,84 @@ public class Photo_usecases {
     }
 
     public void updateGeolocation(IPhoto photo) throws DBException, DataException {
-        blphoto.updateGeolocation(photo);
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.updateGeolocation(tq, photo);
+        sqlwriter.Commit2DB(tq);
     }
 
     public boolean copyPreviousGeolocation(IPhoto photo) throws DBException, CustomException {
-        return blphoto.updateCopyPrevGeolocation(photo);
+        SQLTqueue tq = new SQLTqueue();
+        boolean updated = blphoto.updateCopyPrevGeolocation(tq, photo);
+        sqlwriter.Commit2DB(tq);
+        return updated;
     }
 
     public boolean copyGeolocation_from_Photo(IPhoto photo, IPhotoPK source_photoPK) throws DBException, CustomException {
-        return blphoto.copyPhotoGeolocation(photo, source_photoPK);
+        SQLTqueue tq = new SQLTqueue();
+        boolean updated = blphoto.copyPhotoGeolocation(tq, photo, source_photoPK);
+        sqlwriter.Commit2DB(tq);
+        return updated;
     }
     
     public void uploadPhotoImage_Root(Filedata rootphotofile) throws DBException, DataException {
-        blphoto.uploadPhotoImage_Root(rootphotofile);
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.uploadPhotoImage_Root(tq, rootphotofile);
+        sqlwriter.Commit2DB(tq);
     }
 
     public void uploadPhotoImage_Cropped(Filedata croppedphotofile) throws DBException, DataException {
-        blphoto.uploadPhotoImage_Cropped(croppedphotofile);
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.uploadPhotoImage_Cropped(tq, croppedphotofile);
     }
 
     public String uploadPhotoImage_Manual_return_filename(Filedata photofile, HashMap photoproperties) throws DBException, DataException {
-        return blphoto.uploadPhotoImage("Photo_usecases.uploadPhotoImage_Manual", photofile, photoproperties);
+        SQLTqueue tq = new SQLTqueue();
+        String filename = blphoto.uploadPhotoImage(tq, "Photo_usecases.uploadPhotoImage_Manual", photofile, photoproperties);
+        sqlwriter.Commit2DB(tq);
+        return filename;
     }
 
     public String uploadPhotoImage_CONroot(Filedata conrootphotofile, HashMap conhotoproperties) throws DBException, DataException {
-        return blphoto.uploadPhotoImage_CONRoot(conrootphotofile, conhotoproperties);
+        SQLTqueue tq = new SQLTqueue();
+        String filename = blphoto.uploadPhotoImage_CONRoot(tq, conrootphotofile, conhotoproperties);
+        sqlwriter.Commit2DB(tq);
+        return filename;
     }
 
     public void uploadPhotoImage_CONcropped(Filedata concroppedphotofile, HashMap concroppedphotoproperties) throws DBException, DataException {
-        blphoto.uploadPhotoImage_CONCropped(concroppedphotofile, concroppedphotoproperties);
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.uploadPhotoImage_CONCropped(tq, concroppedphotofile, concroppedphotoproperties);
+        sqlwriter.Commit2DB(tq);
     }
 
     public void uploadPhoto_properties(film.logic.Userprofile userprofile, IPhoto photo, ArrayList tree7subjects) throws DBException, DataException {
-        blphoto.updatePhoto("Photo_usecases.uploadPhoto_properties", userprofile, photo, tree7subjects);
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.updatePhoto(tq, "Photo_usecases.uploadPhoto_properties", userprofile, photo, tree7subjects);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public java.io.File getThumbnail(IPhotoPK photoPK) throws DBException {
+        return blphoto.getThumbnail(photoPK);
+    }
+    
+    public java.io.File getSmall(IPhotoPK photoPK) throws DBException {
+        return blphoto.getSmall(photoPK);
+    }
+
+    public Photo getLastPhotoinGroup(String filmgroupid) throws DBException {
+        return blphoto.getLastPhotoinGroup(filmgroupid);
+    }
+
+    public Photo getLastPhotoinGroupAndType(String filmgroupid, String uploadtype) throws DBException {
+        return blphoto.getLastPhotoinGroupAndType(filmgroupid, uploadtype);
+    }
+    
+    public String getImagePath(IPhotoPK photoPK, String subpath) {
+        return blphoto.getImagePath(photoPK, subpath);
+    }
+    
+    public ArrayList getPhotos4photo_film(boolean hasprivateaccess, IFilmPK filmPK, boolean loadthumbnails) throws CustomException {
+        return blphoto.getPhotos4photo_film(hasprivateaccess, filmPK, loadthumbnails);
     }
 //Custom code, do not change this line   
 
@@ -155,7 +206,7 @@ public class Photo_usecases {
     }
     
     public boolean getPhotoExists(IPhotoPK photoPK) throws DBException {
-        return blphoto.getEntityExists(photoPK);
+        return blphoto.getPhotoExists(photoPK);
     }
     
     public Photo get_photo_by_primarykey(IPhotoPK photoPK) throws DBException {
@@ -198,16 +249,41 @@ public class Photo_usecases {
         return blphoto.searchcount(photosearch);
     }
 
-    public void secureinsertPhoto(IPhoto photo) throws DBException, DataException {
-        blphoto.secureinsertPhoto(photo);
+    public void insertPhoto(IPhoto photo) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.insertPhoto(tq, photo);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdatePhoto(IPhoto photo) throws DBException, DataException {
-        blphoto.secureupdatePhoto(photo);
+    public void updatePhoto(IPhoto photo) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.updatePhoto(tq, photo);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeletePhoto(IPhoto photo) throws DBException, DataException {
-        blphoto.securedeletePhoto(photo);
+    public void deletePhoto(IPhoto photo) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.deletePhoto(tq, photo);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Route(IRoutePK routePK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.delete4route(tq, routePK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public void delete_all_containing_Creator(ICreatorPK creatorPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.delete4creator(tq, creatorPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public void delete_all_containing_Film(IFilmPK filmPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blphoto.delete4film(tq, filmPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

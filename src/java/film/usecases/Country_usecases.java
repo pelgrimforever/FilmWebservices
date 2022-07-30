@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Country;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Country_usecases {
 
     private boolean loggedin = false;
-    private BLcountry blcountry = new BLcountry();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLcountry blcountry = new BLcountry(sqlreader);
     
     public Country_usecases() {
         this(false);
@@ -40,7 +46,9 @@ public class Country_usecases {
 //Custom code, do not change this line
 //add here custom operations
     public void insert_country_with_check(ICountry country) throws DBException, DataException {
-        blcountry.insertcheckCountry(country);
+        SQLTqueue tq = new SQLTqueue();
+        blcountry.insertcheckCountry(tq, country);
+        sqlwriter.Commit2DB(tq);
     }
 //Custom code, do not change this line   
 
@@ -53,7 +61,7 @@ public class Country_usecases {
     }
     
     public boolean getCountryExists(ICountryPK countryPK) throws DBException {
-        return blcountry.getEntityExists(countryPK);
+        return blcountry.getCountryExists(countryPK);
     }
     
     public Country get_country_by_primarykey(ICountryPK countryPK) throws DBException {
@@ -72,16 +80,23 @@ public class Country_usecases {
         return blcountry.searchcount(countrysearch);
     }
 
-    public void secureinsertCountry(ICountry country) throws DBException, DataException {
-        blcountry.secureinsertCountry(country);
+    public void insertCountry(ICountry country) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blcountry.insertCountry(tq, country);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateCountry(ICountry country) throws DBException, DataException {
-        blcountry.secureupdateCountry(country);
+    public void updateCountry(ICountry country) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blcountry.updateCountry(tq, country);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteCountry(ICountry country) throws DBException, DataException {
-        blcountry.securedeleteCountry(country);
+    public void deleteCountry(ICountry country) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blcountry.deleteCountry(tq, country);
+        sqlwriter.Commit2DB(tq);
     }
+
 }
 

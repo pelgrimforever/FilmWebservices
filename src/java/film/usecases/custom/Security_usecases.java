@@ -1,4 +1,4 @@
-package film.usecases;
+package film.usecases.custom;
 
 import base.servlets.DataHandler;
 import base.servlets.Securitycheck;

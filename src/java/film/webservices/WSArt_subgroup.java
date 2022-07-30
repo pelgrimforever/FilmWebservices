@@ -2,23 +2,25 @@
  * WSArt_subgroup.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  *
  */
 
 package film.webservices;
 
+import base.restservices.RS_json_login;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
+import film.interfaces.searchentity.IArt_subgroupsearch;
 import film.interfaces.webservice.WSIArt_subgroup;
 import film.logicentity.Art_subgroup;
 import film.searchentity.Art_subgroupsearch;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import general.exception.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.jws.WebMethod;
@@ -27,14 +29,17 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import film.usecases.custom.Security_usecases;
 
 /**
  *
  * @author Franky Laseure
  */
 @WebService(endpointInterface = "film.interfaces.webservice.WSIArt_subgroup")
-public class WSArt_subgroup implements WSIArt_subgroup {
+public class WSArt_subgroup extends RS_json_login implements WSIArt_subgroup {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     private JSONArray toJSONArray(ArrayList art_subgroups) {
         JSONArray jsonart_subgroups = new JSONArray();
         Iterator art_subgroupsI = art_subgroups.iterator();
@@ -44,152 +49,168 @@ public class WSArt_subgroup implements WSIArt_subgroup {
         return jsonart_subgroups;
     }
 
-    /**
-     * Web service operation
-     */
     //@WebMethod(operationName = "getArt_subgroups")
     @Override
     public String getArt_subgroups() {
         try {
-            BLart_subgroup blart_subgroup = new BLart_subgroup();
-            ArrayList art_subgroups = blart_subgroup.getAll();
-            JSONArray jsonart_subgroups = toJSONArray(art_subgroups);
-            return jsonart_subgroups.toJSONString();
+            Art_subgroup_usecases art_subgroupusecases = new Art_subgroup_usecases(loggedin);
+            return get_all_art_subgroup(art_subgroupusecases);
         }
-        catch(DBException e) {
+        catch(CustomException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "search")
     @Override
-    public String search(String json) {
-        BLart_subgroup blart_subgroup = new BLart_subgroup();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Art_subgroup art_subgroup;
+    public String search(String jsonstring) {
         try {
-            Art_subgroupsearch art_subgroupsearch = JSONArt_subgroup.toArt_subgroupsearch((JSONObject)parser.parse(json));
-            ArrayList art_subgroups = blart_subgroup.search(art_subgroupsearch);
-            JSONArray jsonart_subgroups = toJSONArray(art_subgroups);
-            result = jsonart_subgroups.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_subgroup_usecases art_subgroupusecases = new Art_subgroup_usecases(loggedin);
+            return search_art_subgroup(art_subgroupusecases, json);
         }
-        catch(ParseException e) {
-            result = "";
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-            result = "";
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "getArt_subgroup")
     @Override
-    public String getArt_subgroup(String json) {
-        BLart_subgroup blart_subgroup = new BLart_subgroup();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Art_subgroup art_subgroup;
+    public String getArt_subgroup(String jsonstring) {
         try {
-            Art_subgroupPK art_subgroupPK = JSONArt_subgroup.toArt_subgroupPK((JSONObject)parser.parse(json));
-            art_subgroup = blart_subgroup.getArt_subgroup(art_subgroupPK);
-            if(art_subgroup!=null) {
-                result = JSONArt_subgroup.toJSON(art_subgroup).toJSONString();
-            }
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_subgroup_usecases art_subgroupusecases = new Art_subgroup_usecases(loggedin);
+            return get_art_subgroup_with_primarykey(art_subgroupusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "insertArt_subgroup")
     @Override
-    public void insertArt_subgroup(String json) {
-        BLart_subgroup blart_subgroup = new BLart_subgroup();
-        JSONParser parser = new JSONParser();
+    public void insertArt_subgroup(String jsonstring) {
         try {
-            IArt_subgroup art_subgroup = JSONArt_subgroup.toArt_subgroup((JSONObject)parser.parse(json));
-            blart_subgroup.insertArt_subgroup(art_subgroup);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_subgroup_usecases art_subgroupusecases = new Art_subgroup_usecases(loggedin);
+            insert_art_subgroup(art_subgroupusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "updateArt_subgroup")
     @Override
-    public void updateArt_subgroup(String json) {
-        BLart_subgroup blart_subgroup = new BLart_subgroup();
-        JSONParser parser = new JSONParser();
+    public void updateArt_subgroup(String jsonstring) {
         try {
-            IArt_subgroup art_subgroup = JSONArt_subgroup.toArt_subgroup((JSONObject)parser.parse(json));
-            blart_subgroup.updateArt_subgroup(art_subgroup);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_subgroup_usecases art_subgroupusecases = new Art_subgroup_usecases(loggedin);
+            update_art_subgroup(art_subgroupusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "deleteArt_subgroup")
     @Override
-    public void deleteArt_subgroup(String json) {
-        BLart_subgroup blart_subgroup = new BLart_subgroup();
-        JSONParser parser = new JSONParser();
+    public void deleteArt_subgroup(String jsonstring) {
         try {
-            IArt_subgroup art_subgroup = JSONArt_subgroup.toArt_subgroup((JSONObject)parser.parse(json));
-            blart_subgroup.deleteArt_subgroup(art_subgroup);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_subgroup_usecases art_subgroupusecases = new Art_subgroup_usecases(loggedin);
+            delete_art_subgroup(art_subgroupusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getArt_subgroups4art_group")
     @Override
-    public String getArt_subgroups4art_group(String json) {
-        BLart_subgroup blart_subgroup = new BLart_subgroup();
-        JSONParser parser = new JSONParser();
-        Art_subgroup art_subgroup;
+    public String getArt_subgroups4art_group(String jsonstring) {
         try {
-            IArt_groupPK art_groupPK = JSONArt_group.toArt_groupPK((JSONObject)parser.parse(json));
-            ArrayList art_subgroups = blart_subgroup.getArt_subgroups4art_group(art_groupPK);
-            JSONArray jsonart_subgroups = toJSONArray(art_subgroups);
-            return jsonart_subgroups.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_subgroup_usecases art_subgroupusecases = new Art_subgroup_usecases(loggedin);
+            return get_art_subgroup_with_foreignkey_art_group(art_subgroupusecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4art_group")
     @Override
-    public void delete4art_group(String json) {
-        BLart_subgroup blart_subgroup = new BLart_subgroup();
-        JSONParser parser = new JSONParser();
-        Art_subgroup art_subgroup;
+    public void delete4art_group(String jsonstring) {
         try {
-            IArt_groupPK art_groupPK = JSONArt_group.toArt_groupPK((JSONObject)parser.parse(json));
-            blart_subgroup.delete4art_group(art_groupPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_subgroup_usecases art_subgroupusecases = new Art_subgroup_usecases(loggedin);
+            delete_art_subgroup(art_subgroupusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
+
+    private String count_records(Art_subgroup_usecases art_subgroupusecases) throws ParseException, CustomException {
+        JSONObject jsoncount = new JSONObject();
+        jsoncount.put("recordcount", art_subgroupusecases.count());
+        return jsoncount.toJSONString();
+    }
+    
+    private String get_all_art_subgroup(Art_subgroup_usecases art_subgroupusecases) throws ParseException, CustomException {
+    	return JSONArt_subgroup.toJSONArray(art_subgroupusecases.get_all()).toJSONString();
+    }
+    
+    private String get_art_subgroup_with_primarykey(Art_subgroup_usecases art_subgroupusecases, JSONObject json) throws ParseException, CustomException {
+        IArt_subgroupPK art_subgroupPK = (IArt_subgroupPK)JSONArt_subgroup.toArt_subgroupPK((JSONObject)json.get("art_subgrouppk"));
+	return JSONArt_subgroup.toJSON(art_subgroupusecases.get_art_subgroup_by_primarykey(art_subgroupPK)).toJSONString();
+    }
+    
+    private String get_art_subgroup_with_foreignkey_art_group(Art_subgroup_usecases art_subgroupusecases, JSONObject json) throws ParseException, CustomException {
+        IArt_groupPK art_groupPK = (IArt_groupPK)JSONArt_group.toArt_groupPK((JSONObject)json.get("art_grouppk"));
+        return JSONArt_subgroup.toJSONArray(art_subgroupusecases.get_art_subgroup_with_foreignkey_art_group(art_groupPK)).toJSONString();
+    }
+    
+    private String search_art_subgroup(Art_subgroup_usecases art_subgroupusecases, JSONObject json) throws ParseException, CustomException {
+        IArt_subgroupsearch search = (IArt_subgroupsearch)JSONArt_subgroup.toArt_subgroupsearch((JSONObject)json.get("search"));
+        return JSONArt_subgroup.toJSONArray(art_subgroupusecases.search_art_subgroup(search)).toJSONString();
+    }
+    
+    private String search_art_subgroup_count(Art_subgroup_usecases art_subgroupusecases, JSONObject json) throws ParseException, CustomException {
+        IArt_subgroupsearch art_subgroupsearch = (IArt_subgroupsearch)JSONArt_subgroup.toArt_subgroupsearch((JSONObject)json.get("search"));
+        JSONObject jsonsearchcount = new JSONObject();
+        jsonsearchcount.put("recordcount", art_subgroupusecases.search_art_subgroup_count(art_subgroupsearch));
+        return jsonsearchcount.toJSONString();
+    }
+
+    private void insert_art_subgroup(Art_subgroup_usecases art_subgroupusecases, JSONObject json) throws ParseException, CustomException {
+        IArt_subgroup art_subgroup = (IArt_subgroup)JSONArt_subgroup.toArt_subgroup((JSONObject)json.get("art_subgroup"));
+        art_subgroupusecases.insertArt_subgroup(art_subgroup);
+        setReturnstatus("OK");
+    }
+
+    private void update_art_subgroup(Art_subgroup_usecases art_subgroupusecases, JSONObject json) throws ParseException, CustomException {
+        IArt_subgroup art_subgroup = (IArt_subgroup)JSONArt_subgroup.toArt_subgroup((JSONObject)json.get("art_subgroup"));
+        art_subgroupusecases.updateArt_subgroup(art_subgroup);
+        setReturnstatus("OK");
+    }
+
+    private void delete_art_subgroup(Art_subgroup_usecases art_subgroupusecases, JSONObject json) throws ParseException, CustomException {
+        IArt_subgroup art_subgroup = (IArt_subgroup)JSONArt_subgroup.toArt_subgroup((JSONObject)json.get("art_subgroup"));
+        art_subgroupusecases.deleteArt_subgroup(art_subgroup);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Art_group(Art_subgroup_usecases art_subgroupusecases, JSONObject json) throws ParseException, CustomException {
+        IArt_groupPK art_groupPK = (IArt_groupPK)JSONArt_group.toArt_groupPK((JSONObject)json.get("art_grouppk"));
+        art_subgroupusecases.delete_all_containing_Art_group(art_groupPK);
+        setReturnstatus("OK");
+    }
 
 }
 

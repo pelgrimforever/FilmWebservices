@@ -1,9 +1,6 @@
 /*
- * BLfilm.java
- *
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
- *
  */
 
 package film.BusinessObject.Logic;
@@ -12,7 +9,10 @@ import BusinessObject.BLtable;
 import XML.XMLElement;
 import XML.XMLfile;
 import data.interfaces.db.Filedata;
+import db.SQLTqueue;
 import db.SQLparameters;
+import db.SQLreader;
+import db.TableBusinessrules;
 import film.interfaces.logicentity.IFilm;
 import film.logicentity.Film;
 import film.BusinessObject.table.Bfilm;
@@ -50,13 +50,6 @@ import org.jdom2.Element;
 import text.Conversion;
 
 /**
- * Business Logic Entity class BLfilm
- *
- * Class for manipulating data- and database objects
- * for Entity Film and direct related data
- * This class is only generated once
- * Implement here all additional business logic
- *
  * @author Franky Laseure
  */
 public class BLfilm extends Bfilm {
@@ -72,30 +65,16 @@ public class BLfilm extends Bfilm {
 
     private Object[][] publiconly = { { "public", true } };
 
-    /**
-     * Constructor, sets Film as default Entity
-     */
-    public BLfilm() {
-        this.setLogginrequired(isprivatetable);
+    public BLfilm(SQLreader sqlreader) {
+        super(sqlreader);
+        setLogginrequired(isprivatetable);
     }
 
-    /**
-     * Constructor, sets Film as default Entity
-     * sets transaction queue from given GeneralObject implementation
-     * all transactions will commit at same time
-     * @param transactionobject: GeneralObjects that holds the transaction queue
-     */
-    public BLfilm(BLtable transactionobject) {
-        super(transactionobject);
-        this.setLogginrequired(isprivatetable);
+    public BLfilm(TableBusinessrules businessrules) {
+        super(businessrules);
+        tableio.setLogginrequired(isprivatetable);
     }
 
-    /**
-     * get all Film objects from database
-     * @param userprofile
-     * @return ArrayList of Film objects
-     * @throws DBException
-     */
     public ArrayList getFilms(Userprofile userprofile) throws DBException {
         if(userprofile!=null && userprofile.privateaccess())
             return this.getEntities(EMfilm.SQLSelectAll);
@@ -105,12 +84,6 @@ public class BLfilm extends Bfilm {
         }
     }
 
-    /**
-     * get all Film objects from database
-     * @param userprofile
-     * @return ArrayList of Film objects
-     * @throws DBException
-     */
     public ArrayList getFilms4Edit(Userprofile userprofile) throws DBException {
         ArrayList films4edit = new ArrayList();
         if(userprofile!=null && userprofile.isEditor()) {
@@ -119,24 +92,12 @@ public class BLfilm extends Bfilm {
         return films4edit;
     }
 
-    /**
-     * search Film for primary key
-     * @param userprofile
-     * @param filmPK: Film primary key
-     * @return Film object
-     * @throws DBException
-     */
     public Film getFilm(Userprofile userprofile, IFilmPK filmPK) throws DBException {
-        Film returnfilm = (Film)super.getEntity((FilmPK)filmPK);
+        Film returnfilm = super.getFilm(filmPK);
         if(!userprofile.privateaccess() && !returnfilm.getPublic()) returnfilm = null;
         return returnfilm;
     }
 
-    /**
-     *
-     * @param filmPK: Film Primary Key
-     * @return Root Image Path of a foto folder
-     */
     public static StringBuffer getRootImagePath(IFilmPK filmPK) {
         StringBuffer filepath = new StringBuffer(PHOTOSUBROOT);
         String filmid = Film.getDirectoryName(filmPK);
@@ -164,94 +125,37 @@ public class BLfilm extends Bfilm {
         return groups;
     }
 
-    /**
-     * try to insert Film object in database
-     * commit transaction
-     * @param film: Film Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
     @Override
-    public void insertFilm(IFilm film) throws DBException, DataException {
+    public void insertFilm(SQLTqueue transactionqueue, IFilm film) throws DBException, DataException {
         if(this.getFilm(film.getPrimaryKey())==null) {
-            trans_insertFilm(film);
-            super.Commit2DB();
+            super.insertFilm(transactionqueue, film);
         }
     }
     
-    /**
-     * try to insert Film object in database
-     * commit transaction
-     * @param film: Film Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void secureinsertFilm(IFilm film) throws DBException, DataException {
-        if(this.getFilm(film.getPrimaryKey())==null) {
-            trans_insertFilm(film);
-            super.Commit2DB();
-        }
-    }
-    
-    /**
-     * try to update Film object in database
-     * commit transaction
-     * @param film: Film Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    @Override
-    public void updateFilm(IFilm film) throws DBException, DataException {
-        trans_updateFilm(film);
-        super.Commit2DB();
-    }
-    
-    /**
-     * try to update Film object in database
-     * commit transaction
-     * @param film: Film Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void secureupdateFilm(IFilm film) throws DBException, DataException {
-        trans_updateFilm(film);
-        super.Commit2DB();
-    }
-    
-    /**
-     * try to update Photo object in database
-     * commit transaction
-     * @param userprofile
-     * @param film
-     * @param subjects
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void updateFilm(Userprofile userprofile, IFilm film, ArrayList subjects) throws DBException, DataException {
+    public void updateFilm(SQLTqueue transactionqueue, Userprofile userprofile, IFilm film, ArrayList subjects) throws DBException, DataException {
         //check if user is allowed to edit
         if(userprofile.isEditor()) {
             //check if user is allowed to manage this film (privateaccess check)
             if(getFilm(userprofile, film.getPrimaryKey())!=null) {
-                trans_updateFilm(film);
+                updateFilm(transactionqueue, film);
                 BLfilmsubjects blfilmsubjects = new BLfilmsubjects(this);
-                blfilmsubjects.linkFilm_with_Subjects(film.getPrimaryKey(), subjects);
-                super.Commit2DB();
+                blfilmsubjects.linkFilm_with_Subjects(transactionqueue, film.getPrimaryKey(), subjects);
             }
         }
     }
 
-    public void updateFilm(Userprofile userprofile, IFilm film) throws DBException, DataException {
+    public void updateFilm(SQLTqueue transactionqueue, Userprofile userprofile, IFilm film) throws DBException, DataException {
         //check if user is allowed to edit
         if(userprofile.isEditor()) {
             //check if user is allowed to manage this film (privateaccess check)
             if(getFilm(userprofile, film.getPrimaryKey())!=null) {
-                trans_updateFilm(film);
-                super.Commit2DB();
+                film.setBackup(true);
+                updateFilm(transactionqueue, film);
             }
         }
     }
 
-    public void updateFilm_LoadJPGproperties(Userprofile userprofile, IFilm film) throws DBException, CustomException {
+    public void updateFilm_LoadJPGproperties(SQLTqueue transactionqueue, Userprofile userprofile, IFilm film) throws DBException, CustomException {
         try {
             //check if user is allowed to edit
             if(userprofile.isEditor()) {
@@ -279,13 +183,12 @@ public class BLfilm extends Bfilm {
                                 if(datetimetag!=null) {
                                     photo.setPhotodate(datetimetag.getDateValue());
                                     photo.setPhototime(datetimetag.getTimeValue());
-                                    blphoto.updatePhoto(photo);
+                                    blphoto.updatePhoto(transactionqueue, photo);
                                 }
-                                blphototags.insertGraphicfileMetatags(gf, photo);
+                                blphototags.insertGraphicfileMetatags(transactionqueue, gf, photo);
                             }
                         }
                     }
-                    super.Commit2DB();
                 }
             }
         }
@@ -294,7 +197,7 @@ public class BLfilm extends Bfilm {
         }
     }
 
-    public void updateFilm_LoadGPSproperties(Userprofile userprofile, IFilm film, ArrayList<GPSTrackpoint> gpstrackpoints) throws DBException, CustomException {
+    public void updateFilm_LoadGPSproperties(SQLTqueue transactionqueue, Userprofile userprofile, IFilm film, ArrayList<GPSTrackpoint> gpstrackpoints) throws DBException, CustomException {
         //check if user is allowed to edit
         if(userprofile.isEditor()) {
             //check if user is allowed to manage this film (privateaccess check)
@@ -335,8 +238,7 @@ public class BLfilm extends Bfilm {
                             }
                             photo.setLocation(gpstrackpoint4photo.getPoint());
                             photo.setReversegeocode(this.reversegeocode(gpstrackpoint4photo.getPoint().getY(), gpstrackpoint4photo.getPoint().getX()));
-                            log.fine("GPS location found for " + photo.getPrimaryKey().getFilm() + " " + photo.getPrimaryKey().getId());
-                            blphoto.updateGeolocation(photo);
+                            blphoto.updateGeolocation(transactionqueue, photo);
                         }
                     }
                 }
@@ -394,80 +296,22 @@ public class BLfilm extends Bfilm {
         return returnstring;
     }
 
-    /**
-     * try to delete Film object in database
-     * commit transaction
-     * @param film: Film Entity Object
-     * @throws general.exception.DBException
-     */
-    @Override
-    public void deleteFilm(IFilm film) throws DBException {
-        trans_deleteFilm(film);
-        super.Commit2DB();
-    }
-
-    /**
-     * try to delete Film object in database
-     * commit transaction
-     * @param film: Film Entity Object
-     * @throws general.exception.DBException
-     */
-    public void securedeleteFilm(IFilm film) throws DBException {
-        trans_deleteFilm(film);
-        super.Commit2DB();
-    }
-
-    /**
-     * try to insert Film object in database
-     * do not commit transaction
-     * @param film: Film Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void trans_insertFilm(IFilm film) throws DBException, DataException {
-        super.checkDATA(film);
-        super.insertFilm((Film)film);
-    }
-    
-    /**
-     * try to update Film object in database
-     * do not commit transaction
-     * @param film: Film Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void trans_updateFilm(IFilm film) throws DBException, DataException {
-        super.checkDATA(film);
-        film.setBackup(true);
-        super.updateFilm((Film)film);
-    }
-    
-    /**
-     * try to delete Film object in database
-     * do not commit transaction
-     * @param film: Film Entity Object
-     * @throws general.exception.DBException
-     */
-    public void trans_deleteFilm(IFilm film) throws DBException {
-        super.deleteFilm((Film)film);
-    }
-
-    public void backupPhoto(String senderobject, IFilmPK filmpk) throws DBException, CustomException {
+    public void backupPhoto(SQLTqueue transactionqueue, String senderobject, IFilmPK filmpk) throws DBException, CustomException {
         ProjectLog log = new ProjectLog(this);
-        BLphoto blphoto = new BLphoto();
+        BLphoto blphoto = new BLphoto(this);
         Film film = getFilm(filmpk);
         ArrayList photobackups = blphoto.getPhotos4photo_film_imagebackup(filmpk);
         if(photobackups.size()>0) {
             Photo photo = (Photo)photobackups.get(0);
-            blphoto.backupImages(film, photo, backupdir);
+            blphoto.backupImages(transactionqueue, film, photo, backupdir);
         } else {
             photobackups = blphoto.getPhotos4photo_film_backup(filmpk);
             if(photobackups.size()>0) {
                 ArrayList photos = blphoto.getPhotos4photo_film(true, filmpk, false);
                 Photo photo;
                 Subject subject;
-                BLsubject blsubject = new BLsubject();
-                BLtree7subject bltree7subject = new BLtree7subject();
+                BLsubject blsubject = new BLsubject(this);
+                BLtree7subject bltree7subject = new BLtree7subject(this);
                 ArrayList tree7subjects;
                 Tree7subject tree7subject;
 
@@ -546,7 +390,7 @@ public class BLfilm extends Bfilm {
                 catch(IOException e) {
                     throw new CustomException(e);
                 }
-                blphoto.setBackedup(senderobject, filmpk);
+                blphoto.setBackedup(transactionqueue, senderobject, filmpk);
             }
         }
     }

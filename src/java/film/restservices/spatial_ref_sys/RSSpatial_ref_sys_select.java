@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.spatial_ref_sys;
@@ -10,7 +10,8 @@ import data.gis.shape.GISConversion;
 import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
-import film.usecases.Spatial_ref_sys_usecases;
+import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.ISpatial_ref_syssearch;
@@ -18,10 +19,8 @@ import film.interfaces.servlet.ISpatial_ref_sysOperation;
 import film.logicentity.Spatial_ref_sys;
 import film.searchentity.Spatial_ref_syssearch;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,15 +47,15 @@ import org.json.simple.parser.ParseException;
 @Path("rsspatial_ref_sys_select")
 public class RSSpatial_ref_sys_select extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
-            ISpatial_ref_sysPK spatial_ref_sysPK;
-            ISpatial_ref_sys spatial_ref_sys;
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Spatial_ref_sys_usecases spatial_ref_sysusecases = new Spatial_ref_sys_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations

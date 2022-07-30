@@ -2,23 +2,25 @@
  * WSMenu.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  *
  */
 
 package film.webservices;
 
+import base.restservices.RS_json_login;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
+import film.interfaces.searchentity.IMenusearch;
 import film.interfaces.webservice.WSIMenu;
 import film.logicentity.Menu;
 import film.searchentity.Menusearch;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import general.exception.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.jws.WebMethod;
@@ -27,14 +29,17 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import film.usecases.custom.Security_usecases;
 
 /**
  *
  * @author Franky Laseure
  */
 @WebService(endpointInterface = "film.interfaces.webservice.WSIMenu")
-public class WSMenu implements WSIMenu {
+public class WSMenu extends RS_json_login implements WSIMenu {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     private JSONArray toJSONArray(ArrayList menus) {
         JSONArray jsonmenus = new JSONArray();
         Iterator menusI = menus.iterator();
@@ -44,178 +49,187 @@ public class WSMenu implements WSIMenu {
         return jsonmenus;
     }
 
-    /**
-     * Web service operation
-     */
     //@WebMethod(operationName = "getMenus")
     @Override
     public String getMenus() {
         try {
-            BLmenu blmenu = new BLmenu();
-            ArrayList menus = blmenu.getAll();
-            JSONArray jsonmenus = toJSONArray(menus);
-            return jsonmenus.toJSONString();
+            Menu_usecases menuusecases = new Menu_usecases(loggedin);
+            return get_all_menu(menuusecases);
         }
-        catch(DBException e) {
+        catch(CustomException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "search")
     @Override
-    public String search(String json) {
-        BLmenu blmenu = new BLmenu();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Menu menu;
+    public String search(String jsonstring) {
         try {
-            Menusearch menusearch = JSONMenu.toMenusearch((JSONObject)parser.parse(json));
-            ArrayList menus = blmenu.search(menusearch);
-            JSONArray jsonmenus = toJSONArray(menus);
-            result = jsonmenus.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Menu_usecases menuusecases = new Menu_usecases(loggedin);
+            return search_menu(menuusecases, json);
         }
-        catch(ParseException e) {
-            result = "";
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-            result = "";
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "getMenu")
     @Override
-    public String getMenu(String json) {
-        BLmenu blmenu = new BLmenu();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Menu menu;
+    public String getMenu(String jsonstring) {
         try {
-            MenuPK menuPK = JSONMenu.toMenuPK((JSONObject)parser.parse(json));
-            menu = blmenu.getMenu(menuPK);
-            if(menu!=null) {
-                result = JSONMenu.toJSON(menu).toJSONString();
-            }
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Menu_usecases menuusecases = new Menu_usecases(loggedin);
+            return get_menu_with_primarykey(menuusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "insertMenu")
     @Override
-    public void insertMenu(String json) {
-        BLmenu blmenu = new BLmenu();
-        JSONParser parser = new JSONParser();
+    public void insertMenu(String jsonstring) {
         try {
-            IMenu menu = JSONMenu.toMenu((JSONObject)parser.parse(json));
-            blmenu.insertMenu(menu);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Menu_usecases menuusecases = new Menu_usecases(loggedin);
+            insert_menu(menuusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "updateMenu")
     @Override
-    public void updateMenu(String json) {
-        BLmenu blmenu = new BLmenu();
-        JSONParser parser = new JSONParser();
+    public void updateMenu(String jsonstring) {
         try {
-            IMenu menu = JSONMenu.toMenu((JSONObject)parser.parse(json));
-            blmenu.updateMenu(menu);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Menu_usecases menuusecases = new Menu_usecases(loggedin);
+            update_menu(menuusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "deleteMenu")
     @Override
-    public void deleteMenu(String json) {
-        BLmenu blmenu = new BLmenu();
-        JSONParser parser = new JSONParser();
+    public void deleteMenu(String jsonstring) {
         try {
-            IMenu menu = JSONMenu.toMenu((JSONObject)parser.parse(json));
-            blmenu.deleteMenu(menu);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Menu_usecases menuusecases = new Menu_usecases(loggedin);
+            delete_menu(menuusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getMenus4mainmenu")
     @Override
-    public String getMenus4mainmenu(String json) {
-        BLmenu blmenu = new BLmenu();
-        JSONParser parser = new JSONParser();
-        Menu menu;
+    public String getMenus4mainmenu(String jsonstring) {
         try {
-            IMainmenuPK mainmenuPK = JSONMainmenu.toMainmenuPK((JSONObject)parser.parse(json));
-            ArrayList menus = blmenu.getMenus4mainmenu(mainmenuPK);
-            JSONArray jsonmenus = toJSONArray(menus);
-            return jsonmenus.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Menu_usecases menuusecases = new Menu_usecases(loggedin);
+            return get_menu_with_foreignkey_mainmenu(menuusecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4mainmenu")
     @Override
-    public void delete4mainmenu(String json) {
-        BLmenu blmenu = new BLmenu();
-        JSONParser parser = new JSONParser();
-        Menu menu;
+    public void delete4mainmenu(String jsonstring) {
         try {
-            IMainmenuPK mainmenuPK = JSONMainmenu.toMainmenuPK((JSONObject)parser.parse(json));
-            blmenu.delete4mainmenu(mainmenuPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Menu_usecases menuusecases = new Menu_usecases(loggedin);
+            delete_menu(menuusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getMenus4menuitem")
     @Override
-    public String getMenus4menuitem(String json) {
-        BLmenu blmenu = new BLmenu();
-        JSONParser parser = new JSONParser();
-        Menu menu;
+    public String getMenus4menuitem(String jsonstring) {
         try {
-            String result = null;
-            IMenuitemPK menuitemPK = JSONMenuitem.toMenuitemPK((JSONObject)parser.parse(json));
-            menu = (Menu)blmenu.getMenuitem(menuitemPK);
-            if(menu!=null) {
-                result = JSONMenu.toJSON(menu).toJSONString();
-            }
-            return result;
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Menu_usecases menuusecases = new Menu_usecases(loggedin);
+            return get_menu_with_externalforeignkey_menuitem(menuusecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
+
+    private String count_records(Menu_usecases menuusecases) throws ParseException, CustomException {
+        JSONObject jsoncount = new JSONObject();
+        jsoncount.put("recordcount", menuusecases.count());
+        return jsoncount.toJSONString();
+    }
+    
+    private String get_all_menu(Menu_usecases menuusecases) throws ParseException, CustomException {
+    	return JSONMenu.toJSONArray(menuusecases.get_all()).toJSONString();
+    }
+    
+    private String get_menu_with_primarykey(Menu_usecases menuusecases, JSONObject json) throws ParseException, CustomException {
+        IMenuPK menuPK = (IMenuPK)JSONMenu.toMenuPK((JSONObject)json.get("menupk"));
+	return JSONMenu.toJSON(menuusecases.get_menu_by_primarykey(menuPK)).toJSONString();
+    }
+    
+    private String get_menu_with_foreignkey_mainmenu(Menu_usecases menuusecases, JSONObject json) throws ParseException, CustomException {
+        IMainmenuPK mainmenuPK = (IMainmenuPK)JSONMainmenu.toMainmenuPK((JSONObject)json.get("mainmenupk"));
+        return JSONMenu.toJSONArray(menuusecases.get_menu_with_foreignkey_mainmenu(mainmenuPK)).toJSONString();
+    }
+    
+    private String get_menu_with_externalforeignkey_menuitem(Menu_usecases menuusecases, JSONObject json) throws ParseException, CustomException {
+        IMenuitemPK menuitemPK = (IMenuitemPK)JSONMenuitem.toMenuitemPK((JSONObject)json.get("menuitempk"));
+        return JSONMenu.toJSON(menuusecases.get_menu_with_externalforeignkey_menuitem(menuitemPK)).toJSONString();
+    }
+    
+    private String search_menu(Menu_usecases menuusecases, JSONObject json) throws ParseException, CustomException {
+        IMenusearch search = (IMenusearch)JSONMenu.toMenusearch((JSONObject)json.get("search"));
+        return JSONMenu.toJSONArray(menuusecases.search_menu(search)).toJSONString();
+    }
+    
+    private String search_menu_count(Menu_usecases menuusecases, JSONObject json) throws ParseException, CustomException {
+        IMenusearch menusearch = (IMenusearch)JSONMenu.toMenusearch((JSONObject)json.get("search"));
+        JSONObject jsonsearchcount = new JSONObject();
+        jsonsearchcount.put("recordcount", menuusecases.search_menu_count(menusearch));
+        return jsonsearchcount.toJSONString();
+    }
+
+    private void insert_menu(Menu_usecases menuusecases, JSONObject json) throws ParseException, CustomException {
+        IMenu menu = (IMenu)JSONMenu.toMenu((JSONObject)json.get("menu"));
+        menuusecases.insertMenu(menu);
+        setReturnstatus("OK");
+    }
+
+    private void update_menu(Menu_usecases menuusecases, JSONObject json) throws ParseException, CustomException {
+        IMenu menu = (IMenu)JSONMenu.toMenu((JSONObject)json.get("menu"));
+        menuusecases.updateMenu(menu);
+        setReturnstatus("OK");
+    }
+
+    private void delete_menu(Menu_usecases menuusecases, JSONObject json) throws ParseException, CustomException {
+        IMenu menu = (IMenu)JSONMenu.toMenu((JSONObject)json.get("menu"));
+        menuusecases.deleteMenu(menu);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Mainmenu(Menu_usecases menuusecases, JSONObject json) throws ParseException, CustomException {
+        IMainmenuPK mainmenuPK = (IMainmenuPK)JSONMainmenu.toMainmenuPK((JSONObject)json.get("mainmenupk"));
+        menuusecases.delete_all_containing_Mainmenu(mainmenuPK);
+        setReturnstatus("OK");
+    }
 
 }
 

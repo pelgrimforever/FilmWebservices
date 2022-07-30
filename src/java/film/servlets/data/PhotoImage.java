@@ -1,9 +1,5 @@
 /*
- * PhotoImage.java
- *
  * Created on Feb 08, 2021, 15:22 PM
- * Custom Image retriever in addition to REST services
- *
  */
 
 package film.servlets.data;
@@ -17,6 +13,7 @@ import film.interfaces.servlet.IPhotoOperation;
 import film.restservices.RSsecurity;
 import film.servlets.DataServlet;
 import film.servlets.SecurityDataServlet;
+import film.usecases.Photo_usecases;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,23 +31,14 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- *
  * @author Franky Laseure
  */
 @WebServlet(name="PhotoImage", urlPatterns={"/film.PhotoImage"})
 public class PhotoImage extends javax.servlet.http.HttpServlet implements SingleThreadModel {
    
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         String result = "";
-        BLphoto blphoto = new BLphoto();
         StringBuffer jsonstring = new StringBuffer();
         String line = null;
         try {
@@ -62,19 +50,20 @@ public class PhotoImage extends javax.servlet.http.HttpServlet implements Single
             JSONObject json = (JSONObject)parser.parse(jsonstring.toString());        
             byte operation = JSONConversion.getbyte(json, "operation");
             boolean loggedin = RSsecurity.check(json);
-            blphoto.setAuthenticated(loggedin);
+            Photo_usecases photousecases = new Photo_usecases(loggedin);
 
             IPhotoPK photoPK = (IPhotoPK)JSONPhoto.toPhotoPK((JSONObject)json.get("photopk"));
             switch(operation) {
                 case IPhotoOperation.GETTHUMBNAIL:
                     response.setContentType("image/jpeg");
-                    BufferedImage bi = ImageIO.read(blphoto.getThumbnail(photoPK));
+                    
+                    BufferedImage bi = ImageIO.read(photousecases.getThumbnail(photoPK));
                     OutputStream out = response.getOutputStream();
                     ImageIO.write(bi, "jpg", out);
                     out.close();
                 case IPhotoOperation.GETSMALL:
                     response.setContentType("image/jpeg");
-                    BufferedImage bismall = ImageIO.read(blphoto.getSmall(photoPK));
+                    BufferedImage bismall = ImageIO.read(photousecases.getSmall(photoPK));
                     OutputStream outsmall = response.getOutputStream();
                     ImageIO.write(bismall, "jpg", outsmall);
                     outsmall.close();

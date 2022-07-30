@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Uploadsession;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Uploadsession_usecases {
 
     private boolean loggedin = false;
-    private BLuploadsession bluploadsession = new BLuploadsession();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLuploadsession bluploadsession = new BLuploadsession(sqlreader);
     
     public Uploadsession_usecases() {
         this(false);
@@ -40,7 +46,7 @@ public class Uploadsession_usecases {
 //Custom code, do not change this line
 //add here custom operations
     public ArrayList<Uploadsession> get_uploadsession_with_tree7subjects() throws DBException {
-        BLtree7subject blsubject = new BLtree7subject();
+        BLtree7subject blsubject = new BLtree7subject(sqlreader);
         blsubject.setAuthenticated(loggedin);
         ArrayList<Uploadsession> uploadsessions = bluploadsession.getUploadsessions();
         for(Uploadsession uploadsession: uploadsessions)
@@ -58,7 +64,9 @@ public class Uploadsession_usecases {
     }
     
     public void insert_uploadsessions(ArrayList<IUploadsession> uploadsessions) throws DBException, DataException {
-        bluploadsession.insertCompletesession(uploadsessions);
+        SQLTqueue tq = new SQLTqueue();
+        bluploadsession.insertCompletesession(tq, uploadsessions);
+        sqlwriter.Commit2DB(tq);
     }
 //Custom code, do not change this line   
 
@@ -71,7 +79,7 @@ public class Uploadsession_usecases {
     }
     
     public boolean getUploadsessionExists(IUploadsessionPK uploadsessionPK) throws DBException {
-        return bluploadsession.getEntityExists(uploadsessionPK);
+        return bluploadsession.getUploadsessionExists(uploadsessionPK);
     }
     
     public Uploadsession get_uploadsession_by_primarykey(IUploadsessionPK uploadsessionPK) throws DBException {
@@ -90,16 +98,29 @@ public class Uploadsession_usecases {
         return bluploadsession.searchcount(uploadsessionsearch);
     }
 
-    public void secureinsertUploadsession(IUploadsession uploadsession) throws DBException, DataException {
-        bluploadsession.secureinsertUploadsession(uploadsession);
+    public void insertUploadsession(IUploadsession uploadsession) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bluploadsession.insertUploadsession(tq, uploadsession);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateUploadsession(IUploadsession uploadsession) throws DBException, DataException {
-        bluploadsession.secureupdateUploadsession(uploadsession);
+    public void updateUploadsession(IUploadsession uploadsession) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bluploadsession.updateUploadsession(tq, uploadsession);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteUploadsession(IUploadsession uploadsession) throws DBException, DataException {
-        bluploadsession.securedeleteUploadsession(uploadsession);
+    public void deleteUploadsession(IUploadsession uploadsession) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bluploadsession.deleteUploadsession(tq, uploadsession);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Creator(ICreatorPK creatorPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        bluploadsession.delete4creator(tq, creatorPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

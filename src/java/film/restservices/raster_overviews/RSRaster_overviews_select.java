@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.raster_overviews;
@@ -16,10 +16,8 @@ import film.interfaces.servlet.IRaster_overviewsOperation;
 import film.usecases.Raster_overviews_usecases;
 import film.logicview.Raster_overviews;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -46,14 +44,15 @@ import org.json.simple.parser.ParseException;
 @Path("rsraster_overviews_select")
 public class RSRaster_overviews_select extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
-            IRaster_overviews raster_overviews;
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Raster_overviews_usecases raster_overviewsusecases = new Raster_overviews_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations

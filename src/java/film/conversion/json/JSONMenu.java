@@ -1,9 +1,6 @@
 /*
- * JSONMenu.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONMenu {
@@ -41,10 +37,6 @@ public class JSONMenu {
         return jsonmenus;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IMenuPK menuPK) {
         JSONObject json = null;
         if(menuPK!=null) {
@@ -55,10 +47,6 @@ public class JSONMenu {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IMenu menu) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(menu.getPrimaryKey()));
@@ -67,10 +55,6 @@ public class JSONMenu {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Menusearch menusearch) {
         JSONObject json = new JSONObject();
         if(menusearch.used()) {
@@ -112,11 +96,6 @@ public class JSONMenu {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Menusearch toMenusearch(JSONObject json) {
         Menusearch menusearch = new Menusearch();
         menusearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

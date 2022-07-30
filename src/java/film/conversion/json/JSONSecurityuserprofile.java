@@ -1,9 +1,6 @@
 /*
- * JSONSecurityuserprofile.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONSecurityuserprofile {
@@ -41,10 +37,6 @@ public class JSONSecurityuserprofile {
         return jsonsecurityuserprofiles;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISecurityuserprofilePK securityuserprofilePK) {
         JSONObject json = null;
         if(securityuserprofilePK!=null) {
@@ -55,10 +47,6 @@ public class JSONSecurityuserprofile {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISecurityuserprofile securityuserprofile) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(securityuserprofile.getPrimaryKey()));
@@ -67,10 +55,6 @@ public class JSONSecurityuserprofile {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Securityuserprofilesearch securityuserprofilesearch) {
         JSONObject json = new JSONObject();
         if(securityuserprofilesearch.used()) {
@@ -109,11 +93,6 @@ public class JSONSecurityuserprofile {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Securityuserprofilesearch toSecurityuserprofilesearch(JSONObject json) {
         Securityuserprofilesearch securityuserprofilesearch = new Securityuserprofilesearch();
         securityuserprofilesearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

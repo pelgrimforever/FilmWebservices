@@ -1,11 +1,10 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 17.4.2022 17:53
+ * Generated on 28.6.2022 19:49
  */
 
 package film.servlets.geography_columns;
 
-import film.BusinessObject.Logic.BLgeography_columns;
 import general.exception.CustomException;
 import data.interfaces.db.Filedata;
 import film.interfaces.logicview.IGeography_columns;
@@ -33,7 +32,6 @@ public class Geography_columns_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLgeography_columns blgeography_columns = new BLgeography_columns();
         Geography_columns_usecases geography_columnsusecases = new Geography_columns_usecases(authenticated);
         try {
             switch(this.operation) {

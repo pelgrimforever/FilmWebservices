@@ -30,7 +30,6 @@ public class ApplicationConfig extends Application {
 //Custom code, do not change this line
 //add here custom operations
 //Custom code, do not change this line   
-        resources.add(film.restservices.RSPhotoDataError.class);
         resources.add(film.restservices.arealevel1.RSArealevel1_delete.class);
         resources.add(film.restservices.arealevel1.RSArealevel1_insert.class);
         resources.add(film.restservices.arealevel1.RSArealevel1_select.class);

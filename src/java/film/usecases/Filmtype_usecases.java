@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Filmtype;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Filmtype_usecases {
 
     private boolean loggedin = false;
-    private BLfilmtype blfilmtype = new BLfilmtype();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLfilmtype blfilmtype = new BLfilmtype(sqlreader);
     
     public Filmtype_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Filmtype_usecases {
     }
     
     public boolean getFilmtypeExists(IFilmtypePK filmtypePK) throws DBException {
-        return blfilmtype.getEntityExists(filmtypePK);
+        return blfilmtype.getFilmtypeExists(filmtypePK);
     }
     
     public Filmtype get_filmtype_by_primarykey(IFilmtypePK filmtypePK) throws DBException {
@@ -65,16 +71,23 @@ public class Filmtype_usecases {
         return blfilmtype.searchcount(filmtypesearch);
     }
 
-    public void secureinsertFilmtype(IFilmtype filmtype) throws DBException, DataException {
-        blfilmtype.secureinsertFilmtype(filmtype);
+    public void insertFilmtype(IFilmtype filmtype) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilmtype.insertFilmtype(tq, filmtype);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateFilmtype(IFilmtype filmtype) throws DBException, DataException {
-        blfilmtype.secureupdateFilmtype(filmtype);
+    public void updateFilmtype(IFilmtype filmtype) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilmtype.updateFilmtype(tq, filmtype);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteFilmtype(IFilmtype filmtype) throws DBException, DataException {
-        blfilmtype.securedeleteFilmtype(filmtype);
+    public void deleteFilmtype(IFilmtype filmtype) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilmtype.deleteFilmtype(tq, filmtype);
+        sqlwriter.Commit2DB(tq);
     }
+
 }
 

@@ -1,9 +1,6 @@
 /*
- * JSONRoute.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONRoute {
@@ -41,10 +37,6 @@ public class JSONRoute {
         return jsonroutes;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IRoutePK routePK) {
         JSONObject json = null;
         if(routePK!=null) {
@@ -58,10 +50,6 @@ public class JSONRoute {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IRoute route) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(route.getPrimaryKey()));
@@ -81,10 +69,6 @@ public class JSONRoute {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Routesearch routesearch) {
         JSONObject json = new JSONObject();
         if(routesearch.used()) {
@@ -123,11 +107,6 @@ public class JSONRoute {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Routesearch toRoutesearch(JSONObject json) {
         Routesearch routesearch = new Routesearch();
         routesearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

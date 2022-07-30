@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Art_subgroup;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Art_subgroup_usecases {
 
     private boolean loggedin = false;
-    private BLart_subgroup blart_subgroup = new BLart_subgroup();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLart_subgroup blart_subgroup = new BLart_subgroup(sqlreader);
     
     public Art_subgroup_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Art_subgroup_usecases {
     }
     
     public boolean getArt_subgroupExists(IArt_subgroupPK art_subgroupPK) throws DBException {
-        return blart_subgroup.getEntityExists(art_subgroupPK);
+        return blart_subgroup.getArt_subgroupExists(art_subgroupPK);
     }
     
     public Art_subgroup get_art_subgroup_by_primarykey(IArt_subgroupPK art_subgroupPK) throws DBException {
@@ -69,16 +75,29 @@ public class Art_subgroup_usecases {
         return blart_subgroup.searchcount(art_subgroupsearch);
     }
 
-    public void secureinsertArt_subgroup(IArt_subgroup art_subgroup) throws DBException, DataException {
-        blart_subgroup.secureinsertArt_subgroup(art_subgroup);
+    public void insertArt_subgroup(IArt_subgroup art_subgroup) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_subgroup.insertArt_subgroup(tq, art_subgroup);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateArt_subgroup(IArt_subgroup art_subgroup) throws DBException, DataException {
-        blart_subgroup.secureupdateArt_subgroup(art_subgroup);
+    public void updateArt_subgroup(IArt_subgroup art_subgroup) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_subgroup.updateArt_subgroup(tq, art_subgroup);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteArt_subgroup(IArt_subgroup art_subgroup) throws DBException, DataException {
-        blart_subgroup.securedeleteArt_subgroup(art_subgroup);
+    public void deleteArt_subgroup(IArt_subgroup art_subgroup) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_subgroup.deleteArt_subgroup(tq, art_subgroup);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Art_group(IArt_groupPK art_groupPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_subgroup.delete4art_group(tq, art_groupPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

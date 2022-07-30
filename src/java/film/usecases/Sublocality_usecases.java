@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Sublocality;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Sublocality_usecases {
 
     private boolean loggedin = false;
-    private BLsublocality blsublocality = new BLsublocality();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLsublocality blsublocality = new BLsublocality(sqlreader);
     
     public Sublocality_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Sublocality_usecases {
     }
     
     public boolean getSublocalityExists(ISublocalityPK sublocalityPK) throws DBException {
-        return blsublocality.getEntityExists(sublocalityPK);
+        return blsublocality.getSublocalityExists(sublocalityPK);
     }
     
     public Sublocality get_sublocality_by_primarykey(ISublocalityPK sublocalityPK) throws DBException {
@@ -73,16 +79,29 @@ public class Sublocality_usecases {
         return blsublocality.searchcount(sublocalitysearch);
     }
 
-    public void secureinsertSublocality(ISublocality sublocality) throws DBException, DataException {
-        blsublocality.secureinsertSublocality(sublocality);
+    public void insertSublocality(ISublocality sublocality) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsublocality.insertSublocality(tq, sublocality);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateSublocality(ISublocality sublocality) throws DBException, DataException {
-        blsublocality.secureupdateSublocality(sublocality);
+    public void updateSublocality(ISublocality sublocality) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsublocality.updateSublocality(tq, sublocality);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteSublocality(ISublocality sublocality) throws DBException, DataException {
-        blsublocality.securedeleteSublocality(sublocality);
+    public void deleteSublocality(ISublocality sublocality) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsublocality.deleteSublocality(tq, sublocality);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Locality(ILocalityPK localityPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blsublocality.delete4locality(tq, localityPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

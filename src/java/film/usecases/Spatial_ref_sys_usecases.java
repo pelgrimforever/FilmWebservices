@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Spatial_ref_sys;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Spatial_ref_sys_usecases {
 
     private boolean loggedin = false;
-    private BLspatial_ref_sys blspatial_ref_sys = new BLspatial_ref_sys();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLspatial_ref_sys blspatial_ref_sys = new BLspatial_ref_sys(sqlreader);
     
     public Spatial_ref_sys_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Spatial_ref_sys_usecases {
     }
     
     public boolean getSpatial_ref_sysExists(ISpatial_ref_sysPK spatial_ref_sysPK) throws DBException {
-        return blspatial_ref_sys.getEntityExists(spatial_ref_sysPK);
+        return blspatial_ref_sys.getSpatial_ref_sysExists(spatial_ref_sysPK);
     }
     
     public Spatial_ref_sys get_spatial_ref_sys_by_primarykey(ISpatial_ref_sysPK spatial_ref_sysPK) throws DBException {
@@ -65,16 +71,23 @@ public class Spatial_ref_sys_usecases {
         return blspatial_ref_sys.searchcount(spatial_ref_syssearch);
     }
 
-    public void secureinsertSpatial_ref_sys(ISpatial_ref_sys spatial_ref_sys) throws DBException, DataException {
-        blspatial_ref_sys.secureinsertSpatial_ref_sys(spatial_ref_sys);
+    public void insertSpatial_ref_sys(ISpatial_ref_sys spatial_ref_sys) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blspatial_ref_sys.insertSpatial_ref_sys(tq, spatial_ref_sys);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateSpatial_ref_sys(ISpatial_ref_sys spatial_ref_sys) throws DBException, DataException {
-        blspatial_ref_sys.secureupdateSpatial_ref_sys(spatial_ref_sys);
+    public void updateSpatial_ref_sys(ISpatial_ref_sys spatial_ref_sys) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blspatial_ref_sys.updateSpatial_ref_sys(tq, spatial_ref_sys);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteSpatial_ref_sys(ISpatial_ref_sys spatial_ref_sys) throws DBException, DataException {
-        blspatial_ref_sys.securedeleteSpatial_ref_sys(spatial_ref_sys);
+    public void deleteSpatial_ref_sys(ISpatial_ref_sys spatial_ref_sys) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blspatial_ref_sys.deleteSpatial_ref_sys(tq, spatial_ref_sys);
+        sqlwriter.Commit2DB(tq);
     }
+
 }
 

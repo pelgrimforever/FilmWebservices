@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Filmsubjects;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Filmsubjects_usecases {
 
     private boolean loggedin = false;
-    private BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLfilmsubjects blfilmsubjects = new BLfilmsubjects(sqlreader);
     
     public Filmsubjects_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Filmsubjects_usecases {
     }
     
     public boolean getFilmsubjectsExists(IFilmsubjectsPK filmsubjectsPK) throws DBException {
-        return blfilmsubjects.getEntityExists(filmsubjectsPK);
+        return blfilmsubjects.getFilmsubjectsExists(filmsubjectsPK);
     }
     
     public Filmsubjects get_filmsubjects_by_primarykey(IFilmsubjectsPK filmsubjectsPK) throws DBException {
@@ -73,16 +79,35 @@ public class Filmsubjects_usecases {
         return blfilmsubjects.searchcount(filmsubjectssearch);
     }
 
-    public void secureinsertFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
-        blfilmsubjects.secureinsertFilmsubjects(filmsubjects);
+    public void insertFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilmsubjects.insertFilmsubjects(tq, filmsubjects);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
-        blfilmsubjects.secureupdateFilmsubjects(filmsubjects);
+    public void updateFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilmsubjects.updateFilmsubjects(tq, filmsubjects);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
-        blfilmsubjects.securedeleteFilmsubjects(filmsubjects);
+    public void deleteFilmsubjects(IFilmsubjects filmsubjects) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilmsubjects.deleteFilmsubjects(tq, filmsubjects);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Subject(ISubjectPK subjectPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilmsubjects.delete4subject(tq, subjectPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public void delete_all_containing_Film(IFilmPK filmPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilmsubjects.delete4film(tq, filmPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

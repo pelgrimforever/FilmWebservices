@@ -1,9 +1,6 @@
 /*
- * JSONPhototree7subject.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONPhototree7subject {
@@ -41,10 +37,6 @@ public class JSONPhototree7subject {
         return jsonphototree7subjects;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IPhototree7subjectPK phototree7subjectPK) {
         JSONObject json = null;
         if(phototree7subjectPK!=null) {
@@ -56,10 +48,6 @@ public class JSONPhototree7subject {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IPhototree7subject phototree7subject) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(phototree7subject.getPrimaryKey()));
@@ -68,10 +56,6 @@ public class JSONPhototree7subject {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Phototree7subjectsearch phototree7subjectsearch) {
         JSONObject json = new JSONObject();
         if(phototree7subjectsearch.used()) {
@@ -113,11 +97,6 @@ public class JSONPhototree7subject {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Phototree7subjectsearch toPhototree7subjectsearch(JSONObject json) {
         Phototree7subjectsearch phototree7subjectsearch = new Phototree7subjectsearch();
         phototree7subjectsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

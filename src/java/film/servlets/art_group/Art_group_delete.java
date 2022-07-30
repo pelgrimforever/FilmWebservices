@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.art_group;
@@ -61,7 +61,7 @@ public class Art_group_delete extends SecurityDataServlet {
 
     private void delete_art_group(Art_group_usecases art_groupusecases) throws CustomException {
         IArt_group art_group = (IArt_group)parser.getJavaObject("art_group");
-        art_groupusecases.securedeleteArt_group(art_group);
+        art_groupusecases.deleteArt_group(art_group);
     }
     
     @Override

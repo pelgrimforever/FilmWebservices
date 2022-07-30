@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.locality;
@@ -10,7 +10,8 @@ import data.gis.shape.GISConversion;
 import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
-import film.usecases.Locality_usecases;
+import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.ILocalitysearch;
@@ -18,10 +19,8 @@ import film.interfaces.servlet.ILocalityOperation;
 import film.logicentity.Locality;
 import film.searchentity.Localitysearch;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,15 +47,15 @@ import org.json.simple.parser.ParseException;
 @Path("rslocality_select")
 public class RSLocality_select extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
-            ILocalityPK localityPK;
-            ILocality locality;
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Locality_usecases localityusecases = new Locality_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations

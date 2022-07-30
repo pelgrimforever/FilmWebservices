@@ -1,16 +1,14 @@
 /*
- * EMalliance_default.java
- *
  * Created on Okt 8, 2021
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 package film.conversion.entity.def;
 
+import data.interfaces.db.*;
 import data.gis.shape.*;
-import data.interfaces.db.LogicEntity;
 import data.json.piJson;
 import db.TableMapper;
+import film.filmDatabaseproperties;
 import film.entity.pk.*;
 import film.logicentity.Phototree7subject;
 import java.sql.Date;
@@ -21,11 +19,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * EMphototree7subject_default
- * Maps SQL ResultSet to film.logicentity objects
  * @author Franky Laseure
  */
-public class EMphototree7subject_default implements TableMapper {
+public class EMphototree7subject_default implements filmDatabaseproperties, TableMapper {
     
     public static final String SQLWhere1 = "film = :phototree7subject.film: and id = :phototree7subject.id: and subjectid = :phototree7subject.subjectid:";
     public static final String SQLSelect1 = "select phototree7subject.* from phototree7subject where " + SQLWhere1;
@@ -45,6 +41,15 @@ public class EMphototree7subject_default implements TableMapper {
     public static final String SQLSelect4photo = "select * from phototree7subject where " + SQLWherephoto + OrderBy;
     public static final String SQLDelete4photo = "delete from phototree7subject where " + SQLWherephoto;
 
+    @Override
+    public String getDbtool() { return databasetool; }
+    
+    @Override
+    public String getConnectionpool() { return connectionpool; }
+    
+    @Override
+    public String getTable() { return "phototree7subject"; }
+
     /**
      * 
      * @return SQL where clause for one Phototree7subject (=Primarykey)
@@ -59,27 +64,14 @@ public class EMphototree7subject_default implements TableMapper {
     @Override
     public String getSQLSelect1() { return SQLSelect1; };
 
-    /**
-     * @return Select statement for Primary key, with count field as result
-     * count = 1: exists
-     * count = 0: not found
-     */
     @Override
     public String getSQLPKExcists() { return SQLSelectPKexists; };
     
-    /**
-     * 
-     * @return SQL select statement for all Phototree7subjects
-     */
     @Override
     public String getSQLSelectAll() { return SQLSelectAll; };
 
-    /**
-     * Map ResultSet Field values to Phototree7subject
-     * @param dbresult: Database ResultSet
-     */
     @Override
-    public Object mapResultSet2Entity(ResultSet dbresult) throws SQLException {
+    public Entity mapResultSet2Entity(ResultSet dbresult) throws SQLException {
         Phototree7subjectPK phototree7subjectPK = null;
         Phototree7subject phototree7subject;
         if(dbresult==null) {

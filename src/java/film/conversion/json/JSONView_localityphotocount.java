@@ -1,9 +1,6 @@
 /*
- * JSONView_localityphotocount.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_localityphotocount {
@@ -36,10 +32,6 @@ public class JSONView_localityphotocount {
         return jsonview_localityphotocounts;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_localityphotocount view_localityphotocount) {
         JSONObject json = new JSONObject();
         json.put("countrycode", view_localityphotocount.getCountrycode());
@@ -62,11 +54,6 @@ public class JSONView_localityphotocount {
         return view_localityphotocount;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_localityphotocountsearch parameters
-     * @return 
-     */
     public static View_localityphotocountsearch toView_localityphotocountsearch(JSONObject json) {
         View_localityphotocountsearch view_localityphotocountsearch = new View_localityphotocountsearch();
         view_localityphotocountsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

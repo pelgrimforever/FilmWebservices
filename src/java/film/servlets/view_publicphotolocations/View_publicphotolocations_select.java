@@ -33,7 +33,6 @@ public class View_publicphotolocations_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLview_publicphotolocations blview_publicphotolocations = new BLview_publicphotolocations();
         View_publicphotolocations_usecases view_publicphotolocationsusecases = new View_publicphotolocations_usecases(authenticated);
         try {
             switch(this.operation) {

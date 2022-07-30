@@ -1,216 +1,142 @@
 /*
- * Bcountry.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-import db.SQLMapperFactory;
-import db.SQLparameters;
-import data.gis.shape.*;
-import data.json.piJson;
-import data.json.psqlJsonobject;
-import db.SQLMapper_pgsql;
-import data.interfaces.db.Filedata;
-import film.BusinessObject.Logic.*;
-import film.conversion.json.JSONCountry;
+import db.*;
+import data.interfaces.db.*;
 import film.conversion.entity.EMcountry;
+import film.BusinessObject.Logic.*;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.searchentity.ICountrysearch;
 import film.logicentity.Country;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import org.postgresql.geometric.PGpoint;
-import org.postgis.PGgeometry;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
- * Business Entity class Bcountry
- *
- * Superclass for manipulating data- and database objects
- * for Entity Country and direct related data
- * This class is overwritten each time the code generator runs
- * and is not meant to be changed
- *
  * @author Franky Laseure
  */
-public abstract class Bcountry extends BLtable {
+public abstract class Bcountry extends TableBusinessrules {
 
-    /**
-     * Constructor, sets Country as default Entity
-     */
-    public Bcountry() {
-        super(new Country(), new EMcountry());
+    public Bcountry(SQLreader sqlreader) {
+        super(new TableIO(sqlreader, new EMcountry()));
     }
 
-    /**
-     * Constructor, sets Country as default Entity
-     * sets transaction queue from given GeneralEntityObject implementation
-     * all transactions will commit at same time
-     * @param transactionobject: GeneralEntityObjects that holds the transaction queue
-     */
-    public Bcountry(BLtable transactionobject) {
-        super(transactionobject, new Country(), new EMcountry());
+    public Bcountry(TableBusinessrules businessrules) {
+        super(new TableIO(businessrules.getTableio(), new EMcountry()));
+        this.tableio.setAuthenticated(tableio!=null && tableio.isAuthenticated());
     }
 
-    /**
-     * create new empty Country object
-     * @return empty ICountry
-     */
     public ICountry newCountry() {
     	return new Country();
     }
     
-    /**
-     * create new empty Country object
-     * create new primary key with given parameters
-     * @param code primary key field
-     * @return ICountry with primary key
-     */
     public ICountry newCountry(java.lang.String code) {
         return new Country(code);
     }
 
-    /**
-     * create new empty Country object with given primary key
-     * @param countryPK: primary key for Country
-     * @return ICountry with primary key
-     */
     public ICountry newCountry(ICountryPK countryPK) {
         return new Country((CountryPK)countryPK);
     }
 
-    /**
-     * create new empty primary key
-     * @return empty CountryPK
-     */
     public ICountryPK newCountryPK() {
         return new CountryPK();
     }
 
-    /**
-     * create new primary key with given parameters
-     * @param code primary key field
-     * @return new ICountryPK
-     */
     public ICountryPK newCountryPK(java.lang.String code) {
         return new CountryPK(code);
     }
 
-    /**
-     * get all Country objects from database
-     * @return ArrayList of Country objects
-     * @throws DBException
-     */
     public ArrayList<Country> getCountrys() throws DBException {
-        return (ArrayList<Country>)super.getEntities(EMcountry.SQLSelectAll);
+        return (ArrayList<Country>)tableio.getEntities(EMcountry.SQLSelectAll);
     }
 
-    /**
-     * search Country for primary key
-     * @param countryPK: Country primary key
-     * @return Country object
-     * @throws DBException
-     */
     public Country getCountry(ICountryPK countryPK) throws DBException {
-        return (Country)super.getEntity((CountryPK)countryPK);
+        return (Country)tableio.getEntity((CountryPK)countryPK);
     }
 
-    /**
-     * search country with ICountrysearch parameters
-     * @param search ICountrysearch
-     * @return ArrayList of Country
-     * @throws DBException 
-     */
     public ArrayList<Country> searchcountrys(ICountrysearch search) throws DBException {
-        return (ArrayList<Country>)this.search(search);
+        return (ArrayList<Country>)tableio.search(search);
     }
 
-    /**
-     * search country with ICountrysearch parameters, order by orderby sql clause
-     * @param search ICountrysearch
-     * @param orderby sql order by string
-     * @return ArrayList of Country
-     * @throws DBException 
-     */
     public ArrayList<Country> searchcountrys(ICountrysearch search, String orderby) throws DBException {
-        return (ArrayList<Country>)this.search(search, orderby);
+        return (ArrayList<Country>)tableio.search(search, orderby);
     }
 
-    /**
-     * Search country in database for countryPK:
-     * @param countryPK: Country Primary Key, only valid for the initialized Entity
-     * @return true if found in database
-     * @throws DBException
-     */
     public boolean getCountryExists(ICountryPK countryPK) throws DBException {
-        return super.getEntityExists((CountryPK)countryPK);
+        return tableio.getEntityExists((CountryPK)countryPK);
     }
 
-    /**
-     * try to insert Country in database
-     * @param country Country object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertCountry(ICountry country) throws DBException, DataException {
-        super.insertEntity(country);
+    public Country getEntity(String sql) throws DBException {
+        return (Country)tableio.getEntity(sql);
+    }
+    
+    public Country getEntity(String sql, SQLparameters parameters) throws DBException {
+        return (Country)tableio.getEntity(sql, parameters);
+    }
+    
+    public ArrayList<Country> getEntities(String sql) throws DBException {
+        return tableio.getEntities(sql);
+    }
+    
+    public ArrayList<Country> getEntities(String sql, SQLparameters parameters) throws DBException {
+        return tableio.getEntities(sql, parameters);
     }
 
-    /**
-     * check if CountryPK exists
-     * insert if not, update if found
-     * do not commit transaction
-     * @param country Country object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertupdateCountry(ICountry country) throws DBException, DataException {
+    public long count() throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+    
+    public long count(String sql, SQLparameters parameters) throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+
+    public ArrayList<Country> search(Tablesearcher search) throws DBException {
+        return tableio.search(search);
+    }
+
+    public ArrayList<Country> search(Tablesearcher search, String orderby) throws DBException {
+        return tableio.search(search, orderby);
+    }
+
+    public long searchcount(Tablesearcher search) throws DBException {
+        return tableio.searchcount(search);
+    }
+
+    public void insertCountry(SQLTqueue transactionqueue, ICountry country) throws DBException, DataException {
+        tableio.insertEntity(transactionqueue, country);
+    }
+
+    public void insertupdateCountry(SQLTqueue transactionqueue, ICountry country) throws DBException, DataException {
+    	checkDATA(country);
         if(this.getCountryExists(country.getPrimaryKey())) {
-            super.updateEntity(country);
+            tableio.updateEntity(transactionqueue, country);
         } else {
-            super.insertEntity(country);
+            tableio.insertEntity(transactionqueue, country);
         }
     }
 
-    /**
-     * try to update Country in database
-     * @param country Country object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void updateCountry(ICountry country) throws DBException, DataException {
-        super.updateEntity(country);
+    public void updateCountry(SQLTqueue transactionqueue, ICountry country) throws DBException, DataException {
+    	checkDATA(country);
+        tableio.updateEntity(transactionqueue, country);
     }
 
-    /**
-     * try to delete Country in database
-     * @param country Country object
-     * @throws DBException
-     */
-    public void deleteCountry(ICountry country) throws DBException {
-        cascadedeleteCountry(country.getPrimaryKey());
-        super.deleteEntity(country);
+    public void deleteCountry(SQLTqueue transactionqueue, ICountry country) throws DBException {
+        cascadedeleteCountry(transactionqueue, country.getPrimaryKey());
+        tableio.deleteEntity(transactionqueue, country);
     }
 
-    /**
-     * check data rules in Country, throw DataException with customized message if rules do not apply
-     * @param country Country object
-     * @throws DataException
-     * @throws DBException
-     */
-    public void checkDATA(ICountry country) throws DataException, DBException {
+    private void checkDATA(ICountry country) throws DataException, DBException {
         StringBuffer message = new StringBuffer();
         //Primary key
         if(country.getName()!=null && country.getName().length()>ICountry.SIZE_NAME) {
@@ -221,35 +147,18 @@ public abstract class Bcountry extends BLtable {
         }
     }
         
-    /**
-     * delete all records in tables where countryPK is used in a primary key
-     * @param countryPK: Country primary key
-     */
-    public void cascadedeleteCountry(ICountryPK countryPK) {
+    public void cascadedeleteCountry(SQLTqueue transactionqueue, ICountryPK countryPK) {
         BLarealevel1 blarealevel1 = new BLarealevel1(this);
-        blarealevel1.delete4country(countryPK);
+        blarealevel1.setAuthenticated(isAuthenticated());
+        blarealevel1.delete4country(transactionqueue, countryPK);
     }
 
-    /**
-     * @param arealevel1PK: parent Arealevel1 for child object Country Entity
-     * @return child Country Entity object
-     * @throws CustomException
-     */
     public Country getArealevel1(IArealevel1PK arealevel1PK) throws CustomException {
         CountryPK countryPK = new CountryPK(arealevel1PK.getCountrycode());
         return this.getCountry(countryPK);
     }
 
 
-    /**
-     * get all Country objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @param sortlist sql sort string
-     * @param sortoperator asc/desc
-     * @return ArrayList of Country objects
-     * @throws DBException
-     */
     public ArrayList<Country> getCountrys(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
         StringBuilder sql = new StringBuilder(EMcountry.SQLSelect);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
@@ -264,16 +173,10 @@ public abstract class Bcountry extends BLtable {
         if(sortlist.length()>0) {
             sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return (ArrayList<Country>)super.getEntities(sql.toString(), sqlparameters);
+        return (ArrayList<Country>)tableio.getEntities(sql.toString(), sqlparameters);
     }
 
-    /**
-     * delete all Country objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @throws DBException
-     */
-    public void delCountry(SQLparameters sqlparameters, String andoroperator) throws DBException {
+    public void delCountry(SQLTqueue transactionqueue, SQLparameters sqlparameters, String andoroperator) throws DBException {
         StringBuilder sql = new StringBuilder("delete from ").append(Country.table);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
         int l = parameters.size();
@@ -284,7 +187,7 @@ public abstract class Bcountry extends BLtable {
                 if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(sql.toString(), sqlparameters);
+        tableio.addStatement(transactionqueue, sql.toString(), sqlparameters);
     }
 
 

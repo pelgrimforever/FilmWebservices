@@ -1,9 +1,6 @@
 /*
- * BLview_localityphotocount.java
- *
  * Created on March 26, 2007, 5:44 PM
  * Generated on 9.3.2016 19:49
- *
  */
 
 package film.BusinessObject.Logic;
@@ -11,6 +8,7 @@ package film.BusinessObject.Logic;
 import data.gis.shape.piPoint;
 import general.exception.DBException;
 import db.SQLparameters;
+import db.SQLreader;
 import film.logicview.View_localityphotocount;
 import film.BusinessObject.view.Bview_localityphotocount;
 import film.conversion.entity.EMview_localityphotocount;
@@ -20,33 +18,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Business Logic Entity class BLview_localityphotocount
- *
- * Class for manipulating data- and database objects
- * for View View_localityphotocount and direct related data
- * This class is only generated once
- * Implement here all additional business logic
- *
  * @author Franky Laseure
  */
 public class BLview_localityphotocount extends Bview_localityphotocount {
 //Metacoder: NO AUTHOMATIC UPDATE
 	
-    /**
-     * Constructor, sets View_localityphotocount as default Entity
-     */
-    public BLview_localityphotocount() {
+    public BLview_localityphotocount(SQLreader sqlreader) {
+        super(sqlreader);
     }
 
-    /**
-     * get all View_publiclocalityphotocount objects from database
-     * prevent from getting private data
-     * @return ArrayList of View_localityphotocount objects
-     * @throws DBException
-     */
     @Override
     public ArrayList getView_localityphotocounts() throws DBException {
-        return this.getEntities(EMview_publiclocalityphotocount.SQLSelectAll);
+        return viewio.getEntities(EMview_publiclocalityphotocount.SQLSelectAll);
     }
     
     public ArrayList get4Countrycode(String countrycode, boolean loggedin) throws DBException {
@@ -56,7 +39,7 @@ public class BLview_localityphotocount extends Bview_localityphotocount {
         if(loggedin) {
             sql = EMview_localityphotocount.SQLSelect4countrycode;
         }
-        ArrayList localities = this.getEntities(sql, parameters);
+        ArrayList localities = viewio.getEntities(sql, parameters);
         ArrayList result = new ArrayList();
         Iterator<View_localityphotocount> localitiesI = localities.iterator();
         View_localityphotocount locality;
@@ -73,7 +56,7 @@ public class BLview_localityphotocount extends Bview_localityphotocount {
         }
         
         //calculate locations from locality with empty location field
-        BLview_locality_photolocations blview_locality_photolocations = new BLview_locality_photolocations();
+        BLview_locality_photolocations blview_locality_photolocations = new BLview_locality_photolocations(viewio.getSQLreader());
         localitiesI = result.iterator();
         ArrayList photolocations;
         View_locality_photolocations photolocation;

@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.subjectcat;
@@ -76,7 +76,7 @@ public class Subjectcat_insert extends SecurityDataServlet {
 
     private void insert_subjectcat(Subjectcat_usecases subjectcatusecases) throws CustomException {
         ISubjectcat subjectcat = (ISubjectcat)parser.getJavaObject("subjectcat");
-        subjectcatusecases.secureinsertSubjectcat(subjectcat);
+        subjectcatusecases.insertSubjectcat(subjectcat);
     }
     
     @Override

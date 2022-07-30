@@ -2,23 +2,25 @@
  * WSFilmsubjects.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  *
  */
 
 package film.webservices;
 
+import base.restservices.RS_json_login;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
+import film.interfaces.searchentity.IFilmsubjectssearch;
 import film.interfaces.webservice.WSIFilmsubjects;
 import film.logicentity.Filmsubjects;
 import film.searchentity.Filmsubjectssearch;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import general.exception.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.jws.WebMethod;
@@ -27,14 +29,17 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import film.usecases.custom.Security_usecases;
 
 /**
  *
  * @author Franky Laseure
  */
 @WebService(endpointInterface = "film.interfaces.webservice.WSIFilmsubjects")
-public class WSFilmsubjects implements WSIFilmsubjects {
+public class WSFilmsubjects extends RS_json_login implements WSIFilmsubjects {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     private JSONArray toJSONArray(ArrayList filmsubjectss) {
         JSONArray jsonfilmsubjectss = new JSONArray();
         Iterator filmsubjectssI = filmsubjectss.iterator();
@@ -44,189 +49,206 @@ public class WSFilmsubjects implements WSIFilmsubjects {
         return jsonfilmsubjectss;
     }
 
-    /**
-     * Web service operation
-     */
     //@WebMethod(operationName = "getFilmsubjectss")
     @Override
     public String getFilmsubjectss() {
         try {
-            BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-            ArrayList filmsubjectss = blfilmsubjects.getAll();
-            JSONArray jsonfilmsubjectss = toJSONArray(filmsubjectss);
-            return jsonfilmsubjectss.toJSONString();
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            return get_all_filmsubjects(filmsubjectsusecases);
         }
-        catch(DBException e) {
+        catch(CustomException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "search")
     @Override
-    public String search(String json) {
-        BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Filmsubjects filmsubjects;
+    public String search(String jsonstring) {
         try {
-            Filmsubjectssearch filmsubjectssearch = JSONFilmsubjects.toFilmsubjectssearch((JSONObject)parser.parse(json));
-            ArrayList filmsubjectss = blfilmsubjects.search(filmsubjectssearch);
-            JSONArray jsonfilmsubjectss = toJSONArray(filmsubjectss);
-            result = jsonfilmsubjectss.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            return search_filmsubjects(filmsubjectsusecases, json);
         }
-        catch(ParseException e) {
-            result = "";
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-            result = "";
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "getFilmsubjects")
     @Override
-    public String getFilmsubjects(String json) {
-        BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Filmsubjects filmsubjects;
+    public String getFilmsubjects(String jsonstring) {
         try {
-            FilmsubjectsPK filmsubjectsPK = JSONFilmsubjects.toFilmsubjectsPK((JSONObject)parser.parse(json));
-            filmsubjects = blfilmsubjects.getFilmsubjects(filmsubjectsPK);
-            if(filmsubjects!=null) {
-                result = JSONFilmsubjects.toJSON(filmsubjects).toJSONString();
-            }
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            return get_filmsubjects_with_primarykey(filmsubjectsusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "insertFilmsubjects")
     @Override
-    public void insertFilmsubjects(String json) {
-        BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-        JSONParser parser = new JSONParser();
+    public void insertFilmsubjects(String jsonstring) {
         try {
-            IFilmsubjects filmsubjects = JSONFilmsubjects.toFilmsubjects((JSONObject)parser.parse(json));
-            blfilmsubjects.insertFilmsubjects(filmsubjects);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            insert_filmsubjects(filmsubjectsusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "updateFilmsubjects")
     @Override
-    public void updateFilmsubjects(String json) {
-        BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-        JSONParser parser = new JSONParser();
+    public void updateFilmsubjects(String jsonstring) {
         try {
-            IFilmsubjects filmsubjects = JSONFilmsubjects.toFilmsubjects((JSONObject)parser.parse(json));
-            blfilmsubjects.updateFilmsubjects(filmsubjects);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            update_filmsubjects(filmsubjectsusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "deleteFilmsubjects")
     @Override
-    public void deleteFilmsubjects(String json) {
-        BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-        JSONParser parser = new JSONParser();
+    public void deleteFilmsubjects(String jsonstring) {
         try {
-            IFilmsubjects filmsubjects = JSONFilmsubjects.toFilmsubjects((JSONObject)parser.parse(json));
-            blfilmsubjects.deleteFilmsubjects(filmsubjects);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            delete_filmsubjects(filmsubjectsusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getFilmsubjectss4subject")
     @Override
-    public String getFilmsubjectss4subject(String json) {
-        BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-        JSONParser parser = new JSONParser();
-        Filmsubjects filmsubjects;
+    public String getFilmsubjectss4subject(String jsonstring) {
         try {
-            ISubjectPK subjectPK = JSONSubject.toSubjectPK((JSONObject)parser.parse(json));
-            ArrayList filmsubjectss = blfilmsubjects.getFilmsubjectss4subject(subjectPK);
-            JSONArray jsonfilmsubjectss = toJSONArray(filmsubjectss);
-            return jsonfilmsubjectss.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            return get_filmsubjects_with_foreignkey_subject(filmsubjectsusecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4subject")
     @Override
-    public void delete4subject(String json) {
-        BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-        JSONParser parser = new JSONParser();
-        Filmsubjects filmsubjects;
+    public void delete4subject(String jsonstring) {
         try {
-            ISubjectPK subjectPK = JSONSubject.toSubjectPK((JSONObject)parser.parse(json));
-            blfilmsubjects.delete4subject(subjectPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            delete_filmsubjects(filmsubjectsusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getFilmsubjectss4film")
     @Override
-    public String getFilmsubjectss4film(String json) {
-        BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-        JSONParser parser = new JSONParser();
-        Filmsubjects filmsubjects;
+    public String getFilmsubjectss4film(String jsonstring) {
         try {
-            IFilmPK filmPK = JSONFilm.toFilmPK((JSONObject)parser.parse(json));
-            ArrayList filmsubjectss = blfilmsubjects.getFilmsubjectss4film(filmPK);
-            JSONArray jsonfilmsubjectss = toJSONArray(filmsubjectss);
-            return jsonfilmsubjectss.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            return get_filmsubjects_with_foreignkey_film(filmsubjectsusecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4film")
     @Override
-    public void delete4film(String json) {
-        BLfilmsubjects blfilmsubjects = new BLfilmsubjects();
-        JSONParser parser = new JSONParser();
-        Filmsubjects filmsubjects;
+    public void delete4film(String jsonstring) {
         try {
-            IFilmPK filmPK = JSONFilm.toFilmPK((JSONObject)parser.parse(json));
-            blfilmsubjects.delete4film(filmPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Filmsubjects_usecases filmsubjectsusecases = new Filmsubjects_usecases(loggedin);
+            delete_filmsubjects(filmsubjectsusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
+
+    private String count_records(Filmsubjects_usecases filmsubjectsusecases) throws ParseException, CustomException {
+        JSONObject jsoncount = new JSONObject();
+        jsoncount.put("recordcount", filmsubjectsusecases.count());
+        return jsoncount.toJSONString();
+    }
+    
+    private String get_all_filmsubjects(Filmsubjects_usecases filmsubjectsusecases) throws ParseException, CustomException {
+    	return JSONFilmsubjects.toJSONArray(filmsubjectsusecases.get_all()).toJSONString();
+    }
+    
+    private String get_filmsubjects_with_primarykey(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IFilmsubjectsPK filmsubjectsPK = (IFilmsubjectsPK)JSONFilmsubjects.toFilmsubjectsPK((JSONObject)json.get("filmsubjectspk"));
+	return JSONFilmsubjects.toJSON(filmsubjectsusecases.get_filmsubjects_by_primarykey(filmsubjectsPK)).toJSONString();
+    }
+    
+    private String get_filmsubjects_with_foreignkey_subject(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        ISubjectPK subjectPK = (ISubjectPK)JSONSubject.toSubjectPK((JSONObject)json.get("subjectpk"));
+        return JSONFilmsubjects.toJSONArray(filmsubjectsusecases.get_filmsubjects_with_foreignkey_subject(subjectPK)).toJSONString();
+    }
+    
+    private String get_filmsubjects_with_foreignkey_film(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IFilmPK filmPK = (IFilmPK)JSONFilm.toFilmPK((JSONObject)json.get("filmpk"));
+        return JSONFilmsubjects.toJSONArray(filmsubjectsusecases.get_filmsubjects_with_foreignkey_film(filmPK)).toJSONString();
+    }
+    
+    private String search_filmsubjects(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IFilmsubjectssearch search = (IFilmsubjectssearch)JSONFilmsubjects.toFilmsubjectssearch((JSONObject)json.get("search"));
+        return JSONFilmsubjects.toJSONArray(filmsubjectsusecases.search_filmsubjects(search)).toJSONString();
+    }
+    
+    private String search_filmsubjects_count(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IFilmsubjectssearch filmsubjectssearch = (IFilmsubjectssearch)JSONFilmsubjects.toFilmsubjectssearch((JSONObject)json.get("search"));
+        JSONObject jsonsearchcount = new JSONObject();
+        jsonsearchcount.put("recordcount", filmsubjectsusecases.search_filmsubjects_count(filmsubjectssearch));
+        return jsonsearchcount.toJSONString();
+    }
+
+    private void insert_filmsubjects(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IFilmsubjects filmsubjects = (IFilmsubjects)JSONFilmsubjects.toFilmsubjects((JSONObject)json.get("filmsubjects"));
+        filmsubjectsusecases.insertFilmsubjects(filmsubjects);
+        setReturnstatus("OK");
+    }
+
+    private void update_filmsubjects(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IFilmsubjects filmsubjects = (IFilmsubjects)JSONFilmsubjects.toFilmsubjects((JSONObject)json.get("filmsubjects"));
+        filmsubjectsusecases.updateFilmsubjects(filmsubjects);
+        setReturnstatus("OK");
+    }
+
+    private void delete_filmsubjects(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IFilmsubjects filmsubjects = (IFilmsubjects)JSONFilmsubjects.toFilmsubjects((JSONObject)json.get("filmsubjects"));
+        filmsubjectsusecases.deleteFilmsubjects(filmsubjects);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Subject(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        ISubjectPK subjectPK = (ISubjectPK)JSONSubject.toSubjectPK((JSONObject)json.get("subjectpk"));
+        filmsubjectsusecases.delete_all_containing_Subject(subjectPK);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Film(Filmsubjects_usecases filmsubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IFilmPK filmPK = (IFilmPK)JSONFilm.toFilmPK((JSONObject)json.get("filmpk"));
+        filmsubjectsusecases.delete_all_containing_Film(filmPK);
+        setReturnstatus("OK");
+    }
 
 }
 

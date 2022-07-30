@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Art_photo;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Art_photo_usecases {
 
     private boolean loggedin = false;
-    private BLart_photo blart_photo = new BLart_photo();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLart_photo blart_photo = new BLart_photo(sqlreader);
     
     public Art_photo_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Art_photo_usecases {
     }
     
     public boolean getArt_photoExists(IArt_photoPK art_photoPK) throws DBException {
-        return blart_photo.getEntityExists(art_photoPK);
+        return blart_photo.getArt_photoExists(art_photoPK);
     }
     
     public Art_photo get_art_photo_by_primarykey(IArt_photoPK art_photoPK) throws DBException {
@@ -81,16 +87,47 @@ public class Art_photo_usecases {
         return blart_photo.searchcount(art_photosearch);
     }
 
-    public void secureinsertArt_photo(IArt_photo art_photo) throws DBException, DataException {
-        blart_photo.secureinsertArt_photo(art_photo);
+    public void insertArt_photo(IArt_photo art_photo) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_photo.insertArt_photo(tq, art_photo);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateArt_photo(IArt_photo art_photo) throws DBException, DataException {
-        blart_photo.secureupdateArt_photo(art_photo);
+    public void updateArt_photo(IArt_photo art_photo) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_photo.updateArt_photo(tq, art_photo);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteArt_photo(IArt_photo art_photo) throws DBException, DataException {
-        blart_photo.securedeleteArt_photo(art_photo);
+    public void deleteArt_photo(IArt_photo art_photo) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_photo.deleteArt_photo(tq, art_photo);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Photo(IPhotoPK photoPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_photo.delete4photo(tq, photoPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public void delete_all_containing_Art_subgroup(IArt_subgroupPK art_subgroupPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_photo.delete4art_subgroup(tq, art_subgroupPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public void delete_all_containing_Art_academy(IArt_academyPK art_academyPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_photo.delete4art_academy(tq, art_academyPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public void delete_all_containing_Art_group(IArt_groupPK art_groupPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blart_photo.delete4art_group(tq, art_groupPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

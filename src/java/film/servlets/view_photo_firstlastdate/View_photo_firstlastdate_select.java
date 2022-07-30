@@ -33,7 +33,6 @@ public class View_photo_firstlastdate_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLview_photo_firstlastdate blview_photo_firstlastdate = new BLview_photo_firstlastdate();
         View_photo_firstlastdate_usecases view_photo_firstlastdateusecases = new View_photo_firstlastdate_usecases(authenticated);
         try {
             switch(this.operation) {

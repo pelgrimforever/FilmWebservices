@@ -1,9 +1,6 @@
 /*
- * JSONView_locality_photolocations.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_locality_photolocations {
@@ -36,10 +32,6 @@ public class JSONView_locality_photolocations {
         return jsonview_locality_photolocationss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_locality_photolocations view_locality_photolocations) {
         JSONObject json = new JSONObject();
         json.put("countrycode", view_locality_photolocations.getCountrycode());
@@ -60,11 +52,6 @@ public class JSONView_locality_photolocations {
         return view_locality_photolocations;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_locality_photolocationssearch parameters
-     * @return 
-     */
     public static View_locality_photolocationssearch toView_locality_photolocationssearch(JSONObject json) {
         View_locality_photolocationssearch view_locality_photolocationssearch = new View_locality_photolocationssearch();
         view_locality_photolocationssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

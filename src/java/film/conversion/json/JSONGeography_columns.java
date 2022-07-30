@@ -1,9 +1,6 @@
 /*
- * JSONGeography_columns.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONGeography_columns {
@@ -36,10 +32,6 @@ public class JSONGeography_columns {
         return jsongeography_columnss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IGeography_columns geography_columns) {
         JSONObject json = new JSONObject();
         json.put("f_table_catalog", geography_columns.getF_table_catalog());
@@ -66,11 +58,6 @@ public class JSONGeography_columns {
         return geography_columns;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Geography_columnssearch parameters
-     * @return 
-     */
     public static Geography_columnssearch toGeography_columnssearch(JSONObject json) {
         Geography_columnssearch geography_columnssearch = new Geography_columnssearch();
         geography_columnssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

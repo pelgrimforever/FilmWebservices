@@ -1,11 +1,10 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 17.4.2022 17:53
+ * Generated on 28.6.2022 19:49
  */
 
 package film.servlets.raster_columns;
 
-import film.BusinessObject.Logic.BLraster_columns;
 import general.exception.CustomException;
 import data.interfaces.db.Filedata;
 import film.interfaces.logicview.IRaster_columns;
@@ -33,7 +32,6 @@ public class Raster_columns_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLraster_columns blraster_columns = new BLraster_columns();
         Raster_columns_usecases raster_columnsusecases = new Raster_columns_usecases(authenticated);
         try {
             switch(this.operation) {

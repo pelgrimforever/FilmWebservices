@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.uploadsession;
@@ -61,7 +61,7 @@ public class Uploadsession_update extends SecurityDataServlet {
 
     private void update_uploadsession(Uploadsession_usecases uploadsessionusecases) throws CustomException {
         IUploadsession uploadsession = (IUploadsession)parser.getJavaObject("uploadsession");
-        uploadsessionusecases.secureupdateUploadsession(uploadsession);
+        uploadsessionusecases.updateUploadsession(uploadsession);
     }
     
     @Override

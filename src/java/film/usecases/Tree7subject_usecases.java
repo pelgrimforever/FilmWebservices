@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Tree7subject;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Tree7subject_usecases {
 
     private boolean loggedin = false;
-    private BLtree7subject bltree7subject = new BLtree7subject();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLtree7subject bltree7subject = new BLtree7subject(sqlreader);
     
     public Tree7subject_usecases() {
         this(false);
@@ -64,14 +70,20 @@ public class Tree7subject_usecases {
     }
 
     public void insertTree7subject_in_tree(film.logic.Userprofile userprofile, ITree7subject tree7subject) throws DBException, CustomException {
-        bltree7subject.insertTree7subject(userprofile, tree7subject);
+        SQLTqueue tq = new SQLTqueue();
+        bltree7subject.insertTree7subject(tq, userprofile, tree7subject);
+        sqlwriter.Commit2DB(tq);
     }
 
     public void update_tree7subject_in_tree(film.logic.Userprofile userprofile, ITree7subject tree7subject) throws DBException, CustomException {
-        bltree7subject.updateTree7subject(userprofile, tree7subject);
+        SQLTqueue tq = new SQLTqueue();
+        bltree7subject.updateTree7subject(tq, userprofile, tree7subject);
+        sqlwriter.Commit2DB(tq);
     }
     public void delete_tree7subject_in_tree(film.logic.Userprofile userprofile, ITree7subject tree7subject) throws DBException, CustomException {
-        bltree7subject.deleteTree7subject(userprofile, tree7subject);
+        SQLTqueue tq = new SQLTqueue();        
+        bltree7subject.deleteTree7subject(tq, userprofile, tree7subject);
+        sqlwriter.Commit2DB(tq);
     }
 //Custom code, do not change this line   
 
@@ -84,7 +96,7 @@ public class Tree7subject_usecases {
     }
     
     public boolean getTree7subjectExists(ITree7subjectPK tree7subjectPK) throws DBException {
-        return bltree7subject.getEntityExists(tree7subjectPK);
+        return bltree7subject.getTree7subjectExists(tree7subjectPK);
     }
     
     public Tree7subject get_tree7subject_by_primarykey(ITree7subjectPK tree7subjectPK) throws DBException {
@@ -107,16 +119,29 @@ public class Tree7subject_usecases {
         return bltree7subject.searchcount(tree7subjectsearch);
     }
 
-    public void secureinsertTree7subject(ITree7subject tree7subject) throws DBException, DataException {
-        bltree7subject.secureinsertTree7subject(tree7subject);
+    public void insertTree7subject(ITree7subject tree7subject) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bltree7subject.insertTree7subject(tq, tree7subject);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateTree7subject(ITree7subject tree7subject) throws DBException, DataException {
-        bltree7subject.secureupdateTree7subject(tree7subject);
+    public void updateTree7subject(ITree7subject tree7subject) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bltree7subject.updateTree7subject(tq, tree7subject);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteTree7subject(ITree7subject tree7subject) throws DBException, DataException {
-        bltree7subject.securedeleteTree7subject(tree7subject);
+    public void deleteTree7subject(ITree7subject tree7subject) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bltree7subject.deleteTree7subject(tq, tree7subject);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Tree7subjectparentsubjectid(ITree7subjectPK tree7subjectParentsubjectidPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        bltree7subject.delete4tree7subjectParentsubjectid(tq, tree7subjectParentsubjectidPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

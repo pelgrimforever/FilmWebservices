@@ -1,22 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package film.servlets.data;
 
 import static BusinessObject.BusinessLogic.FILEROOT;
 import film.BusinessObject.Logic.BLfilm;
-import film.BusinessObject.Logic.BLphoto;
 import static film.BusinessObject.Logic.BLphoto.CROPPEDPATH;
 import static film.BusinessObject.Logic.BLphoto.FILEEXTENTION;
 import static film.BusinessObject.Logic.BLphoto.SMALLPATH;
 import static film.BusinessObject.Logic.BLphoto.THUMBNAILPATH;
 import film.BusinessObject.Logic.BLphototags;
-import film.BusinessObject.Logic.BLphototree7subject;
 import film.entity.pk.FilmPK;
 import film.entity.pk.FilmtypePK;
 import film.logicentity.Phototree7subject;
+import film.usecases.Film_usecases;
+import film.usecases.Photo_usecases;
+import film.usecases.Phototags_usecases;
+import film.usecases.Phototree7subject_usecases;
 import general.exception.CustomException;
 import java.io.File;
 import java.io.IOException;
@@ -34,21 +31,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- *
- * @author pelgrim
+ * @author Franky Laseure
  */
 @WebServlet(name = "Photomove", urlPatterns = {"/Photomove"})
 public class Photomove extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -66,8 +53,11 @@ public class Photomove extends HttpServlet {
                 String filmgroupid = "CFE";
                 String uploadtype = "DIG";
                 FilmPK filmPK = new FilmPK(oldfilmid);
-                BLphoto blphoto = new BLphoto();
-                ArrayList<film.logicentity.Photo> photos = blphoto.getPhotos4photo_film(true, filmPK, false);
+                Photo_usecases photousecases = new Photo_usecases(true);
+                Film_usecases filmusecases = new Film_usecases(true);
+                Phototree7subject_usecases phototree7subject_usecases = new Phototree7subject_usecases(true);
+                Phototags_usecases phototags_usecases = new Phototags_usecases(true);
+                ArrayList<film.logicentity.Photo> photos = photousecases.getPhotos4photo_film(true, filmPK, false);
                 film.logicentity.Photo photo;
                 int start = 0;
                 while(((film.logicentity.Photo)photos.get(start)).getPrimaryKey().getId()<startphotoid) {
@@ -79,9 +69,9 @@ public class Photomove extends HttpServlet {
                     photo = (film.logicentity.Photo)photos.get(i);
                     //rename files and change record id's
                     //last photo for this group
-                    film.logicentity.Photo lastphoto = blphoto.getLastPhotoinGroup(filmgroupid);
+                    film.logicentity.Photo lastphoto = photousecases.getLastPhotoinGroup(filmgroupid);
                     //last photo for this group with uploadtype (film.type)
-                    film.logicentity.Photo lastphotofortype = blphoto.getLastPhotoinGroupAndType(filmgroupid, uploadtype);
+                    film.logicentity.Photo lastphotofortype = photousecases.getLastPhotoinGroupAndType(filmgroupid, uploadtype);
                     if(lastphotofortype==null || (lastphotofortype!=null && lastphotofortype.getPrimaryKey().getId()==99)) {
                         //the combination group, film.type doesn't exist or is at 99
                         String groupid;
@@ -108,8 +98,7 @@ public class Photomove extends HttpServlet {
                         film.logicentity.Film film = new film.logicentity.Film(filmgroupid + groupid);
                         film.setPublic(false);
                         film.setFilmtypePK(new FilmtypePK(uploadtype));
-                        BLfilm blfilm = new BLfilm(blphoto);
-                        blfilm.trans_insertFilm(film);
+                        filmusecases.insertFilm(film);
                         newphoto = new film.logicentity.Photo(filmgroupid + groupid, 0);
                     } else {
                         newphoto = new film.logicentity.Photo(lastphotofortype.getPrimaryKey().getFilm(), lastphotofortype.getPrimaryKey().getId()+1);
@@ -117,9 +106,9 @@ public class Photomove extends HttpServlet {
                     String filename = photo.getFileName(photo.getPrimaryKey());
                     String rootpath = BLfilm.getRootImagePath(photo.getPrimaryKey().getFilmPK()).toString();
                     String originalfilename = FILEROOT + rootpath + filename + "." + FILEEXTENTION;
-                    String croppedpath = FILEROOT + blphoto.getImagePath(photo.getPrimaryKey(), CROPPEDPATH) + filename + "." + FILEEXTENTION;
-                    String smallpath = FILEROOT + blphoto.getImagePath(photo.getPrimaryKey(), SMALLPATH) + filename + "." + FILEEXTENTION;
-                    String thumbnailpath = FILEROOT + blphoto.getImagePath(photo.getPrimaryKey(), THUMBNAILPATH) + filename + "." + FILEEXTENTION;
+                    String croppedpath = FILEROOT + photousecases.getImagePath(photo.getPrimaryKey(), CROPPEDPATH) + filename + "." + FILEEXTENTION;
+                    String smallpath = FILEROOT + photousecases.getImagePath(photo.getPrimaryKey(), SMALLPATH) + filename + "." + FILEEXTENTION;
+                    String thumbnailpath = FILEROOT + photousecases.getImagePath(photo.getPrimaryKey(), THUMBNAILPATH) + filename + "." + FILEEXTENTION;
                     Path original = FileSystems.getDefault().getPath(originalfilename);
                     Path originalcropped = FileSystems.getDefault().getPath(croppedpath);
                     Path originalsmall = FileSystems.getDefault().getPath(smallpath);
@@ -128,9 +117,9 @@ public class Photomove extends HttpServlet {
                     String newfilename = newphoto.getFileName(newphoto.getPrimaryKey());
                     String newrootpath = BLfilm.getRootImagePath(newphoto.getPrimaryKey().getFilmPK()).toString();
                     String renamefilename = FILEROOT + newrootpath + newfilename + "." + FILEEXTENTION;
-                    String newcroppedpath = FILEROOT + blphoto.getImagePath(newphoto.getPrimaryKey(), CROPPEDPATH) + newfilename + "." + FILEEXTENTION;
-                    String newsmallpath = FILEROOT + blphoto.getImagePath(newphoto.getPrimaryKey(), SMALLPATH) + newfilename + "." + FILEEXTENTION;
-                    String newthumbnailpath = FILEROOT + blphoto.getImagePath(newphoto.getPrimaryKey(), THUMBNAILPATH) + newfilename + "." + FILEEXTENTION;
+                    String newcroppedpath = FILEROOT + photousecases.getImagePath(newphoto.getPrimaryKey(), CROPPEDPATH) + newfilename + "." + FILEEXTENTION;
+                    String newsmallpath = FILEROOT + photousecases.getImagePath(newphoto.getPrimaryKey(), SMALLPATH) + newfilename + "." + FILEEXTENTION;
+                    String newthumbnailpath = FILEROOT + photousecases.getImagePath(newphoto.getPrimaryKey(), THUMBNAILPATH) + newfilename + "." + FILEEXTENTION;
                     Path target = FileSystems.getDefault().getPath(renamefilename);
                     Path targetcropped = FileSystems.getDefault().getPath(newcroppedpath);
                     Path targetsmall = FileSystems.getDefault().getPath(newsmallpath);
@@ -140,11 +129,11 @@ public class Photomove extends HttpServlet {
             out.println(smallpath + " -> " + targetsmall + "<br>");
             out.println(originalfilename + " -> " + targetthumb + "<br>");
 
-                    check = new File(FILEROOT + blphoto.getImagePath(newphoto.getPrimaryKey(), CROPPEDPATH));
+                    check = new File(FILEROOT + photousecases.getImagePath(newphoto.getPrimaryKey(), CROPPEDPATH));
                     if(!check.exists()) check.mkdirs();
-                    check = new File(FILEROOT + blphoto.getImagePath(newphoto.getPrimaryKey(), SMALLPATH));
+                    check = new File(FILEROOT + photousecases.getImagePath(newphoto.getPrimaryKey(), SMALLPATH));
                     if(!check.exists()) check.mkdirs();
-                    check = new File(FILEROOT + blphoto.getImagePath(newphoto.getPrimaryKey(), THUMBNAILPATH));
+                    check = new File(FILEROOT + photousecases.getImagePath(newphoto.getPrimaryKey(), THUMBNAILPATH));
                     if(!check.exists()) check.mkdirs();
 
                     Files.move(original, target, StandardCopyOption.REPLACE_EXISTING);
@@ -153,11 +142,9 @@ public class Photomove extends HttpServlet {
                     Files.move(originalthumb, targetthumb, StandardCopyOption.REPLACE_EXISTING);
                     
                     //SQL statements
-                    BLphototree7subject blphototree7subject = new BLphototree7subject(blphoto);
-                    ArrayList phototree7subjects = blphototree7subject.getPhototree7subjects4photo(photo.getPrimaryKey());
+                    ArrayList phototree7subjects = phototree7subject_usecases.getPhototree7subjects4photo(photo.getPrimaryKey());
                     Iterator<Phototree7subject> phototree7subjectsI = phototree7subjects.iterator();
-                    BLphototags blphototags = new BLphototags(blphoto);
-                    ArrayList phototags = blphototags.getPhototagss4photo(photo.getPrimaryKey());
+                    ArrayList phototags = phototags_usecases.getPhototagss4photo(photo.getPrimaryKey());
                     Iterator<film.logicentity.Phototags> phototagsI = phototags.iterator();
                     Phototree7subject subject;
                     film.logicentity.Phototags phototag;
@@ -173,22 +160,20 @@ public class Photomove extends HttpServlet {
                     newphoto.setPublic(photo.getPublic());
                     newphoto.setRotation(photo.getRotation());
                     
-                    blphoto.trans_insertPhoto(newphoto);
+                    photousecases.insertPhoto(newphoto);
                     while(phototree7subjectsI.hasNext()) {
                         subject = phototree7subjectsI.next();
                         subject.getPrimaryKey().setFilm(newphoto.getPrimaryKey().getFilm());
                         subject.getPrimaryKey().setId(newphoto.getPrimaryKey().getId());
-                        blphototree7subject.trans_insertPhototree7subject(subject);
+                        phototree7subject_usecases.insertPhototree7subject(subject);
                     }
                     while(phototagsI.hasNext()) {
                         phototag = phototagsI.next();
                         phototag.getPrimaryKey().setFilm(newphoto.getPrimaryKey().getFilm());
                         phototag.getPrimaryKey().setId(newphoto.getPrimaryKey().getId());
                         phototag.getAll();
-                        blphototags.trans_insertPhototags(phototag);
+                        phototags_usecases.insertPhototags(phototag);
                     }
-                    
-                    blphoto.Commit2DB();
                 }
             }
             catch(CustomException e) {

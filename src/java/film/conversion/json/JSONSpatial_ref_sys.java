@@ -1,9 +1,6 @@
 /*
- * JSONSpatial_ref_sys.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONSpatial_ref_sys {
@@ -41,10 +37,6 @@ public class JSONSpatial_ref_sys {
         return jsonspatial_ref_syss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISpatial_ref_sysPK spatial_ref_sysPK) {
         JSONObject json = null;
         if(spatial_ref_sysPK!=null) {
@@ -54,10 +46,6 @@ public class JSONSpatial_ref_sys {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISpatial_ref_sys spatial_ref_sys) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(spatial_ref_sys.getPrimaryKey()));
@@ -70,10 +58,6 @@ public class JSONSpatial_ref_sys {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Spatial_ref_syssearch spatial_ref_syssearch) {
         JSONObject json = new JSONObject();
         if(spatial_ref_syssearch.used()) {
@@ -109,11 +93,6 @@ public class JSONSpatial_ref_sys {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Spatial_ref_syssearch toSpatial_ref_syssearch(JSONObject json) {
         Spatial_ref_syssearch spatial_ref_syssearch = new Spatial_ref_syssearch();
         spatial_ref_syssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

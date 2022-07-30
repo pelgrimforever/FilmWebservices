@@ -1,16 +1,14 @@
 /*
- * EMalliance_default.java
- *
  * Created on Okt 8, 2021
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 package film.conversion.entity.def;
 
+import data.interfaces.db.*;
 import data.gis.shape.*;
-import data.interfaces.db.LogicEntity;
 import data.json.piJson;
 import db.TableMapper;
+import film.filmDatabaseproperties;
 import film.entity.pk.*;
 import film.logicentity.Tree7subject;
 import java.sql.Date;
@@ -21,11 +19,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * EMtree7subject_default
- * Maps SQL ResultSet to film.logicentity objects
  * @author Franky Laseure
  */
-public class EMtree7subject_default implements TableMapper {
+public class EMtree7subject_default implements filmDatabaseproperties, TableMapper {
     
     public static final String SQLWhere1 = "subjectid = :tree7subject.subjectid:";
     public static final String SQLSelect1 = "select tree7subject.* from tree7subject where " + SQLWhere1;
@@ -42,6 +38,15 @@ public class EMtree7subject_default implements TableMapper {
     public static final String SQLSelect4tree7subjectParentsubjectid = "select * from tree7subject where " + SQLWheretree7subjectParentsubjectid + OrderBy;
     public static final String SQLDelete4tree7subjectParentsubjectid = "delete from tree7subject where " + SQLWheretree7subjectParentsubjectid;
 
+    @Override
+    public String getDbtool() { return databasetool; }
+    
+    @Override
+    public String getConnectionpool() { return connectionpool; }
+    
+    @Override
+    public String getTable() { return "tree7subject"; }
+
     /**
      * 
      * @return SQL where clause for one Tree7subject (=Primarykey)
@@ -56,27 +61,14 @@ public class EMtree7subject_default implements TableMapper {
     @Override
     public String getSQLSelect1() { return SQLSelect1; };
 
-    /**
-     * @return Select statement for Primary key, with count field as result
-     * count = 1: exists
-     * count = 0: not found
-     */
     @Override
     public String getSQLPKExcists() { return SQLSelectPKexists; };
     
-    /**
-     * 
-     * @return SQL select statement for all Tree7subjects
-     */
     @Override
     public String getSQLSelectAll() { return SQLSelectAll; };
 
-    /**
-     * Map ResultSet Field values to Tree7subject
-     * @param dbresult: Database ResultSet
-     */
     @Override
-    public Object mapResultSet2Entity(ResultSet dbresult) throws SQLException {
+    public Entity mapResultSet2Entity(ResultSet dbresult) throws SQLException {
         Tree7subjectPK tree7subjectPK = null;
         Tree7subject tree7subject;
         if(dbresult==null) {

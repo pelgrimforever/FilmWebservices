@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.menuitem;
@@ -11,6 +11,7 @@ import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IMenuitemsearch;
@@ -18,10 +19,8 @@ import film.interfaces.servlet.IMenuitemOperation;
 import film.logicentity.Menuitem;
 import film.searchentity.Menuitemsearch;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,19 +47,24 @@ import org.json.simple.parser.ParseException;
 @Path("rsmenuitem_delete")
 public class RSMenuitem_delete extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Menuitem_usecases menuitemusecases = new Menuitem_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations
 //Custom code, do not change this line   
             switch(operation) {
                 case IMenuitemOperation.DELETE_MENUITEM:
+                    delete_menuitem(menuitemusecases, json);
+                    break;
+                case IMenuitemOperation.DELETE_Menu:
                     delete_menuitem(menuitemusecases, json);
                     break;
 //Custom code, do not change this line
@@ -80,8 +84,15 @@ public class RSMenuitem_delete extends RS_json_login {
 
     private void delete_menuitem(Menuitem_usecases menuitemusecases, JSONObject json) throws ParseException, CustomException {
         IMenuitem menuitem = (IMenuitem)JSONMenuitem.toMenuitem((JSONObject)json.get("menuitem"));
-        menuitemusecases.securedeleteMenuitem(menuitem);
+        menuitemusecases.deleteMenuitem(menuitem);
         setReturnstatus("OK");
     }
+
+    private void delete_all_containing_Menu(Menuitem_usecases menuitemusecases, JSONObject json) throws ParseException, CustomException {
+        IMenuPK menuPK = (IMenuPK)JSONMenu.toMenuPK((JSONObject)json.get("menupk"));
+        menuitemusecases.delete_all_containing_Menu(menuPK);
+        setReturnstatus("OK");
+    }
+
 }
 

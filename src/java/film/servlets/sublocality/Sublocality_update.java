@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.sublocality;
@@ -61,7 +61,7 @@ public class Sublocality_update extends SecurityDataServlet {
 
     private void update_sublocality(Sublocality_usecases sublocalityusecases) throws CustomException {
         ISublocality sublocality = (ISublocality)parser.getJavaObject("sublocality");
-        sublocalityusecases.secureupdateSublocality(sublocality);
+        sublocalityusecases.updateSublocality(sublocality);
     }
     
     @Override

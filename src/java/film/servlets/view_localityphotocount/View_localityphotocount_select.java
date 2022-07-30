@@ -33,7 +33,6 @@ public class View_localityphotocount_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLview_localityphotocount blview_localityphotocount = new BLview_localityphotocount();
         View_localityphotocount_usecases view_localityphotocountusecases = new View_localityphotocount_usecases(authenticated);
         try {
             switch(this.operation) {

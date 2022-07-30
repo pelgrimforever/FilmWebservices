@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Photosubjects;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Photosubjects_usecases {
 
     private boolean loggedin = false;
-    private BLphotosubjects blphotosubjects = new BLphotosubjects();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLphotosubjects blphotosubjects = new BLphotosubjects(sqlreader);
     
     public Photosubjects_usecases() {
         this(false);
@@ -40,7 +46,9 @@ public class Photosubjects_usecases {
 //Custom code, do not change this line
 //add here custom operations
     public ArrayList<Photosubjects> insert_photosubjects_and_reload(IPhotosubjects photosubjects) throws DBException, CustomException {
-        blphotosubjects.insertPhotosubjects(photosubjects);
+        SQLTqueue tq = new SQLTqueue();
+        blphotosubjects.insertPhotosubjects(tq, photosubjects);
+        sqlwriter.Commit2DB(tq);
         IPhotoPK photopk = photosubjects.getPrimaryKey().getPhotoPK();
         return blphotosubjects.getPhotosubjectss4photo(photopk);
     }
@@ -55,7 +63,7 @@ public class Photosubjects_usecases {
     }
     
     public boolean getPhotosubjectsExists(IPhotosubjectsPK photosubjectsPK) throws DBException {
-        return blphotosubjects.getEntityExists(photosubjectsPK);
+        return blphotosubjects.getPhotosubjectsExists(photosubjectsPK);
     }
     
     public Photosubjects get_photosubjects_by_primarykey(IPhotosubjectsPK photosubjectsPK) throws DBException {
@@ -78,16 +86,35 @@ public class Photosubjects_usecases {
         return blphotosubjects.searchcount(photosubjectssearch);
     }
 
-    public void secureinsertPhotosubjects(IPhotosubjects photosubjects) throws DBException, DataException {
-        blphotosubjects.secureinsertPhotosubjects(photosubjects);
+    public void insertPhotosubjects(IPhotosubjects photosubjects) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blphotosubjects.insertPhotosubjects(tq, photosubjects);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdatePhotosubjects(IPhotosubjects photosubjects) throws DBException, DataException {
-        blphotosubjects.secureupdatePhotosubjects(photosubjects);
+    public void updatePhotosubjects(IPhotosubjects photosubjects) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blphotosubjects.updatePhotosubjects(tq, photosubjects);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeletePhotosubjects(IPhotosubjects photosubjects) throws DBException, DataException {
-        blphotosubjects.securedeletePhotosubjects(photosubjects);
+    public void deletePhotosubjects(IPhotosubjects photosubjects) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blphotosubjects.deletePhotosubjects(tq, photosubjects);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Photo(IPhotoPK photoPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blphotosubjects.delete4photo(tq, photoPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
+    public void delete_all_containing_Subject(ISubjectPK subjectPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blphotosubjects.delete4subject(tq, subjectPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

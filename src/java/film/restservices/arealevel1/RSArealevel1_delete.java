@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.arealevel1;
@@ -11,6 +11,7 @@ import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IArealevel1search;
@@ -18,10 +19,8 @@ import film.interfaces.servlet.IArealevel1Operation;
 import film.logicentity.Arealevel1;
 import film.searchentity.Arealevel1search;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,19 +47,24 @@ import org.json.simple.parser.ParseException;
 @Path("rsarealevel1_delete")
 public class RSArealevel1_delete extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Arealevel1_usecases arealevel1usecases = new Arealevel1_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations
 //Custom code, do not change this line   
             switch(operation) {
                 case IArealevel1Operation.DELETE_AREALEVEL1:
+                    delete_arealevel1(arealevel1usecases, json);
+                    break;
+                case IArealevel1Operation.DELETE_Country:
                     delete_arealevel1(arealevel1usecases, json);
                     break;
 //Custom code, do not change this line
@@ -80,8 +84,15 @@ public class RSArealevel1_delete extends RS_json_login {
 
     private void delete_arealevel1(Arealevel1_usecases arealevel1usecases, JSONObject json) throws ParseException, CustomException {
         IArealevel1 arealevel1 = (IArealevel1)JSONArealevel1.toArealevel1((JSONObject)json.get("arealevel1"));
-        arealevel1usecases.securedeleteArealevel1(arealevel1);
+        arealevel1usecases.deleteArealevel1(arealevel1);
         setReturnstatus("OK");
     }
+
+    private void delete_all_containing_Country(Arealevel1_usecases arealevel1usecases, JSONObject json) throws ParseException, CustomException {
+        ICountryPK countryPK = (ICountryPK)JSONCountry.toCountryPK((JSONObject)json.get("countrypk"));
+        arealevel1usecases.delete_all_containing_Country(countryPK);
+        setReturnstatus("OK");
+    }
+
 }
 

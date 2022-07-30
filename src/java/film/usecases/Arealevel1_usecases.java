@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Arealevel1;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Arealevel1_usecases {
 
     private boolean loggedin = false;
-    private BLarealevel1 blarealevel1 = new BLarealevel1();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLarealevel1 blarealevel1 = new BLarealevel1(sqlreader);
     
     public Arealevel1_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Arealevel1_usecases {
     }
     
     public boolean getArealevel1Exists(IArealevel1PK arealevel1PK) throws DBException {
-        return blarealevel1.getEntityExists(arealevel1PK);
+        return blarealevel1.getArealevel1Exists(arealevel1PK);
     }
     
     public Arealevel1 get_arealevel1_by_primarykey(IArealevel1PK arealevel1PK) throws DBException {
@@ -73,16 +79,29 @@ public class Arealevel1_usecases {
         return blarealevel1.searchcount(arealevel1search);
     }
 
-    public void secureinsertArealevel1(IArealevel1 arealevel1) throws DBException, DataException {
-        blarealevel1.secureinsertArealevel1(arealevel1);
+    public void insertArealevel1(IArealevel1 arealevel1) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blarealevel1.insertArealevel1(tq, arealevel1);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateArealevel1(IArealevel1 arealevel1) throws DBException, DataException {
-        blarealevel1.secureupdateArealevel1(arealevel1);
+    public void updateArealevel1(IArealevel1 arealevel1) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blarealevel1.updateArealevel1(tq, arealevel1);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteArealevel1(IArealevel1 arealevel1) throws DBException, DataException {
-        blarealevel1.securedeleteArealevel1(arealevel1);
+    public void deleteArealevel1(IArealevel1 arealevel1) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blarealevel1.deleteArealevel1(tq, arealevel1);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Country(ICountryPK countryPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blarealevel1.delete4country(tq, countryPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

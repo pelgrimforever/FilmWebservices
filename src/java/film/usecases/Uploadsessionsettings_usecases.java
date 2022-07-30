@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Uploadsessionsettings;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Uploadsessionsettings_usecases {
 
     private boolean loggedin = false;
-    private BLuploadsessionsettings bluploadsessionsettings = new BLuploadsessionsettings();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLuploadsessionsettings bluploadsessionsettings = new BLuploadsessionsettings(sqlreader);
     
     public Uploadsessionsettings_usecases() {
         this(false);
@@ -40,7 +46,9 @@ public class Uploadsessionsettings_usecases {
 //Custom code, do not change this line
 //add here custom operations
     public void deleteall() throws DBException, DataException {
-        bluploadsessionsettings.deleteall("Uploadsessionsettings_usecases.deleteall");
+        SQLTqueue tq = new SQLTqueue();
+        bluploadsessionsettings.deleteall(tq, "Uploadsessionsettings_usecases.deleteall");
+        sqlwriter.Commit2DB(tq);
     }
 //Custom code, do not change this line   
 
@@ -53,7 +61,7 @@ public class Uploadsessionsettings_usecases {
     }
     
     public boolean getUploadsessionsettingsExists(IUploadsessionsettingsPK uploadsessionsettingsPK) throws DBException {
-        return bluploadsessionsettings.getEntityExists(uploadsessionsettingsPK);
+        return bluploadsessionsettings.getUploadsessionsettingsExists(uploadsessionsettingsPK);
     }
     
     public Uploadsessionsettings get_uploadsessionsettings_by_primarykey(IUploadsessionsettingsPK uploadsessionsettingsPK) throws DBException {
@@ -68,16 +76,23 @@ public class Uploadsessionsettings_usecases {
         return bluploadsessionsettings.searchcount(uploadsessionsettingssearch);
     }
 
-    public void secureinsertUploadsessionsettings(IUploadsessionsettings uploadsessionsettings) throws DBException, DataException {
-        bluploadsessionsettings.secureinsertUploadsessionsettings(uploadsessionsettings);
+    public void insertUploadsessionsettings(IUploadsessionsettings uploadsessionsettings) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bluploadsessionsettings.insertUploadsessionsettings(tq, uploadsessionsettings);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateUploadsessionsettings(IUploadsessionsettings uploadsessionsettings) throws DBException, DataException {
-        bluploadsessionsettings.secureupdateUploadsessionsettings(uploadsessionsettings);
+    public void updateUploadsessionsettings(IUploadsessionsettings uploadsessionsettings) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bluploadsessionsettings.updateUploadsessionsettings(tq, uploadsessionsettings);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteUploadsessionsettings(IUploadsessionsettings uploadsessionsettings) throws DBException, DataException {
-        bluploadsessionsettings.securedeleteUploadsessionsettings(uploadsessionsettings);
+    public void deleteUploadsessionsettings(IUploadsessionsettings uploadsessionsettings) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bluploadsessionsettings.deleteUploadsessionsettings(tq, uploadsessionsettings);
+        sqlwriter.Commit2DB(tq);
     }
+
 }
 

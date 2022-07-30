@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Creator;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Creator_usecases {
 
     private boolean loggedin = false;
-    private BLcreator blcreator = new BLcreator();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLcreator blcreator = new BLcreator(sqlreader);
     
     public Creator_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Creator_usecases {
     }
     
     public boolean getCreatorExists(ICreatorPK creatorPK) throws DBException {
-        return blcreator.getEntityExists(creatorPK);
+        return blcreator.getCreatorExists(creatorPK);
     }
     
     public Creator get_creator_by_primarykey(ICreatorPK creatorPK) throws DBException {
@@ -65,16 +71,23 @@ public class Creator_usecases {
         return blcreator.searchcount(creatorsearch);
     }
 
-    public void secureinsertCreator(ICreator creator) throws DBException, DataException {
-        blcreator.secureinsertCreator(creator);
+    public void insertCreator(ICreator creator) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blcreator.insertCreator(tq, creator);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateCreator(ICreator creator) throws DBException, DataException {
-        blcreator.secureupdateCreator(creator);
+    public void updateCreator(ICreator creator) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blcreator.updateCreator(tq, creator);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteCreator(ICreator creator) throws DBException, DataException {
-        blcreator.securedeleteCreator(creator);
+    public void deleteCreator(ICreator creator) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blcreator.deleteCreator(tq, creator);
+        sqlwriter.Commit2DB(tq);
     }
+
 }
 

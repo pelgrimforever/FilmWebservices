@@ -1,9 +1,6 @@
 /*
- * JSONView_locationtree.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_locationtree {
@@ -36,10 +32,6 @@ public class JSONView_locationtree {
         return jsonview_locationtrees;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_locationtree view_locationtree) {
         JSONObject json = new JSONObject();
         json.put("countrycode", view_locationtree.getCountrycode());
@@ -80,11 +72,6 @@ public class JSONView_locationtree {
         return view_locationtree;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_locationtreesearch parameters
-     * @return 
-     */
     public static View_locationtreesearch toView_locationtreesearch(JSONObject json) {
         View_locationtreesearch view_locationtreesearch = new View_locationtreesearch();
         view_locationtreesearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

@@ -1,216 +1,142 @@
 /*
- * Bart_academy.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-import db.SQLMapperFactory;
-import db.SQLparameters;
-import data.gis.shape.*;
-import data.json.piJson;
-import data.json.psqlJsonobject;
-import db.SQLMapper_pgsql;
-import data.interfaces.db.Filedata;
-import film.BusinessObject.Logic.*;
-import film.conversion.json.JSONArt_academy;
+import db.*;
+import data.interfaces.db.*;
 import film.conversion.entity.EMart_academy;
+import film.BusinessObject.Logic.*;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.searchentity.IArt_academysearch;
 import film.logicentity.Art_academy;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import org.postgresql.geometric.PGpoint;
-import org.postgis.PGgeometry;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
- * Business Entity class Bart_academy
- *
- * Superclass for manipulating data- and database objects
- * for Entity Art_academy and direct related data
- * This class is overwritten each time the code generator runs
- * and is not meant to be changed
- *
  * @author Franky Laseure
  */
-public abstract class Bart_academy extends BLtable {
+public abstract class Bart_academy extends TableBusinessrules {
 
-    /**
-     * Constructor, sets Art_academy as default Entity
-     */
-    public Bart_academy() {
-        super(new Art_academy(), new EMart_academy());
+    public Bart_academy(SQLreader sqlreader) {
+        super(new TableIO(sqlreader, new EMart_academy()));
     }
 
-    /**
-     * Constructor, sets Art_academy as default Entity
-     * sets transaction queue from given GeneralEntityObject implementation
-     * all transactions will commit at same time
-     * @param transactionobject: GeneralEntityObjects that holds the transaction queue
-     */
-    public Bart_academy(BLtable transactionobject) {
-        super(transactionobject, new Art_academy(), new EMart_academy());
+    public Bart_academy(TableBusinessrules businessrules) {
+        super(new TableIO(businessrules.getTableio(), new EMart_academy()));
+        this.tableio.setAuthenticated(tableio!=null && tableio.isAuthenticated());
     }
 
-    /**
-     * create new empty Art_academy object
-     * @return empty IArt_academy
-     */
     public IArt_academy newArt_academy() {
     	return new Art_academy();
     }
     
-    /**
-     * create new empty Art_academy object
-     * create new primary key with given parameters
-     * @param academyid primary key field
-     * @return IArt_academy with primary key
-     */
     public IArt_academy newArt_academy(long academyid) {
         return new Art_academy(academyid);
     }
 
-    /**
-     * create new empty Art_academy object with given primary key
-     * @param art_academyPK: primary key for Art_academy
-     * @return IArt_academy with primary key
-     */
     public IArt_academy newArt_academy(IArt_academyPK art_academyPK) {
         return new Art_academy((Art_academyPK)art_academyPK);
     }
 
-    /**
-     * create new empty primary key
-     * @return empty Art_academyPK
-     */
     public IArt_academyPK newArt_academyPK() {
         return new Art_academyPK();
     }
 
-    /**
-     * create new primary key with given parameters
-     * @param academyid primary key field
-     * @return new IArt_academyPK
-     */
     public IArt_academyPK newArt_academyPK(long academyid) {
         return new Art_academyPK(academyid);
     }
 
-    /**
-     * get all Art_academy objects from database
-     * @return ArrayList of Art_academy objects
-     * @throws DBException
-     */
     public ArrayList<Art_academy> getArt_academys() throws DBException {
-        return (ArrayList<Art_academy>)super.getEntities(EMart_academy.SQLSelectAll);
+        return (ArrayList<Art_academy>)tableio.getEntities(EMart_academy.SQLSelectAll);
     }
 
-    /**
-     * search Art_academy for primary key
-     * @param art_academyPK: Art_academy primary key
-     * @return Art_academy object
-     * @throws DBException
-     */
     public Art_academy getArt_academy(IArt_academyPK art_academyPK) throws DBException {
-        return (Art_academy)super.getEntity((Art_academyPK)art_academyPK);
+        return (Art_academy)tableio.getEntity((Art_academyPK)art_academyPK);
     }
 
-    /**
-     * search art_academy with IArt_academysearch parameters
-     * @param search IArt_academysearch
-     * @return ArrayList of Art_academy
-     * @throws DBException 
-     */
     public ArrayList<Art_academy> searchart_academys(IArt_academysearch search) throws DBException {
-        return (ArrayList<Art_academy>)this.search(search);
+        return (ArrayList<Art_academy>)tableio.search(search);
     }
 
-    /**
-     * search art_academy with IArt_academysearch parameters, order by orderby sql clause
-     * @param search IArt_academysearch
-     * @param orderby sql order by string
-     * @return ArrayList of Art_academy
-     * @throws DBException 
-     */
     public ArrayList<Art_academy> searchart_academys(IArt_academysearch search, String orderby) throws DBException {
-        return (ArrayList<Art_academy>)this.search(search, orderby);
+        return (ArrayList<Art_academy>)tableio.search(search, orderby);
     }
 
-    /**
-     * Search art_academy in database for art_academyPK:
-     * @param art_academyPK: Art_academy Primary Key, only valid for the initialized Entity
-     * @return true if found in database
-     * @throws DBException
-     */
     public boolean getArt_academyExists(IArt_academyPK art_academyPK) throws DBException {
-        return super.getEntityExists((Art_academyPK)art_academyPK);
+        return tableio.getEntityExists((Art_academyPK)art_academyPK);
     }
 
-    /**
-     * try to insert Art_academy in database
-     * @param art_academy Art_academy object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertArt_academy(IArt_academy art_academy) throws DBException, DataException {
-        super.insertEntity(art_academy);
+    public Art_academy getEntity(String sql) throws DBException {
+        return (Art_academy)tableio.getEntity(sql);
+    }
+    
+    public Art_academy getEntity(String sql, SQLparameters parameters) throws DBException {
+        return (Art_academy)tableio.getEntity(sql, parameters);
+    }
+    
+    public ArrayList<Art_academy> getEntities(String sql) throws DBException {
+        return tableio.getEntities(sql);
+    }
+    
+    public ArrayList<Art_academy> getEntities(String sql, SQLparameters parameters) throws DBException {
+        return tableio.getEntities(sql, parameters);
     }
 
-    /**
-     * check if Art_academyPK exists
-     * insert if not, update if found
-     * do not commit transaction
-     * @param art_academy Art_academy object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertupdateArt_academy(IArt_academy art_academy) throws DBException, DataException {
+    public long count() throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+    
+    public long count(String sql, SQLparameters parameters) throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+
+    public ArrayList<Art_academy> search(Tablesearcher search) throws DBException {
+        return tableio.search(search);
+    }
+
+    public ArrayList<Art_academy> search(Tablesearcher search, String orderby) throws DBException {
+        return tableio.search(search, orderby);
+    }
+
+    public long searchcount(Tablesearcher search) throws DBException {
+        return tableio.searchcount(search);
+    }
+
+    public void insertArt_academy(SQLTqueue transactionqueue, IArt_academy art_academy) throws DBException, DataException {
+        tableio.insertEntity(transactionqueue, art_academy);
+    }
+
+    public void insertupdateArt_academy(SQLTqueue transactionqueue, IArt_academy art_academy) throws DBException, DataException {
+    	checkDATA(art_academy);
         if(this.getArt_academyExists(art_academy.getPrimaryKey())) {
-            super.updateEntity(art_academy);
+            tableio.updateEntity(transactionqueue, art_academy);
         } else {
-            super.insertEntity(art_academy);
+            tableio.insertEntity(transactionqueue, art_academy);
         }
     }
 
-    /**
-     * try to update Art_academy in database
-     * @param art_academy Art_academy object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void updateArt_academy(IArt_academy art_academy) throws DBException, DataException {
-        super.updateEntity(art_academy);
+    public void updateArt_academy(SQLTqueue transactionqueue, IArt_academy art_academy) throws DBException, DataException {
+    	checkDATA(art_academy);
+        tableio.updateEntity(transactionqueue, art_academy);
     }
 
-    /**
-     * try to delete Art_academy in database
-     * @param art_academy Art_academy object
-     * @throws DBException
-     */
-    public void deleteArt_academy(IArt_academy art_academy) throws DBException {
-        cascadedeleteArt_academy(art_academy.getPrimaryKey());
-        super.deleteEntity(art_academy);
+    public void deleteArt_academy(SQLTqueue transactionqueue, IArt_academy art_academy) throws DBException {
+        cascadedeleteArt_academy(transactionqueue, art_academy.getPrimaryKey());
+        tableio.deleteEntity(transactionqueue, art_academy);
     }
 
-    /**
-     * check data rules in Art_academy, throw DataException with customized message if rules do not apply
-     * @param art_academy Art_academy object
-     * @throws DataException
-     * @throws DBException
-     */
-    public void checkDATA(IArt_academy art_academy) throws DataException, DBException {
+    private void checkDATA(IArt_academy art_academy) throws DataException, DBException {
         StringBuffer message = new StringBuffer();
         //Primary key
         if(art_academy.getAcademy()!=null && art_academy.getAcademy().length()>IArt_academy.SIZE_ACADEMY) {
@@ -230,23 +156,10 @@ public abstract class Bart_academy extends BLtable {
         }
     }
         
-    /**
-     * delete all records in tables where art_academyPK is used in a primary key
-     * @param art_academyPK: Art_academy primary key
-     */
-    public void cascadedeleteArt_academy(IArt_academyPK art_academyPK) {
+    public void cascadedeleteArt_academy(SQLTqueue transactionqueue, IArt_academyPK art_academyPK) {
     }
 
 
-    /**
-     * get all Art_academy objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @param sortlist sql sort string
-     * @param sortoperator asc/desc
-     * @return ArrayList of Art_academy objects
-     * @throws DBException
-     */
     public ArrayList<Art_academy> getArt_academys(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
         StringBuilder sql = new StringBuilder(EMart_academy.SQLSelect);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
@@ -261,16 +174,10 @@ public abstract class Bart_academy extends BLtable {
         if(sortlist.length()>0) {
             sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return (ArrayList<Art_academy>)super.getEntities(sql.toString(), sqlparameters);
+        return (ArrayList<Art_academy>)tableio.getEntities(sql.toString(), sqlparameters);
     }
 
-    /**
-     * delete all Art_academy objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @throws DBException
-     */
-    public void delArt_academy(SQLparameters sqlparameters, String andoroperator) throws DBException {
+    public void delArt_academy(SQLTqueue transactionqueue, SQLparameters sqlparameters, String andoroperator) throws DBException {
         StringBuilder sql = new StringBuilder("delete from ").append(Art_academy.table);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
         int l = parameters.size();
@@ -281,7 +188,7 @@ public abstract class Bart_academy extends BLtable {
                 if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(sql.toString(), sqlparameters);
+        tableio.addStatement(transactionqueue, sql.toString(), sqlparameters);
     }
 
 

@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.art_subgroup;
@@ -61,7 +61,7 @@ public class Art_subgroup_update extends SecurityDataServlet {
 
     private void update_art_subgroup(Art_subgroup_usecases art_subgroupusecases) throws CustomException {
         IArt_subgroup art_subgroup = (IArt_subgroup)parser.getJavaObject("art_subgroup");
-        art_subgroupusecases.secureupdateArt_subgroup(art_subgroup);
+        art_subgroupusecases.updateArt_subgroup(art_subgroup);
     }
     
     @Override

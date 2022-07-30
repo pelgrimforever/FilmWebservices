@@ -1,9 +1,6 @@
 /*
- * JSONMenuitem.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONMenuitem {
@@ -41,10 +37,6 @@ public class JSONMenuitem {
         return jsonmenuitems;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IMenuitemPK menuitemPK) {
         JSONObject json = null;
         if(menuitemPK!=null) {
@@ -56,10 +48,6 @@ public class JSONMenuitem {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IMenuitem menuitem) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(menuitem.getPrimaryKey()));
@@ -71,10 +59,6 @@ public class JSONMenuitem {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Menuitemsearch menuitemsearch) {
         JSONObject json = new JSONObject();
         if(menuitemsearch.used()) {
@@ -113,11 +97,6 @@ public class JSONMenuitem {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Menuitemsearch toMenuitemsearch(JSONObject json) {
         Menuitemsearch menuitemsearch = new Menuitemsearch();
         menuitemsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

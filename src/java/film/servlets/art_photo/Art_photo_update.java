@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.art_photo;
@@ -61,7 +61,7 @@ public class Art_photo_update extends SecurityDataServlet {
 
     private void update_art_photo(Art_photo_usecases art_photousecases) throws CustomException {
         IArt_photo art_photo = (IArt_photo)parser.getJavaObject("art_photo");
-        art_photousecases.secureupdateArt_photo(art_photo);
+        art_photousecases.updateArt_photo(art_photo);
     }
     
     @Override

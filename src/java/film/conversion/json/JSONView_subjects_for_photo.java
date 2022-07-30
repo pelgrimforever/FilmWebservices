@@ -1,9 +1,6 @@
 /*
- * JSONView_subjects_for_photo.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_subjects_for_photo {
@@ -36,10 +32,6 @@ public class JSONView_subjects_for_photo {
         return jsonview_subjects_for_photos;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_subjects_for_photo view_subjects_for_photo) {
         JSONObject json = new JSONObject();
         json.put("film", view_subjects_for_photo.getFilm());
@@ -66,11 +58,6 @@ public class JSONView_subjects_for_photo {
         return view_subjects_for_photo;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_subjects_for_photosearch parameters
-     * @return 
-     */
     public static View_subjects_for_photosearch toView_subjects_for_photosearch(JSONObject json) {
         View_subjects_for_photosearch view_subjects_for_photosearch = new View_subjects_for_photosearch();
         view_subjects_for_photosearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

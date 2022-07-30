@@ -1,9 +1,6 @@
 /*
- * JSONArt_photo.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONArt_photo {
@@ -41,10 +37,6 @@ public class JSONArt_photo {
         return jsonart_photos;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IArt_photoPK art_photoPK) {
         JSONObject json = null;
         if(art_photoPK!=null) {
@@ -55,10 +47,6 @@ public class JSONArt_photo {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IArt_photo art_photo) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(art_photo.getPrimaryKey()));
@@ -78,10 +66,6 @@ public class JSONArt_photo {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Art_photosearch art_photosearch) {
         JSONObject json = new JSONObject();
         if(art_photosearch.used()) {
@@ -129,11 +113,6 @@ public class JSONArt_photo {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Art_photosearch toArt_photosearch(JSONObject json) {
         Art_photosearch art_photosearch = new Art_photosearch();
         art_photosearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

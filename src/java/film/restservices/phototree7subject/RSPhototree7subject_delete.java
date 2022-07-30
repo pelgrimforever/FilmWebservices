@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.phototree7subject;
@@ -11,6 +11,7 @@ import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IPhototree7subjectsearch;
@@ -18,10 +19,8 @@ import film.interfaces.servlet.IPhototree7subjectOperation;
 import film.logicentity.Phototree7subject;
 import film.searchentity.Phototree7subjectsearch;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,19 +47,27 @@ import org.json.simple.parser.ParseException;
 @Path("rsphototree7subject_delete")
 public class RSPhototree7subject_delete extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Phototree7subject_usecases phototree7subjectusecases = new Phototree7subject_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations
 //Custom code, do not change this line   
             switch(operation) {
                 case IPhototree7subjectOperation.DELETE_PHOTOTREE7SUBJECT:
+                    delete_phototree7subject(phototree7subjectusecases, json);
+                    break;
+                case IPhototree7subjectOperation.DELETE_Tree7subject:
+                    delete_phototree7subject(phototree7subjectusecases, json);
+                    break;
+                case IPhototree7subjectOperation.DELETE_Photo:
                     delete_phototree7subject(phototree7subjectusecases, json);
                     break;
 //Custom code, do not change this line
@@ -80,8 +87,21 @@ public class RSPhototree7subject_delete extends RS_json_login {
 
     private void delete_phototree7subject(Phototree7subject_usecases phototree7subjectusecases, JSONObject json) throws ParseException, CustomException {
         IPhototree7subject phototree7subject = (IPhototree7subject)JSONPhototree7subject.toPhototree7subject((JSONObject)json.get("phototree7subject"));
-        phototree7subjectusecases.securedeletePhototree7subject(phototree7subject);
+        phototree7subjectusecases.deletePhototree7subject(phototree7subject);
         setReturnstatus("OK");
     }
+
+    private void delete_all_containing_Tree7subject(Phototree7subject_usecases phototree7subjectusecases, JSONObject json) throws ParseException, CustomException {
+        ITree7subjectPK tree7subjectPK = (ITree7subjectPK)JSONTree7subject.toTree7subjectPK((JSONObject)json.get("tree7subjectpk"));
+        phototree7subjectusecases.delete_all_containing_Tree7subject(tree7subjectPK);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Photo(Phototree7subject_usecases phototree7subjectusecases, JSONObject json) throws ParseException, CustomException {
+        IPhotoPK photoPK = (IPhotoPK)JSONPhoto.toPhotoPK((JSONObject)json.get("photopk"));
+        phototree7subjectusecases.delete_all_containing_Photo(photoPK);
+        setReturnstatus("OK");
+    }
+
 }
 

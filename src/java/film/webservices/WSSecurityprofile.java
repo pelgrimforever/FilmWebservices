@@ -2,23 +2,25 @@
  * WSSecurityprofile.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  *
  */
 
 package film.webservices;
 
+import base.restservices.RS_json_login;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
+import film.interfaces.searchentity.ISecurityprofilesearch;
 import film.interfaces.webservice.WSISecurityprofile;
 import film.logicentity.Securityprofile;
 import film.searchentity.Securityprofilesearch;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import general.exception.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.jws.WebMethod;
@@ -27,14 +29,17 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import film.usecases.custom.Security_usecases;
 
 /**
  *
  * @author Franky Laseure
  */
 @WebService(endpointInterface = "film.interfaces.webservice.WSISecurityprofile")
-public class WSSecurityprofile implements WSISecurityprofile {
+public class WSSecurityprofile extends RS_json_login implements WSISecurityprofile {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     private JSONArray toJSONArray(ArrayList securityprofiles) {
         JSONArray jsonsecurityprofiles = new JSONArray();
         Iterator securityprofilesI = securityprofiles.iterator();
@@ -44,141 +49,149 @@ public class WSSecurityprofile implements WSISecurityprofile {
         return jsonsecurityprofiles;
     }
 
-    /**
-     * Web service operation
-     */
     //@WebMethod(operationName = "getSecurityprofiles")
     @Override
     public String getSecurityprofiles() {
         try {
-            BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
-            ArrayList securityprofiles = blsecurityprofile.getAll();
-            JSONArray jsonsecurityprofiles = toJSONArray(securityprofiles);
-            return jsonsecurityprofiles.toJSONString();
+            Securityprofile_usecases securityprofileusecases = new Securityprofile_usecases(loggedin);
+            return get_all_securityprofile(securityprofileusecases);
         }
-        catch(DBException e) {
+        catch(CustomException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "search")
     @Override
-    public String search(String json) {
-        BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Securityprofile securityprofile;
+    public String search(String jsonstring) {
         try {
-            Securityprofilesearch securityprofilesearch = JSONSecurityprofile.toSecurityprofilesearch((JSONObject)parser.parse(json));
-            ArrayList securityprofiles = blsecurityprofile.search(securityprofilesearch);
-            JSONArray jsonsecurityprofiles = toJSONArray(securityprofiles);
-            result = jsonsecurityprofiles.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Securityprofile_usecases securityprofileusecases = new Securityprofile_usecases(loggedin);
+            return search_securityprofile(securityprofileusecases, json);
         }
-        catch(ParseException e) {
-            result = "";
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-            result = "";
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "getSecurityprofile")
     @Override
-    public String getSecurityprofile(String json) {
-        BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Securityprofile securityprofile;
+    public String getSecurityprofile(String jsonstring) {
         try {
-            SecurityprofilePK securityprofilePK = JSONSecurityprofile.toSecurityprofilePK((JSONObject)parser.parse(json));
-            securityprofile = blsecurityprofile.getSecurityprofile(securityprofilePK);
-            if(securityprofile!=null) {
-                result = JSONSecurityprofile.toJSON(securityprofile).toJSONString();
-            }
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Securityprofile_usecases securityprofileusecases = new Securityprofile_usecases(loggedin);
+            return get_securityprofile_with_primarykey(securityprofileusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "insertSecurityprofile")
     @Override
-    public void insertSecurityprofile(String json) {
-        BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
-        JSONParser parser = new JSONParser();
+    public void insertSecurityprofile(String jsonstring) {
         try {
-            ISecurityprofile securityprofile = JSONSecurityprofile.toSecurityprofile((JSONObject)parser.parse(json));
-            blsecurityprofile.insertSecurityprofile(securityprofile);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Securityprofile_usecases securityprofileusecases = new Securityprofile_usecases(loggedin);
+            insert_securityprofile(securityprofileusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "updateSecurityprofile")
     @Override
-    public void updateSecurityprofile(String json) {
-        BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
-        JSONParser parser = new JSONParser();
+    public void updateSecurityprofile(String jsonstring) {
         try {
-            ISecurityprofile securityprofile = JSONSecurityprofile.toSecurityprofile((JSONObject)parser.parse(json));
-            blsecurityprofile.updateSecurityprofile(securityprofile);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Securityprofile_usecases securityprofileusecases = new Securityprofile_usecases(loggedin);
+            update_securityprofile(securityprofileusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "deleteSecurityprofile")
     @Override
-    public void deleteSecurityprofile(String json) {
-        BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
-        JSONParser parser = new JSONParser();
+    public void deleteSecurityprofile(String jsonstring) {
         try {
-            ISecurityprofile securityprofile = JSONSecurityprofile.toSecurityprofile((JSONObject)parser.parse(json));
-            blsecurityprofile.deleteSecurityprofile(securityprofile);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Securityprofile_usecases securityprofileusecases = new Securityprofile_usecases(loggedin);
+            delete_securityprofile(securityprofileusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getSecurityprofiles4securityuserprofile")
     @Override
-    public String getSecurityprofiles4securityuserprofile(String json) {
-        BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
-        JSONParser parser = new JSONParser();
-        Securityprofile securityprofile;
+    public String getSecurityprofiles4securityuserprofile(String jsonstring) {
         try {
-            String result = null;
-            ISecurityuserprofilePK securityuserprofilePK = JSONSecurityuserprofile.toSecurityuserprofilePK((JSONObject)parser.parse(json));
-            securityprofile = (Securityprofile)blsecurityprofile.getSecurityuserprofile(securityuserprofilePK);
-            if(securityprofile!=null) {
-                result = JSONSecurityprofile.toJSON(securityprofile).toJSONString();
-            }
-            return result;
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Securityprofile_usecases securityprofileusecases = new Securityprofile_usecases(loggedin);
+            return get_securityprofile_with_externalforeignkey_securityuserprofile(securityprofileusecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
+
+    private String count_records(Securityprofile_usecases securityprofileusecases) throws ParseException, CustomException {
+        JSONObject jsoncount = new JSONObject();
+        jsoncount.put("recordcount", securityprofileusecases.count());
+        return jsoncount.toJSONString();
+    }
+    
+    private String get_all_securityprofile(Securityprofile_usecases securityprofileusecases) throws ParseException, CustomException {
+    	return JSONSecurityprofile.toJSONArray(securityprofileusecases.get_all()).toJSONString();
+    }
+    
+    private String get_securityprofile_with_primarykey(Securityprofile_usecases securityprofileusecases, JSONObject json) throws ParseException, CustomException {
+        ISecurityprofilePK securityprofilePK = (ISecurityprofilePK)JSONSecurityprofile.toSecurityprofilePK((JSONObject)json.get("securityprofilepk"));
+	return JSONSecurityprofile.toJSON(securityprofileusecases.get_securityprofile_by_primarykey(securityprofilePK)).toJSONString();
+    }
+    
+    private String get_securityprofile_with_externalforeignkey_securityuserprofile(Securityprofile_usecases securityprofileusecases, JSONObject json) throws ParseException, CustomException {
+        ISecurityuserprofilePK securityuserprofilePK = (ISecurityuserprofilePK)JSONSecurityuserprofile.toSecurityuserprofilePK((JSONObject)json.get("securityuserprofilepk"));
+        return JSONSecurityprofile.toJSON(securityprofileusecases.get_securityprofile_with_externalforeignkey_securityuserprofile(securityuserprofilePK)).toJSONString();
+    }
+    
+    private String search_securityprofile(Securityprofile_usecases securityprofileusecases, JSONObject json) throws ParseException, CustomException {
+        ISecurityprofilesearch search = (ISecurityprofilesearch)JSONSecurityprofile.toSecurityprofilesearch((JSONObject)json.get("search"));
+        return JSONSecurityprofile.toJSONArray(securityprofileusecases.search_securityprofile(search)).toJSONString();
+    }
+    
+    private String search_securityprofile_count(Securityprofile_usecases securityprofileusecases, JSONObject json) throws ParseException, CustomException {
+        ISecurityprofilesearch securityprofilesearch = (ISecurityprofilesearch)JSONSecurityprofile.toSecurityprofilesearch((JSONObject)json.get("search"));
+        JSONObject jsonsearchcount = new JSONObject();
+        jsonsearchcount.put("recordcount", securityprofileusecases.search_securityprofile_count(securityprofilesearch));
+        return jsonsearchcount.toJSONString();
+    }
+
+    private void insert_securityprofile(Securityprofile_usecases securityprofileusecases, JSONObject json) throws ParseException, CustomException {
+        ISecurityprofile securityprofile = (ISecurityprofile)JSONSecurityprofile.toSecurityprofile((JSONObject)json.get("securityprofile"));
+        securityprofileusecases.insertSecurityprofile(securityprofile);
+        setReturnstatus("OK");
+    }
+
+    private void update_securityprofile(Securityprofile_usecases securityprofileusecases, JSONObject json) throws ParseException, CustomException {
+        ISecurityprofile securityprofile = (ISecurityprofile)JSONSecurityprofile.toSecurityprofile((JSONObject)json.get("securityprofile"));
+        securityprofileusecases.updateSecurityprofile(securityprofile);
+        setReturnstatus("OK");
+    }
+
+    private void delete_securityprofile(Securityprofile_usecases securityprofileusecases, JSONObject json) throws ParseException, CustomException {
+        ISecurityprofile securityprofile = (ISecurityprofile)JSONSecurityprofile.toSecurityprofile((JSONObject)json.get("securityprofile"));
+        securityprofileusecases.deleteSecurityprofile(securityprofile);
+        setReturnstatus("OK");
+    }
 
 }
 

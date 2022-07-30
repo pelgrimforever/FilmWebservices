@@ -28,13 +28,14 @@ import javax.servlet.http.HttpServletResponse;
 public class View_backupstatus_select extends SecurityDataServlet {
 //Metacoder: NO AUTHOMATIC UPDATE
    
+    View_backupstatus_usecases view_backupstatususecases;
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLview_backupstatus blview_backupstatus = new BLview_backupstatus();
-        View_backupstatus_usecases view_backupstatususecases = new View_backupstatus_usecases(authenticated);
+        view_backupstatususecases = new View_backupstatus_usecases(authenticated);
         try {
             switch(this.operation) {
                 case IView_backupstatusOperation.SELECT_ALL:

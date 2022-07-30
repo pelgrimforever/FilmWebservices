@@ -1,216 +1,142 @@
 /*
- * Bfilm.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-import db.SQLMapperFactory;
-import db.SQLparameters;
-import data.gis.shape.*;
-import data.json.piJson;
-import data.json.psqlJsonobject;
-import db.SQLMapper_pgsql;
-import data.interfaces.db.Filedata;
-import film.BusinessObject.Logic.*;
-import film.conversion.json.JSONFilm;
+import db.*;
+import data.interfaces.db.*;
 import film.conversion.entity.EMfilm;
+import film.BusinessObject.Logic.*;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.searchentity.IFilmsearch;
 import film.logicentity.Film;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import org.postgresql.geometric.PGpoint;
-import org.postgis.PGgeometry;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
- * Business Entity class Bfilm
- *
- * Superclass for manipulating data- and database objects
- * for Entity Film and direct related data
- * This class is overwritten each time the code generator runs
- * and is not meant to be changed
- *
  * @author Franky Laseure
  */
-public abstract class Bfilm extends BLtable {
+public abstract class Bfilm extends TableBusinessrules {
 
-    /**
-     * Constructor, sets Film as default Entity
-     */
-    public Bfilm() {
-        super(new Film(), new EMfilm());
+    public Bfilm(SQLreader sqlreader) {
+        super(new TableIO(sqlreader, new EMfilm()));
     }
 
-    /**
-     * Constructor, sets Film as default Entity
-     * sets transaction queue from given GeneralEntityObject implementation
-     * all transactions will commit at same time
-     * @param transactionobject: GeneralEntityObjects that holds the transaction queue
-     */
-    public Bfilm(BLtable transactionobject) {
-        super(transactionobject, new Film(), new EMfilm());
+    public Bfilm(TableBusinessrules businessrules) {
+        super(new TableIO(businessrules.getTableio(), new EMfilm()));
+        this.tableio.setAuthenticated(tableio!=null && tableio.isAuthenticated());
     }
 
-    /**
-     * create new empty Film object
-     * @return empty IFilm
-     */
     public IFilm newFilm() {
     	return new Film();
     }
     
-    /**
-     * create new empty Film object
-     * create new primary key with given parameters
-     * @param id primary key field
-     * @return IFilm with primary key
-     */
     public IFilm newFilm(java.lang.String id) {
         return new Film(id);
     }
 
-    /**
-     * create new empty Film object with given primary key
-     * @param filmPK: primary key for Film
-     * @return IFilm with primary key
-     */
     public IFilm newFilm(IFilmPK filmPK) {
         return new Film((FilmPK)filmPK);
     }
 
-    /**
-     * create new empty primary key
-     * @return empty FilmPK
-     */
     public IFilmPK newFilmPK() {
         return new FilmPK();
     }
 
-    /**
-     * create new primary key with given parameters
-     * @param id primary key field
-     * @return new IFilmPK
-     */
     public IFilmPK newFilmPK(java.lang.String id) {
         return new FilmPK(id);
     }
 
-    /**
-     * get all Film objects from database
-     * @return ArrayList of Film objects
-     * @throws DBException
-     */
     public ArrayList<Film> getFilms() throws DBException {
-        return (ArrayList<Film>)super.getEntities(EMfilm.SQLSelectAll);
+        return (ArrayList<Film>)tableio.getEntities(EMfilm.SQLSelectAll);
     }
 
-    /**
-     * search Film for primary key
-     * @param filmPK: Film primary key
-     * @return Film object
-     * @throws DBException
-     */
     public Film getFilm(IFilmPK filmPK) throws DBException {
-        return (Film)super.getEntity((FilmPK)filmPK);
+        return (Film)tableio.getEntity((FilmPK)filmPK);
     }
 
-    /**
-     * search film with IFilmsearch parameters
-     * @param search IFilmsearch
-     * @return ArrayList of Film
-     * @throws DBException 
-     */
     public ArrayList<Film> searchfilms(IFilmsearch search) throws DBException {
-        return (ArrayList<Film>)this.search(search);
+        return (ArrayList<Film>)tableio.search(search);
     }
 
-    /**
-     * search film with IFilmsearch parameters, order by orderby sql clause
-     * @param search IFilmsearch
-     * @param orderby sql order by string
-     * @return ArrayList of Film
-     * @throws DBException 
-     */
     public ArrayList<Film> searchfilms(IFilmsearch search, String orderby) throws DBException {
-        return (ArrayList<Film>)this.search(search, orderby);
+        return (ArrayList<Film>)tableio.search(search, orderby);
     }
 
-    /**
-     * Search film in database for filmPK:
-     * @param filmPK: Film Primary Key, only valid for the initialized Entity
-     * @return true if found in database
-     * @throws DBException
-     */
     public boolean getFilmExists(IFilmPK filmPK) throws DBException {
-        return super.getEntityExists((FilmPK)filmPK);
+        return tableio.getEntityExists((FilmPK)filmPK);
     }
 
-    /**
-     * try to insert Film in database
-     * @param film Film object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertFilm(IFilm film) throws DBException, DataException {
-        super.insertEntity(film);
+    public Film getEntity(String sql) throws DBException {
+        return (Film)tableio.getEntity(sql);
+    }
+    
+    public Film getEntity(String sql, SQLparameters parameters) throws DBException {
+        return (Film)tableio.getEntity(sql, parameters);
+    }
+    
+    public ArrayList<Film> getEntities(String sql) throws DBException {
+        return tableio.getEntities(sql);
+    }
+    
+    public ArrayList<Film> getEntities(String sql, SQLparameters parameters) throws DBException {
+        return tableio.getEntities(sql, parameters);
     }
 
-    /**
-     * check if FilmPK exists
-     * insert if not, update if found
-     * do not commit transaction
-     * @param film Film object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertupdateFilm(IFilm film) throws DBException, DataException {
+    public long count() throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+    
+    public long count(String sql, SQLparameters parameters) throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+
+    public ArrayList<Film> search(Tablesearcher search) throws DBException {
+        return tableio.search(search);
+    }
+
+    public ArrayList<Film> search(Tablesearcher search, String orderby) throws DBException {
+        return tableio.search(search, orderby);
+    }
+
+    public long searchcount(Tablesearcher search) throws DBException {
+        return tableio.searchcount(search);
+    }
+
+    public void insertFilm(SQLTqueue transactionqueue, IFilm film) throws DBException, DataException {
+        tableio.insertEntity(transactionqueue, film);
+    }
+
+    public void insertupdateFilm(SQLTqueue transactionqueue, IFilm film) throws DBException, DataException {
+    	checkDATA(film);
         if(this.getFilmExists(film.getPrimaryKey())) {
-            super.updateEntity(film);
+            tableio.updateEntity(transactionqueue, film);
         } else {
-            super.insertEntity(film);
+            tableio.insertEntity(transactionqueue, film);
         }
     }
 
-    /**
-     * try to update Film in database
-     * @param film Film object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void updateFilm(IFilm film) throws DBException, DataException {
-        super.updateEntity(film);
+    public void updateFilm(SQLTqueue transactionqueue, IFilm film) throws DBException, DataException {
+    	checkDATA(film);
+        tableio.updateEntity(transactionqueue, film);
     }
 
-    /**
-     * try to delete Film in database
-     * @param film Film object
-     * @throws DBException
-     */
-    public void deleteFilm(IFilm film) throws DBException {
-        cascadedeleteFilm(film.getPrimaryKey());
-        super.deleteEntity(film);
+    public void deleteFilm(SQLTqueue transactionqueue, IFilm film) throws DBException {
+        cascadedeleteFilm(transactionqueue, film.getPrimaryKey());
+        tableio.deleteEntity(transactionqueue, film);
     }
 
-    /**
-     * check data rules in Film, throw DataException with customized message if rules do not apply
-     * @param film Film object
-     * @throws DataException
-     * @throws DBException
-     */
-    public void checkDATA(IFilm film) throws DataException, DBException {
+    private void checkDATA(IFilm film) throws DataException, DBException {
         StringBuffer message = new StringBuffer();
         //Primary key
         if(film.getFilmtypePK()!=null && film.getFilmtypePK().getType()!=null && film.getFilmtypePK().getType().length()>IFilm.SIZE_TYPE) {
@@ -234,63 +160,33 @@ public abstract class Bfilm extends BLtable {
         }
     }
         
-    /**
-     * delete all records in tables where filmPK is used in a primary key
-     * @param filmPK: Film primary key
-     */
-    public void cascadedeleteFilm(IFilmPK filmPK) {
+    public void cascadedeleteFilm(SQLTqueue transactionqueue, IFilmPK filmPK) {
         BLfilmsubjects blfilmsubjects = new BLfilmsubjects(this);
-        blfilmsubjects.delete4film(filmPK);
+        blfilmsubjects.setAuthenticated(isAuthenticated());
+        blfilmsubjects.delete4film(transactionqueue, filmPK);
         BLphoto blphoto = new BLphoto(this);
-        blphoto.delete4film(filmPK);
+        blphoto.setAuthenticated(isAuthenticated());
+        blphoto.delete4film(transactionqueue, filmPK);
     }
 
-    /**
-     * @param filmtypePK: foreign key for Filmtype
-     * @delete all Film Entity objects for Filmtype in database
-     */
-    public void delete4filmtype(IFilmtypePK filmtypePK) {
-        super.addStatement(EMfilm.SQLDelete4filmtype, filmtypePK.getSQLprimarykey());
+    public void delete4filmtype(SQLTqueue transactionqueue, IFilmtypePK filmtypePK) {
+        tableio.addStatement(transactionqueue, EMfilm.SQLDelete4filmtype, filmtypePK.getSQLprimarykey());
     }
 
-    /**
-     * @param filmtypePK: foreign key for Filmtype
-     * @return all Film Entity objects for Filmtype
-     * @throws CustomException
-     */
     public ArrayList<Film> getFilms4filmtype(IFilmtypePK filmtypePK) throws CustomException {
-        return super.getEntities(EMfilm.SQLSelect4filmtype, filmtypePK.getSQLprimarykey());
+        return tableio.getEntities(EMfilm.SQLSelect4filmtype, filmtypePK.getSQLprimarykey());
     }
-    /**
-     * @param filmsubjectsPK: parent Filmsubjects for child object Film Entity
-     * @return child Film Entity object
-     * @throws CustomException
-     */
     public Film getFilmsubjects(IFilmsubjectsPK filmsubjectsPK) throws CustomException {
         FilmPK filmPK = new FilmPK(filmsubjectsPK.getFilm());
         return this.getFilm(filmPK);
     }
 
-    /**
-     * @param photoPK: parent Photo for child object Film Entity
-     * @return child Film Entity object
-     * @throws CustomException
-     */
     public Film getPhoto(IPhotoPK photoPK) throws CustomException {
         FilmPK filmPK = new FilmPK(photoPK.getFilm());
         return this.getFilm(filmPK);
     }
 
 
-    /**
-     * get all Film objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @param sortlist sql sort string
-     * @param sortoperator asc/desc
-     * @return ArrayList of Film objects
-     * @throws DBException
-     */
     public ArrayList<Film> getFilms(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
         StringBuilder sql = new StringBuilder(EMfilm.SQLSelect);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
@@ -305,16 +201,10 @@ public abstract class Bfilm extends BLtable {
         if(sortlist.length()>0) {
             sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return (ArrayList<Film>)super.getEntities(sql.toString(), sqlparameters);
+        return (ArrayList<Film>)tableio.getEntities(sql.toString(), sqlparameters);
     }
 
-    /**
-     * delete all Film objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @throws DBException
-     */
-    public void delFilm(SQLparameters sqlparameters, String andoroperator) throws DBException {
+    public void delFilm(SQLTqueue transactionqueue, SQLparameters sqlparameters, String andoroperator) throws DBException {
         StringBuilder sql = new StringBuilder("delete from ").append(Film.table);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
         int l = parameters.size();
@@ -325,7 +215,7 @@ public abstract class Bfilm extends BLtable {
                 if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(sql.toString(), sqlparameters);
+        tableio.addStatement(transactionqueue, sql.toString(), sqlparameters);
     }
 
 

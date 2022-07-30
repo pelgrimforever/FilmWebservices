@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.art_group;
@@ -11,6 +11,7 @@ import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IArt_groupsearch;
@@ -18,10 +19,8 @@ import film.interfaces.servlet.IArt_groupOperation;
 import film.logicentity.Art_group;
 import film.searchentity.Art_groupsearch;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,13 +47,15 @@ import org.json.simple.parser.ParseException;
 @Path("rsart_group_insert")
 public class RSArt_group_insert extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Art_group_usecases art_groupusecases = new Art_group_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations
@@ -80,7 +81,7 @@ public class RSArt_group_insert extends RS_json_login {
 
     private void insert_art_group(Art_group_usecases art_groupusecases, JSONObject json) throws ParseException, CustomException {
         IArt_group art_group = (IArt_group)JSONArt_group.toArt_group((JSONObject)json.get("art_group"));
-        art_groupusecases.secureinsertArt_group(art_group);
+        art_groupusecases.insertArt_group(art_group);
         setReturnstatus("OK");
     }
 }

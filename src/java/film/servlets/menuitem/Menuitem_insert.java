@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.menuitem;
@@ -61,7 +61,7 @@ public class Menuitem_insert extends SecurityDataServlet {
 
     private void insert_menuitem(Menuitem_usecases menuitemusecases) throws CustomException {
         IMenuitem menuitem = (IMenuitem)parser.getJavaObject("menuitem");
-        menuitemusecases.secureinsertMenuitem(menuitem);
+        menuitemusecases.insertMenuitem(menuitem);
     }
     
     @Override

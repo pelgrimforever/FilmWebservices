@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Postalcode;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Postalcode_usecases {
 
     private boolean loggedin = false;
-    private BLpostalcode blpostalcode = new BLpostalcode();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLpostalcode blpostalcode = new BLpostalcode(sqlreader);
     
     public Postalcode_usecases() {
         this(false);
@@ -50,7 +56,7 @@ public class Postalcode_usecases {
     }
     
     public boolean getPostalcodeExists(IPostalcodePK postalcodePK) throws DBException {
-        return blpostalcode.getEntityExists(postalcodePK);
+        return blpostalcode.getPostalcodeExists(postalcodePK);
     }
     
     public Postalcode get_postalcode_by_primarykey(IPostalcodePK postalcodePK) throws DBException {
@@ -73,16 +79,29 @@ public class Postalcode_usecases {
         return blpostalcode.searchcount(postalcodesearch);
     }
 
-    public void secureinsertPostalcode(IPostalcode postalcode) throws DBException, DataException {
-        blpostalcode.secureinsertPostalcode(postalcode);
+    public void insertPostalcode(IPostalcode postalcode) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blpostalcode.insertPostalcode(tq, postalcode);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdatePostalcode(IPostalcode postalcode) throws DBException, DataException {
-        blpostalcode.secureupdatePostalcode(postalcode);
+    public void updatePostalcode(IPostalcode postalcode) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blpostalcode.updatePostalcode(tq, postalcode);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeletePostalcode(IPostalcode postalcode) throws DBException, DataException {
-        blpostalcode.securedeletePostalcode(postalcode);
+    public void deletePostalcode(IPostalcode postalcode) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blpostalcode.deletePostalcode(tq, postalcode);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Arealevel3(IArealevel3PK arealevel3PK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blpostalcode.delete4arealevel3(tq, arealevel3PK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

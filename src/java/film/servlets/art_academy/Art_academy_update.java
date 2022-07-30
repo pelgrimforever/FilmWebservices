@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.art_academy;
@@ -61,7 +61,7 @@ public class Art_academy_update extends SecurityDataServlet {
 
     private void update_art_academy(Art_academy_usecases art_academyusecases) throws CustomException {
         IArt_academy art_academy = (IArt_academy)parser.getJavaObject("art_academy");
-        art_academyusecases.secureupdateArt_academy(art_academy);
+        art_academyusecases.updateArt_academy(art_academy);
     }
     
     @Override

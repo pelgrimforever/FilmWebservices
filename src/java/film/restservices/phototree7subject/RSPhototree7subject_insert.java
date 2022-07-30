@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.phototree7subject;
@@ -11,6 +11,7 @@ import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IPhototree7subjectsearch;
@@ -18,10 +19,8 @@ import film.interfaces.servlet.IPhototree7subjectOperation;
 import film.logicentity.Phototree7subject;
 import film.searchentity.Phototree7subjectsearch;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,13 +47,15 @@ import org.json.simple.parser.ParseException;
 @Path("rsphototree7subject_insert")
 public class RSPhototree7subject_insert extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Phototree7subject_usecases phototree7subjectusecases = new Phototree7subject_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations
@@ -80,7 +81,7 @@ public class RSPhototree7subject_insert extends RS_json_login {
 
     private void insert_phototree7subject(Phototree7subject_usecases phototree7subjectusecases, JSONObject json) throws ParseException, CustomException {
         IPhototree7subject phototree7subject = (IPhototree7subject)JSONPhototree7subject.toPhototree7subject((JSONObject)json.get("phototree7subject"));
-        phototree7subjectusecases.secureinsertPhototree7subject(phototree7subject);
+        phototree7subjectusecases.insertPhototree7subject(phototree7subject);
         setReturnstatus("OK");
     }
 }

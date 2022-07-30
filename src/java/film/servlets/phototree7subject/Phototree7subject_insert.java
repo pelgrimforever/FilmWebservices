@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.phototree7subject;
@@ -68,7 +68,7 @@ public class Phototree7subject_insert extends SecurityDataServlet {
 
     private void insert_phototree7subject(Phototree7subject_usecases phototree7subjectusecases) throws CustomException {
         IPhototree7subject phototree7subject = (IPhototree7subject)parser.getJavaObject("phototree7subject");
-        phototree7subjectusecases.secureinsertPhototree7subject(phototree7subject);
+        phototree7subjectusecases.insertPhototree7subject(phototree7subject);
     }
     
     @Override

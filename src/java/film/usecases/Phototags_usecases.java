@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Phototags;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Phototags_usecases {
 
     private boolean loggedin = false;
-    private BLphototags blphototags = new BLphototags();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLphototags blphototags = new BLphototags(sqlreader);
     
     public Phototags_usecases() {
         this(false);
@@ -39,6 +45,10 @@ public class Phototags_usecases {
     
 //Custom code, do not change this line
 //add here custom operations
+    public ArrayList getPhototagss4photo(IPhotoPK photoPK) throws CustomException {
+        return blphototags.getPhototagss4photo(photoPK);
+    }
+    
 //Custom code, do not change this line   
 
     public long count() throws DBException {
@@ -50,7 +60,7 @@ public class Phototags_usecases {
     }
     
     public boolean getPhototagsExists(IPhototagsPK phototagsPK) throws DBException {
-        return blphototags.getEntityExists(phototagsPK);
+        return blphototags.getPhototagsExists(phototagsPK);
     }
     
     public Phototags get_phototags_by_primarykey(IPhototagsPK phototagsPK) throws DBException {
@@ -69,16 +79,29 @@ public class Phototags_usecases {
         return blphototags.searchcount(phototagssearch);
     }
 
-    public void secureinsertPhototags(IPhototags phototags) throws DBException, DataException {
-        blphototags.secureinsertPhototags(phototags);
+    public void insertPhototags(IPhototags phototags) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blphototags.insertPhototags(tq, phototags);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdatePhototags(IPhototags phototags) throws DBException, DataException {
-        blphototags.secureupdatePhototags(phototags);
+    public void updatePhototags(IPhototags phototags) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blphototags.updatePhototags(tq, phototags);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeletePhototags(IPhototags phototags) throws DBException, DataException {
-        blphototags.securedeletePhototags(phototags);
+    public void deletePhototags(IPhototags phototags) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blphototags.deletePhototags(tq, phototags);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Photo(IPhotoPK photoPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blphototags.delete4photo(tq, photoPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

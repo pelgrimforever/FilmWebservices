@@ -33,7 +33,6 @@ public class View_locationtree_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLview_locationtree blview_locationtree = new BLview_locationtree();
         View_locationtree_usecases view_locationtreeusecases = new View_locationtree_usecases(authenticated);
         try {
             switch(this.operation) {

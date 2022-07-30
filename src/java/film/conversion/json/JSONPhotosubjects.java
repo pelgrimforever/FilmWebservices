@@ -1,9 +1,6 @@
 /*
- * JSONPhotosubjects.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONPhotosubjects {
@@ -41,10 +37,6 @@ public class JSONPhotosubjects {
         return jsonphotosubjectss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IPhotosubjectsPK photosubjectsPK) {
         JSONObject json = null;
         if(photosubjectsPK!=null) {
@@ -58,10 +50,6 @@ public class JSONPhotosubjects {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IPhotosubjects photosubjects) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(photosubjects.getPrimaryKey()));
@@ -70,10 +58,6 @@ public class JSONPhotosubjects {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Photosubjectssearch photosubjectssearch) {
         JSONObject json = new JSONObject();
         if(photosubjectssearch.used()) {
@@ -115,11 +99,6 @@ public class JSONPhotosubjects {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Photosubjectssearch toPhotosubjectssearch(JSONObject json) {
         Photosubjectssearch photosubjectssearch = new Photosubjectssearch();
         photosubjectssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

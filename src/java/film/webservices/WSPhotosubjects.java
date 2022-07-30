@@ -2,23 +2,25 @@
  * WSPhotosubjects.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  *
  */
 
 package film.webservices;
 
+import base.restservices.RS_json_login;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
+import film.interfaces.searchentity.IPhotosubjectssearch;
 import film.interfaces.webservice.WSIPhotosubjects;
 import film.logicentity.Photosubjects;
 import film.searchentity.Photosubjectssearch;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import general.exception.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.jws.WebMethod;
@@ -27,14 +29,17 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import film.usecases.custom.Security_usecases;
 
 /**
  *
  * @author Franky Laseure
  */
 @WebService(endpointInterface = "film.interfaces.webservice.WSIPhotosubjects")
-public class WSPhotosubjects implements WSIPhotosubjects {
+public class WSPhotosubjects extends RS_json_login implements WSIPhotosubjects {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     private JSONArray toJSONArray(ArrayList photosubjectss) {
         JSONArray jsonphotosubjectss = new JSONArray();
         Iterator photosubjectssI = photosubjectss.iterator();
@@ -44,189 +49,206 @@ public class WSPhotosubjects implements WSIPhotosubjects {
         return jsonphotosubjectss;
     }
 
-    /**
-     * Web service operation
-     */
     //@WebMethod(operationName = "getPhotosubjectss")
     @Override
     public String getPhotosubjectss() {
         try {
-            BLphotosubjects blphotosubjects = new BLphotosubjects();
-            ArrayList photosubjectss = blphotosubjects.getAll();
-            JSONArray jsonphotosubjectss = toJSONArray(photosubjectss);
-            return jsonphotosubjectss.toJSONString();
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            return get_all_photosubjects(photosubjectsusecases);
         }
-        catch(DBException e) {
+        catch(CustomException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "search")
     @Override
-    public String search(String json) {
-        BLphotosubjects blphotosubjects = new BLphotosubjects();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Photosubjects photosubjects;
+    public String search(String jsonstring) {
         try {
-            Photosubjectssearch photosubjectssearch = JSONPhotosubjects.toPhotosubjectssearch((JSONObject)parser.parse(json));
-            ArrayList photosubjectss = blphotosubjects.search(photosubjectssearch);
-            JSONArray jsonphotosubjectss = toJSONArray(photosubjectss);
-            result = jsonphotosubjectss.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            return search_photosubjects(photosubjectsusecases, json);
         }
-        catch(ParseException e) {
-            result = "";
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-            result = "";
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "getPhotosubjects")
     @Override
-    public String getPhotosubjects(String json) {
-        BLphotosubjects blphotosubjects = new BLphotosubjects();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Photosubjects photosubjects;
+    public String getPhotosubjects(String jsonstring) {
         try {
-            PhotosubjectsPK photosubjectsPK = JSONPhotosubjects.toPhotosubjectsPK((JSONObject)parser.parse(json));
-            photosubjects = blphotosubjects.getPhotosubjects(photosubjectsPK);
-            if(photosubjects!=null) {
-                result = JSONPhotosubjects.toJSON(photosubjects).toJSONString();
-            }
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            return get_photosubjects_with_primarykey(photosubjectsusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "insertPhotosubjects")
     @Override
-    public void insertPhotosubjects(String json) {
-        BLphotosubjects blphotosubjects = new BLphotosubjects();
-        JSONParser parser = new JSONParser();
+    public void insertPhotosubjects(String jsonstring) {
         try {
-            IPhotosubjects photosubjects = JSONPhotosubjects.toPhotosubjects((JSONObject)parser.parse(json));
-            blphotosubjects.insertPhotosubjects(photosubjects);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            insert_photosubjects(photosubjectsusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "updatePhotosubjects")
     @Override
-    public void updatePhotosubjects(String json) {
-        BLphotosubjects blphotosubjects = new BLphotosubjects();
-        JSONParser parser = new JSONParser();
+    public void updatePhotosubjects(String jsonstring) {
         try {
-            IPhotosubjects photosubjects = JSONPhotosubjects.toPhotosubjects((JSONObject)parser.parse(json));
-            blphotosubjects.updatePhotosubjects(photosubjects);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            update_photosubjects(photosubjectsusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "deletePhotosubjects")
     @Override
-    public void deletePhotosubjects(String json) {
-        BLphotosubjects blphotosubjects = new BLphotosubjects();
-        JSONParser parser = new JSONParser();
+    public void deletePhotosubjects(String jsonstring) {
         try {
-            IPhotosubjects photosubjects = JSONPhotosubjects.toPhotosubjects((JSONObject)parser.parse(json));
-            blphotosubjects.deletePhotosubjects(photosubjects);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            delete_photosubjects(photosubjectsusecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getPhotosubjectss4photo")
     @Override
-    public String getPhotosubjectss4photo(String json) {
-        BLphotosubjects blphotosubjects = new BLphotosubjects();
-        JSONParser parser = new JSONParser();
-        Photosubjects photosubjects;
+    public String getPhotosubjectss4photo(String jsonstring) {
         try {
-            IPhotoPK photoPK = JSONPhoto.toPhotoPK((JSONObject)parser.parse(json));
-            ArrayList photosubjectss = blphotosubjects.getPhotosubjectss4photo(photoPK);
-            JSONArray jsonphotosubjectss = toJSONArray(photosubjectss);
-            return jsonphotosubjectss.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            return get_photosubjects_with_foreignkey_photo(photosubjectsusecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4photo")
     @Override
-    public void delete4photo(String json) {
-        BLphotosubjects blphotosubjects = new BLphotosubjects();
-        JSONParser parser = new JSONParser();
-        Photosubjects photosubjects;
+    public void delete4photo(String jsonstring) {
         try {
-            IPhotoPK photoPK = JSONPhoto.toPhotoPK((JSONObject)parser.parse(json));
-            blphotosubjects.delete4photo(photoPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            delete_photosubjects(photosubjectsusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getPhotosubjectss4subject")
     @Override
-    public String getPhotosubjectss4subject(String json) {
-        BLphotosubjects blphotosubjects = new BLphotosubjects();
-        JSONParser parser = new JSONParser();
-        Photosubjects photosubjects;
+    public String getPhotosubjectss4subject(String jsonstring) {
         try {
-            ISubjectPK subjectPK = JSONSubject.toSubjectPK((JSONObject)parser.parse(json));
-            ArrayList photosubjectss = blphotosubjects.getPhotosubjectss4subject(subjectPK);
-            JSONArray jsonphotosubjectss = toJSONArray(photosubjectss);
-            return jsonphotosubjectss.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            return get_photosubjects_with_foreignkey_subject(photosubjectsusecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4subject")
     @Override
-    public void delete4subject(String json) {
-        BLphotosubjects blphotosubjects = new BLphotosubjects();
-        JSONParser parser = new JSONParser();
-        Photosubjects photosubjects;
+    public void delete4subject(String jsonstring) {
         try {
-            ISubjectPK subjectPK = JSONSubject.toSubjectPK((JSONObject)parser.parse(json));
-            blphotosubjects.delete4subject(subjectPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
+            delete_photosubjects(photosubjectsusecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
+
+    private String count_records(Photosubjects_usecases photosubjectsusecases) throws ParseException, CustomException {
+        JSONObject jsoncount = new JSONObject();
+        jsoncount.put("recordcount", photosubjectsusecases.count());
+        return jsoncount.toJSONString();
+    }
+    
+    private String get_all_photosubjects(Photosubjects_usecases photosubjectsusecases) throws ParseException, CustomException {
+    	return JSONPhotosubjects.toJSONArray(photosubjectsusecases.get_all()).toJSONString();
+    }
+    
+    private String get_photosubjects_with_primarykey(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IPhotosubjectsPK photosubjectsPK = (IPhotosubjectsPK)JSONPhotosubjects.toPhotosubjectsPK((JSONObject)json.get("photosubjectspk"));
+	return JSONPhotosubjects.toJSON(photosubjectsusecases.get_photosubjects_by_primarykey(photosubjectsPK)).toJSONString();
+    }
+    
+    private String get_photosubjects_with_foreignkey_photo(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IPhotoPK photoPK = (IPhotoPK)JSONPhoto.toPhotoPK((JSONObject)json.get("photopk"));
+        return JSONPhotosubjects.toJSONArray(photosubjectsusecases.get_photosubjects_with_foreignkey_photo(photoPK)).toJSONString();
+    }
+    
+    private String get_photosubjects_with_foreignkey_subject(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        ISubjectPK subjectPK = (ISubjectPK)JSONSubject.toSubjectPK((JSONObject)json.get("subjectpk"));
+        return JSONPhotosubjects.toJSONArray(photosubjectsusecases.get_photosubjects_with_foreignkey_subject(subjectPK)).toJSONString();
+    }
+    
+    private String search_photosubjects(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IPhotosubjectssearch search = (IPhotosubjectssearch)JSONPhotosubjects.toPhotosubjectssearch((JSONObject)json.get("search"));
+        return JSONPhotosubjects.toJSONArray(photosubjectsusecases.search_photosubjects(search)).toJSONString();
+    }
+    
+    private String search_photosubjects_count(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IPhotosubjectssearch photosubjectssearch = (IPhotosubjectssearch)JSONPhotosubjects.toPhotosubjectssearch((JSONObject)json.get("search"));
+        JSONObject jsonsearchcount = new JSONObject();
+        jsonsearchcount.put("recordcount", photosubjectsusecases.search_photosubjects_count(photosubjectssearch));
+        return jsonsearchcount.toJSONString();
+    }
+
+    private void insert_photosubjects(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IPhotosubjects photosubjects = (IPhotosubjects)JSONPhotosubjects.toPhotosubjects((JSONObject)json.get("photosubjects"));
+        photosubjectsusecases.insertPhotosubjects(photosubjects);
+        setReturnstatus("OK");
+    }
+
+    private void update_photosubjects(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IPhotosubjects photosubjects = (IPhotosubjects)JSONPhotosubjects.toPhotosubjects((JSONObject)json.get("photosubjects"));
+        photosubjectsusecases.updatePhotosubjects(photosubjects);
+        setReturnstatus("OK");
+    }
+
+    private void delete_photosubjects(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IPhotosubjects photosubjects = (IPhotosubjects)JSONPhotosubjects.toPhotosubjects((JSONObject)json.get("photosubjects"));
+        photosubjectsusecases.deletePhotosubjects(photosubjects);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Photo(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        IPhotoPK photoPK = (IPhotoPK)JSONPhoto.toPhotoPK((JSONObject)json.get("photopk"));
+        photosubjectsusecases.delete_all_containing_Photo(photoPK);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Subject(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
+        ISubjectPK subjectPK = (ISubjectPK)JSONSubject.toSubjectPK((JSONObject)json.get("subjectpk"));
+        photosubjectsusecases.delete_all_containing_Subject(subjectPK);
+        setReturnstatus("OK");
+    }
 
 }
 

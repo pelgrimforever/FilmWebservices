@@ -1,9 +1,6 @@
 /*
- * JSONCreator.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONCreator {
@@ -41,10 +37,6 @@ public class JSONCreator {
         return jsoncreators;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ICreatorPK creatorPK) {
         JSONObject json = null;
         if(creatorPK!=null) {
@@ -54,10 +46,6 @@ public class JSONCreator {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ICreator creator) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(creator.getPrimaryKey()));
@@ -68,10 +56,6 @@ public class JSONCreator {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Creatorsearch creatorsearch) {
         JSONObject json = new JSONObject();
         if(creatorsearch.used()) {
@@ -107,11 +91,6 @@ public class JSONCreator {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Creatorsearch toCreatorsearch(JSONObject json) {
         Creatorsearch creatorsearch = new Creatorsearch();
         creatorsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

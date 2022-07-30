@@ -33,7 +33,6 @@ public class View_subjects_for_photo_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLview_subjects_for_photo blview_subjects_for_photo = new BLview_subjects_for_photo();
         View_subjects_for_photo_usecases view_subjects_for_photousecases = new View_subjects_for_photo_usecases(authenticated);
         try {
             switch(this.operation) {

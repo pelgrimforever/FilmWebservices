@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.filmtype;
@@ -61,7 +61,7 @@ public class Filmtype_update extends SecurityDataServlet {
 
     private void update_filmtype(Filmtype_usecases filmtypeusecases) throws CustomException {
         IFilmtype filmtype = (IFilmtype)parser.getJavaObject("filmtype");
-        filmtypeusecases.secureupdateFilmtype(filmtype);
+        filmtypeusecases.updateFilmtype(filmtype);
     }
     
     @Override

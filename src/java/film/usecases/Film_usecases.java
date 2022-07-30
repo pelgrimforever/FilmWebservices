@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Film;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Film_usecases {
 
     private boolean loggedin = false;
-    private BLfilm blfilm = new BLfilm();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLfilm blfilm = new BLfilm(sqlreader);
     
     public Film_usecases() {
         this(false);
@@ -48,20 +54,33 @@ public class Film_usecases {
     }
     
     public void update_properties(film.logic.Userprofile userprofile, IFilm film) throws DBException, DataException {
-        blfilm.updateFilm(userprofile, film);
+        SQLTqueue tq = new SQLTqueue();
+        blfilm.updateFilm(tq, userprofile, film);
+        sqlwriter.Commit2DB(tq);
     }
     
     public void updateFilm_LoadJPGproperties(film.logic.Userprofile userprofile, IFilm film) throws DBException, CustomException {
-        blfilm.updateFilm_LoadJPGproperties(userprofile, film);
+        SQLTqueue tq = new SQLTqueue();
+        blfilm.updateFilm_LoadJPGproperties(tq, userprofile, film);
+        sqlwriter.Commit2DB(tq);
     }
 
     public void updateFilm_LoadGPSproperties(film.logic.Userprofile userprofile, IFilm film, ArrayList<film.logicentity.GPSTrackpoint> gpstrackpoints) throws DBException, CustomException {
-        blfilm.updateFilm_LoadGPSproperties(userprofile, film, gpstrackpoints);
+        SQLTqueue tq = new SQLTqueue();
+        blfilm.updateFilm_LoadGPSproperties(tq, userprofile, film, gpstrackpoints);
+        sqlwriter.Commit2DB(tq);
     }
 
     public void backupPhotos(IFilmPK filmPK) throws DBException, CustomException {
-        blfilm.backupPhoto("Film_usecases.backupPhotos", filmPK);
+        SQLTqueue tq = new SQLTqueue();
+        blfilm.backupPhoto(tq, "Film_usecases.backupPhotos", filmPK);
+        sqlwriter.Commit2DB(tq);
     }
+    
+    public ArrayList<String> Checkbackup() throws DBException, CustomException {
+        return blfilm.Checkbackup();
+    }
+
 //Custom code, do not change this line   
 
     public long count() throws DBException {
@@ -73,7 +92,7 @@ public class Film_usecases {
     }
     
     public boolean getFilmExists(IFilmPK filmPK) throws DBException {
-        return blfilm.getEntityExists(filmPK);
+        return blfilm.getFilmExists(filmPK);
     }
     
     public Film get_film_by_primarykey(IFilmPK filmPK) throws DBException {
@@ -100,16 +119,29 @@ public class Film_usecases {
         return blfilm.searchcount(filmsearch);
     }
 
-    public void secureinsertFilm(IFilm film) throws DBException, DataException {
-        blfilm.secureinsertFilm(film);
+    public void insertFilm(IFilm film) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilm.insertFilm(tq, film);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateFilm(IFilm film) throws DBException, DataException {
-        blfilm.secureupdateFilm(film);
+    public void updateFilm(IFilm film) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilm.updateFilm(tq, film);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteFilm(IFilm film) throws DBException, DataException {
-        blfilm.securedeleteFilm(film);
+    public void deleteFilm(IFilm film) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilm.deleteFilm(tq, film);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Filmtype(IFilmtypePK filmtypePK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blfilm.delete4filmtype(tq, filmtypePK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

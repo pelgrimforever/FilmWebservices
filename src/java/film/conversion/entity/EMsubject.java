@@ -1,12 +1,10 @@
 /*
- * EMsubject.java
- *
  * Created on Okt 8, 2021
  * Generated on 20.9.2021 18:6
- *
  */
 package film.conversion.entity;
 
+import data.interfaces.db.Entity;
 import data.interfaces.db.LogicEntity;
 import film.conversion.entity.def.EMsubject_default;
 import film.logicentity.Subject;
@@ -14,8 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * EMsubject
- * Custom transformation from ResultSet to Logic Entity
  * @author Franky Laseure
  */
 public class EMsubject extends EMsubject_default {
@@ -36,14 +32,8 @@ public class EMsubject extends EMsubject_default {
                 + " where " + SQLWherefilm + OrderBy;
         public static final String getMaxsubjectid = "select * from subject where id = (select max(id) from subject)";
 
-    /**
-     * Map ResultSet Field values to Subject
-     * @param dbresult: Database ResultSet
-     * @return Subject
-     * @throws java.sql.SQLException
-     */
     @Override
-    public Object mapResultSet2Entity(ResultSet dbresult) throws SQLException {
+    public Entity mapResultSet2Entity(ResultSet dbresult) throws SQLException {
         Subject subject = (Subject)super.mapResultSet2Entity(dbresult);
         return subject;
     }    

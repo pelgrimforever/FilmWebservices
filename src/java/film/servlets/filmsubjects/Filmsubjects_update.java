@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.filmsubjects;
@@ -61,7 +61,7 @@ public class Filmsubjects_update extends SecurityDataServlet {
 
     private void update_filmsubjects(Filmsubjects_usecases filmsubjectsusecases) throws CustomException {
         IFilmsubjects filmsubjects = (IFilmsubjects)parser.getJavaObject("filmsubjects");
-        filmsubjectsusecases.secureupdateFilmsubjects(filmsubjects);
+        filmsubjectsusecases.updateFilmsubjects(filmsubjects);
     }
     
     @Override

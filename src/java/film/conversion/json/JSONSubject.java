@@ -1,9 +1,6 @@
 /*
- * JSONSubject.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 15.3.2022 18:7
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONSubject {
@@ -41,10 +37,6 @@ public class JSONSubject {
         return jsonsubjects;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISubjectPK subjectPK) {
         JSONObject json = null;
         if(subjectPK!=null) {
@@ -56,10 +48,6 @@ public class JSONSubject {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISubject subject) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(subject.getPrimaryKey()));
@@ -71,10 +59,6 @@ public class JSONSubject {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Subjectsearch subjectsearch) {
         JSONObject json = new JSONObject();
         if(subjectsearch.used()) {
@@ -131,11 +115,6 @@ public class JSONSubject {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Subjectsearch toSubjectsearch(JSONObject json) {
         Subjectsearch subjectsearch = new Subjectsearch();
         subjectsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

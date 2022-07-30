@@ -33,7 +33,6 @@ public class View_subjects_for_film_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLview_subjects_for_film blview_subjects_for_film = new BLview_subjects_for_film();
         View_subjects_for_film_usecases view_subjects_for_filmusecases = new View_subjects_for_film_usecases(authenticated);
         try {
             switch(this.operation) {

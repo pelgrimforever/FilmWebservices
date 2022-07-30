@@ -1,9 +1,6 @@
 /*
- * JSONTree7subject.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 15.3.2022 18:7
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONTree7subject {
@@ -41,10 +37,6 @@ public class JSONTree7subject {
         return jsontree7subjects;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ITree7subjectPK tree7subjectPK) {
         JSONObject json = null;
         if(tree7subjectPK!=null) {
@@ -54,10 +46,6 @@ public class JSONTree7subject {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ITree7subject tree7subject) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(tree7subject.getPrimaryKey()));
@@ -80,10 +68,6 @@ public class JSONTree7subject {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Tree7subjectsearch tree7subjectsearch) {
         JSONObject json = new JSONObject();
         if(tree7subjectsearch.used()) {
@@ -128,11 +112,6 @@ public class JSONTree7subject {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Tree7subjectsearch toTree7subjectsearch(JSONObject json) {
         Tree7subjectsearch tree7subjectsearch = new Tree7subjectsearch();
         tree7subjectsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

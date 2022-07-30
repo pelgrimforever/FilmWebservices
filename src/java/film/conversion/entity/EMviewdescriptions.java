@@ -1,33 +1,38 @@
 /*
- * EMviewdescriptions.java
- *
+ * Created on Okt 8, 2021
+ * Generated on 20.9.2021 18:6
  */
 package film.conversion.entity;
 
+import data.interfaces.db.View;
+import db.ViewMapper;
+import static film.conversion.entity.def.EMview_subjects_for_film_default.SQLSelectAll;
+import film.filmDatabaseproperties;
+import static film.filmDatabaseproperties.connectionpool;
+import static film.filmDatabaseproperties.databasetool;
 import film.logicview.Viewdescriptions;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import db.ViewMapper;
 
 /**
- * EMviewdescriptions
  * @author Franky Laseure
  */
-public class EMviewdescriptions implements ViewMapper {
+public class EMviewdescriptions implements filmDatabaseproperties, ViewMapper {
     
-    /**
-     * @return empty string
-     */
-    public String getSQLSelectAll() {
-        return "";
-    }
-    
-    /**
-     * Map ResultSet Field values to View_subjects_for_photo
-     * @param dbresult: Database ResultSet
-     */
     @Override
-    public Viewdescriptions mapResultSet2Entity(ResultSet dbresult) throws SQLException {
+    public String getDbtool() { return databasetool; }
+    
+    @Override
+    public String getConnectionpool() { return connectionpool; }
+    
+    @Override
+    public String getTable() { return "view_subjects_for_film"; }
+
+    @Override
+    public String getSQLSelectAll() { return SQLSelectAll; };
+   
+    @Override
+    public View mapResultSet2Entity(ResultSet dbresult) throws SQLException {
         Viewdescriptions viewdescriptions = new Viewdescriptions();
         if(dbresult!=null) {
             try {

@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Locality;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Locality_usecases {
 
     private boolean loggedin = false;
-    private BLlocality bllocality = new BLlocality();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLlocality bllocality = new BLlocality(sqlreader);
     
     public Locality_usecases() {
         this(false);
@@ -65,7 +71,7 @@ public class Locality_usecases {
     }
     
     public boolean getLocalityExists(ILocalityPK localityPK) throws DBException {
-        return bllocality.getEntityExists(localityPK);
+        return bllocality.getLocalityExists(localityPK);
     }
     
     public Locality get_locality_by_primarykey(ILocalityPK localityPK) throws DBException {
@@ -88,16 +94,29 @@ public class Locality_usecases {
         return bllocality.searchcount(localitysearch);
     }
 
-    public void secureinsertLocality(ILocality locality) throws DBException, DataException {
-        bllocality.secureinsertLocality(locality);
+    public void insertLocality(ILocality locality) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bllocality.insertLocality(tq, locality);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateLocality(ILocality locality) throws DBException, DataException {
-        bllocality.secureupdateLocality(locality);
+    public void updateLocality(ILocality locality) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bllocality.updateLocality(tq, locality);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteLocality(ILocality locality) throws DBException, DataException {
-        bllocality.securedeleteLocality(locality);
+    public void deleteLocality(ILocality locality) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        bllocality.deleteLocality(tq, locality);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Postalcode(IPostalcodePK postalcodePK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        bllocality.delete4postalcode(tq, postalcodePK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

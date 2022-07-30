@@ -1,9 +1,6 @@
 /*
- * JSONView_publicphotolocations.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_publicphotolocations {
@@ -36,10 +32,6 @@ public class JSONView_publicphotolocations {
         return jsonview_publicphotolocationss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_publicphotolocations view_publicphotolocations) {
         JSONObject json = new JSONObject();
         if(view_publicphotolocations.getLocation()!=null) {
@@ -74,11 +66,6 @@ public class JSONView_publicphotolocations {
         return view_publicphotolocations;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_publicphotolocationssearch parameters
-     * @return 
-     */
     public static View_publicphotolocationssearch toView_publicphotolocationssearch(JSONObject json) {
         View_publicphotolocationssearch view_publicphotolocationssearch = new View_publicphotolocationssearch();
         view_publicphotolocationssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

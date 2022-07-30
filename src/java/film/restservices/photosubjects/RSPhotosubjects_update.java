@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.photosubjects;
@@ -11,6 +11,7 @@ import data.gis.shape.piPoint;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.usecases.*;
+import film.usecases.custom.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.IPhotosubjectssearch;
@@ -18,10 +19,9 @@ import film.interfaces.servlet.IPhotosubjectsOperation;
 import film.logicentity.Photosubjects;
 import film.searchentity.Photosubjectssearch;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -48,13 +48,15 @@ import org.json.simple.parser.ParseException;
 @Path("rsphotosubjects_update")
 public class RSPhotosubjects_update extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             Photosubjects_usecases photosubjectsusecases = new Photosubjects_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations
@@ -80,7 +82,7 @@ public class RSPhotosubjects_update extends RS_json_login {
 
     private void update_photosubjects(Photosubjects_usecases photosubjectsusecases, JSONObject json) throws ParseException, CustomException {
         IPhotosubjects photosubjects = (IPhotosubjects)JSONPhotosubjects.toPhotosubjects((JSONObject)json.get("photosubjects"));
-        photosubjectsusecases.secureupdatePhotosubjects(photosubjects);
+        photosubjectsusecases.updatePhotosubjects(photosubjects);
         setReturnstatus("OK");
     }
 }

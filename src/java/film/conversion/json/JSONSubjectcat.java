@@ -1,9 +1,6 @@
 /*
- * JSONSubjectcat.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONSubjectcat {
@@ -41,10 +37,6 @@ public class JSONSubjectcat {
         return jsonsubjectcats;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISubjectcatPK subjectcatPK) {
         JSONObject json = null;
         if(subjectcatPK!=null) {
@@ -54,10 +46,6 @@ public class JSONSubjectcat {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISubjectcat subjectcat) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(subjectcat.getPrimaryKey()));
@@ -68,10 +56,6 @@ public class JSONSubjectcat {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Subjectcatsearch subjectcatsearch) {
         JSONObject json = new JSONObject();
         if(subjectcatsearch.used()) {
@@ -113,11 +97,6 @@ public class JSONSubjectcat {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Subjectcatsearch toSubjectcatsearch(JSONObject json) {
         Subjectcatsearch subjectcatsearch = new Subjectcatsearch();
         subjectcatsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

@@ -1,9 +1,6 @@
 /*
- * JSONView_photolocations.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_photolocations {
@@ -36,10 +32,6 @@ public class JSONView_photolocations {
         return jsonview_photolocationss;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_photolocations view_photolocations) {
         JSONObject json = new JSONObject();
         if(view_photolocations.getLocation()!=null) {
@@ -74,11 +66,6 @@ public class JSONView_photolocations {
         return view_photolocations;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_photolocationssearch parameters
-     * @return 
-     */
     public static View_photolocationssearch toView_photolocationssearch(JSONObject json) {
         View_photolocationssearch view_photolocationssearch = new View_photolocationssearch();
         view_photolocationssearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

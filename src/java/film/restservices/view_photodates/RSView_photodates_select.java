@@ -1,5 +1,5 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.restservices.view_photodates;
@@ -16,10 +16,8 @@ import film.interfaces.servlet.IView_photodatesOperation;
 import film.usecases.View_photodates_usecases;
 import film.logicview.View_photodates;
 import film.servlets.DataServlet;
-import film.usecases.Security_usecases;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.custom.*;
+import general.exception.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.io.File;
@@ -46,14 +44,15 @@ import org.json.simple.parser.ParseException;
 @Path("rsview_photodates_select")
 public class RSView_photodates_select extends RS_json_login {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String post(String jsonstring) {
         try {
             Consume_jsonstring(jsonstring);
-            setLoggedin(Security_usecases.check_authorization(authorisationstring));
-            IView_photodates view_photodates;
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
             View_photodates_usecases view_photodatesusecases = new View_photodates_usecases(loggedin);
 //Custom code, do not change this line
 //add here custom operations

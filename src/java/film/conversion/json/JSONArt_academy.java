@@ -1,9 +1,6 @@
 /*
- * JSONArt_academy.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONArt_academy {
@@ -41,10 +37,6 @@ public class JSONArt_academy {
         return jsonart_academys;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IArt_academyPK art_academyPK) {
         JSONObject json = null;
         if(art_academyPK!=null) {
@@ -54,10 +46,6 @@ public class JSONArt_academy {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IArt_academy art_academy) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(art_academy.getPrimaryKey()));
@@ -68,10 +56,6 @@ public class JSONArt_academy {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Art_academysearch art_academysearch) {
         JSONObject json = new JSONObject();
         if(art_academysearch.used()) {
@@ -107,11 +91,6 @@ public class JSONArt_academy {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Art_academysearch toArt_academysearch(JSONObject json) {
         Art_academysearch art_academysearch = new Art_academysearch();
         art_academysearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

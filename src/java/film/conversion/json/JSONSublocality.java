@@ -1,9 +1,6 @@
 /*
- * JSONSublocality.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONSublocality {
@@ -41,10 +37,6 @@ public class JSONSublocality {
         return jsonsublocalitys;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISublocalityPK sublocalityPK) {
         JSONObject json = null;
         if(sublocalityPK!=null) {
@@ -57,10 +49,6 @@ public class JSONSublocality {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ISublocality sublocality) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(sublocality.getPrimaryKey()));
@@ -79,10 +67,6 @@ public class JSONSublocality {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Sublocalitysearch sublocalitysearch) {
         JSONObject json = new JSONObject();
         if(sublocalitysearch.used()) {
@@ -124,11 +108,6 @@ public class JSONSublocality {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Sublocalitysearch toSublocalitysearch(JSONObject json) {
         Sublocalitysearch sublocalitysearch = new Sublocalitysearch();
         sublocalitysearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

@@ -1,222 +1,142 @@
 /*
- * Bsublocality.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 
 package film.BusinessObject.table;
 
-import BusinessObject.BLtable;
 import general.exception.*;
 import java.util.ArrayList;
-import db.SQLMapperFactory;
-import db.SQLparameters;
-import data.gis.shape.*;
-import data.json.piJson;
-import data.json.psqlJsonobject;
-import db.SQLMapper_pgsql;
-import data.interfaces.db.Filedata;
-import film.BusinessObject.Logic.*;
-import film.conversion.json.JSONSublocality;
+import db.*;
+import data.interfaces.db.*;
 import film.conversion.entity.EMsublocality;
+import film.BusinessObject.Logic.*;
 import film.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.searchentity.ISublocalitysearch;
 import film.logicentity.Sublocality;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Time;
-import org.postgresql.geometric.PGpoint;
-import org.postgis.PGgeometry;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
- * Business Entity class Bsublocality
- *
- * Superclass for manipulating data- and database objects
- * for Entity Sublocality and direct related data
- * This class is overwritten each time the code generator runs
- * and is not meant to be changed
- *
  * @author Franky Laseure
  */
-public abstract class Bsublocality extends BLtable {
+public abstract class Bsublocality extends TableBusinessrules {
 
-    /**
-     * Constructor, sets Sublocality as default Entity
-     */
-    public Bsublocality() {
-        super(new Sublocality(), new EMsublocality());
+    public Bsublocality(SQLreader sqlreader) {
+        super(new TableIO(sqlreader, new EMsublocality()));
     }
 
-    /**
-     * Constructor, sets Sublocality as default Entity
-     * sets transaction queue from given GeneralEntityObject implementation
-     * all transactions will commit at same time
-     * @param transactionobject: GeneralEntityObjects that holds the transaction queue
-     */
-    public Bsublocality(BLtable transactionobject) {
-        super(transactionobject, new Sublocality(), new EMsublocality());
+    public Bsublocality(TableBusinessrules businessrules) {
+        super(new TableIO(businessrules.getTableio(), new EMsublocality()));
+        this.tableio.setAuthenticated(tableio!=null && tableio.isAuthenticated());
     }
 
-    /**
-     * create new empty Sublocality object
-     * @return empty ISublocality
-     */
     public ISublocality newSublocality() {
     	return new Sublocality();
     }
     
-    /**
-     * create new empty Sublocality object
-     * create new primary key with given parameters
-     * @param countrycode primary key field
-     * @param postalcode primary key field
-     * @param locality primary key field
-     * @param sublocality primary key field
-     * @return ISublocality with primary key
-     */
     public ISublocality newSublocality(java.lang.String countrycode, java.lang.String postalcode, java.lang.String locality, java.lang.String sublocality) {
         return new Sublocality(countrycode, postalcode, locality, sublocality);
     }
 
-    /**
-     * create new empty Sublocality object with given primary key
-     * @param sublocalityPK: primary key for Sublocality
-     * @return ISublocality with primary key
-     */
     public ISublocality newSublocality(ISublocalityPK sublocalityPK) {
         return new Sublocality((SublocalityPK)sublocalityPK);
     }
 
-    /**
-     * create new empty primary key
-     * @return empty SublocalityPK
-     */
     public ISublocalityPK newSublocalityPK() {
         return new SublocalityPK();
     }
 
-    /**
-     * create new primary key with given parameters
-     * @param countrycode primary key field
-     * @param postalcode primary key field
-     * @param locality primary key field
-     * @param sublocality primary key field
-     * @return new ISublocalityPK
-     */
     public ISublocalityPK newSublocalityPK(java.lang.String countrycode, java.lang.String postalcode, java.lang.String locality, java.lang.String sublocality) {
         return new SublocalityPK(countrycode, postalcode, locality, sublocality);
     }
 
-    /**
-     * get all Sublocality objects from database
-     * @return ArrayList of Sublocality objects
-     * @throws DBException
-     */
     public ArrayList<Sublocality> getSublocalitys() throws DBException {
-        return (ArrayList<Sublocality>)super.getEntities(EMsublocality.SQLSelectAll);
+        return (ArrayList<Sublocality>)tableio.getEntities(EMsublocality.SQLSelectAll);
     }
 
-    /**
-     * search Sublocality for primary key
-     * @param sublocalityPK: Sublocality primary key
-     * @return Sublocality object
-     * @throws DBException
-     */
     public Sublocality getSublocality(ISublocalityPK sublocalityPK) throws DBException {
-        return (Sublocality)super.getEntity((SublocalityPK)sublocalityPK);
+        return (Sublocality)tableio.getEntity((SublocalityPK)sublocalityPK);
     }
 
-    /**
-     * search sublocality with ISublocalitysearch parameters
-     * @param search ISublocalitysearch
-     * @return ArrayList of Sublocality
-     * @throws DBException 
-     */
     public ArrayList<Sublocality> searchsublocalitys(ISublocalitysearch search) throws DBException {
-        return (ArrayList<Sublocality>)this.search(search);
+        return (ArrayList<Sublocality>)tableio.search(search);
     }
 
-    /**
-     * search sublocality with ISublocalitysearch parameters, order by orderby sql clause
-     * @param search ISublocalitysearch
-     * @param orderby sql order by string
-     * @return ArrayList of Sublocality
-     * @throws DBException 
-     */
     public ArrayList<Sublocality> searchsublocalitys(ISublocalitysearch search, String orderby) throws DBException {
-        return (ArrayList<Sublocality>)this.search(search, orderby);
+        return (ArrayList<Sublocality>)tableio.search(search, orderby);
     }
 
-    /**
-     * Search sublocality in database for sublocalityPK:
-     * @param sublocalityPK: Sublocality Primary Key, only valid for the initialized Entity
-     * @return true if found in database
-     * @throws DBException
-     */
     public boolean getSublocalityExists(ISublocalityPK sublocalityPK) throws DBException {
-        return super.getEntityExists((SublocalityPK)sublocalityPK);
+        return tableio.getEntityExists((SublocalityPK)sublocalityPK);
     }
 
-    /**
-     * try to insert Sublocality in database
-     * @param sublocality Sublocality object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertSublocality(ISublocality sublocality) throws DBException, DataException {
-        super.insertEntity(sublocality);
+    public Sublocality getEntity(String sql) throws DBException {
+        return (Sublocality)tableio.getEntity(sql);
+    }
+    
+    public Sublocality getEntity(String sql, SQLparameters parameters) throws DBException {
+        return (Sublocality)tableio.getEntity(sql, parameters);
+    }
+    
+    public ArrayList<Sublocality> getEntities(String sql) throws DBException {
+        return tableio.getEntities(sql);
+    }
+    
+    public ArrayList<Sublocality> getEntities(String sql, SQLparameters parameters) throws DBException {
+        return tableio.getEntities(sql, parameters);
     }
 
-    /**
-     * check if SublocalityPK exists
-     * insert if not, update if found
-     * do not commit transaction
-     * @param sublocality Sublocality object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void insertupdateSublocality(ISublocality sublocality) throws DBException, DataException {
+    public long count() throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+    
+    public long count(String sql, SQLparameters parameters) throws DBException {
+        long count = 0;
+        if(tableio.isReadAllowed())
+            count = tableio.count();
+        return count;
+    }
+
+    public ArrayList<Sublocality> search(Tablesearcher search) throws DBException {
+        return tableio.search(search);
+    }
+
+    public ArrayList<Sublocality> search(Tablesearcher search, String orderby) throws DBException {
+        return tableio.search(search, orderby);
+    }
+
+    public long searchcount(Tablesearcher search) throws DBException {
+        return tableio.searchcount(search);
+    }
+
+    public void insertSublocality(SQLTqueue transactionqueue, ISublocality sublocality) throws DBException, DataException {
+        tableio.insertEntity(transactionqueue, sublocality);
+    }
+
+    public void insertupdateSublocality(SQLTqueue transactionqueue, ISublocality sublocality) throws DBException, DataException {
+    	checkDATA(sublocality);
         if(this.getSublocalityExists(sublocality.getPrimaryKey())) {
-            super.updateEntity(sublocality);
+            tableio.updateEntity(transactionqueue, sublocality);
         } else {
-            super.insertEntity(sublocality);
+            tableio.insertEntity(transactionqueue, sublocality);
         }
     }
 
-    /**
-     * try to update Sublocality in database
-     * @param sublocality Sublocality object
-     * @throws DBException
-     * @throws DataException
-     */
-    public void updateSublocality(ISublocality sublocality) throws DBException, DataException {
-        super.updateEntity(sublocality);
+    public void updateSublocality(SQLTqueue transactionqueue, ISublocality sublocality) throws DBException, DataException {
+    	checkDATA(sublocality);
+        tableio.updateEntity(transactionqueue, sublocality);
     }
 
-    /**
-     * try to delete Sublocality in database
-     * @param sublocality Sublocality object
-     * @throws DBException
-     */
-    public void deleteSublocality(ISublocality sublocality) throws DBException {
-        cascadedeleteSublocality(sublocality.getPrimaryKey());
-        super.deleteEntity(sublocality);
+    public void deleteSublocality(SQLTqueue transactionqueue, ISublocality sublocality) throws DBException {
+        cascadedeleteSublocality(transactionqueue, sublocality.getPrimaryKey());
+        tableio.deleteEntity(transactionqueue, sublocality);
     }
 
-    /**
-     * check data rules in Sublocality, throw DataException with customized message if rules do not apply
-     * @param sublocality Sublocality object
-     * @throws DataException
-     * @throws DBException
-     */
-    public void checkDATA(ISublocality sublocality) throws DataException, DBException {
+    private void checkDATA(ISublocality sublocality) throws DataException, DBException {
         StringBuffer message = new StringBuffer();
         //foreign key Sublocality.Countrycode - Locality.Countrycode
         //foreign key Sublocality.Postalcode - Locality.Postalcode
@@ -227,51 +147,25 @@ public abstract class Bsublocality extends BLtable {
         }
     }
         
-    /**
-     * delete all records in tables where sublocalityPK is used in a primary key
-     * @param sublocalityPK: Sublocality primary key
-     */
-    public void cascadedeleteSublocality(ISublocalityPK sublocalityPK) {
+    public void cascadedeleteSublocality(SQLTqueue transactionqueue, ISublocalityPK sublocalityPK) {
         BLroute blroute = new BLroute(this);
-        blroute.delete4sublocality(sublocalityPK);
+        blroute.setAuthenticated(isAuthenticated());
+        blroute.delete4sublocality(transactionqueue, sublocalityPK);
     }
 
-    /**
-     * @param localityPK: foreign key for Locality
-     * @delete all Sublocality Entity objects for Locality in database
-     */
-    public void delete4locality(ILocalityPK localityPK) {
-        super.addStatement(EMsublocality.SQLDelete4locality, localityPK.getSQLprimarykey());
+    public void delete4locality(SQLTqueue transactionqueue, ILocalityPK localityPK) {
+        tableio.addStatement(transactionqueue, EMsublocality.SQLDelete4locality, localityPK.getSQLprimarykey());
     }
 
-    /**
-     * @param localityPK: foreign key for Locality
-     * @return all Sublocality Entity objects for Locality
-     * @throws CustomException
-     */
     public ArrayList<Sublocality> getSublocalitys4locality(ILocalityPK localityPK) throws CustomException {
-        return super.getEntities(EMsublocality.SQLSelect4locality, localityPK.getSQLprimarykey());
+        return tableio.getEntities(EMsublocality.SQLSelect4locality, localityPK.getSQLprimarykey());
     }
-    /**
-     * @param routePK: parent Route for child object Sublocality Entity
-     * @return child Sublocality Entity object
-     * @throws CustomException
-     */
     public Sublocality getRoute(IRoutePK routePK) throws CustomException {
         SublocalityPK sublocalityPK = new SublocalityPK(routePK.getCountrycode(), routePK.getPostalcode(), routePK.getLocality(), routePK.getSublocality());
         return this.getSublocality(sublocalityPK);
     }
 
 
-    /**
-     * get all Sublocality objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @param sortlist sql sort string
-     * @param sortoperator asc/desc
-     * @return ArrayList of Sublocality objects
-     * @throws DBException
-     */
     public ArrayList<Sublocality> getSublocalitys(SQLparameters sqlparameters, String andoroperator, String sortlist, String sortoperator) throws DBException {
         StringBuilder sql = new StringBuilder(EMsublocality.SQLSelect);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
@@ -286,16 +180,10 @@ public abstract class Bsublocality extends BLtable {
         if(sortlist.length()>0) {
             sql.append(" order by ").append(sortlist).append(" ").append(sortoperator);
         }
-        return (ArrayList<Sublocality>)super.getEntities(sql.toString(), sqlparameters);
+        return (ArrayList<Sublocality>)tableio.getEntities(sql.toString(), sqlparameters);
     }
 
-    /**
-     * delete all Sublocality objects for sqlparameters
-     * @param sqlparameters SQLparameters object
-     * @param andoroperator "and"/"or"
-     * @throws DBException
-     */
-    public void delSublocality(SQLparameters sqlparameters, String andoroperator) throws DBException {
+    public void delSublocality(SQLTqueue transactionqueue, SQLparameters sqlparameters, String andoroperator) throws DBException {
         StringBuilder sql = new StringBuilder("delete from ").append(Sublocality.table);
         ArrayList<Object[]> parameters = sqlparameters.getParameters();
         int l = parameters.size();
@@ -306,7 +194,7 @@ public abstract class Bsublocality extends BLtable {
                 if(i<l-1) sql.append(" ").append(andoroperator).append(" ");
             }
         }
-        this.addStatement(sql.toString(), sqlparameters);
+        tableio.addStatement(transactionqueue, sql.toString(), sqlparameters);
     }
 
 

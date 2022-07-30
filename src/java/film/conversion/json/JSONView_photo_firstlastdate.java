@@ -1,9 +1,6 @@
 /*
- * JSONView_photo_firstlastdate.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_photo_firstlastdate {
@@ -36,10 +32,6 @@ public class JSONView_photo_firstlastdate {
         return jsonview_photo_firstlastdates;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_photo_firstlastdate view_photo_firstlastdate) {
         JSONObject json = new JSONObject();
         if(view_photo_firstlastdate.getMinphotodate()!=null) {
@@ -60,11 +52,6 @@ public class JSONView_photo_firstlastdate {
         return view_photo_firstlastdate;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_photo_firstlastdatesearch parameters
-     * @return 
-     */
     public static View_photo_firstlastdatesearch toView_photo_firstlastdatesearch(JSONObject json) {
         View_photo_firstlastdatesearch view_photo_firstlastdatesearch = new View_photo_firstlastdatesearch();
         view_photo_firstlastdatesearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

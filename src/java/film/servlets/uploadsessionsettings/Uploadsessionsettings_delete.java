@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.uploadsessionsettings;
@@ -67,7 +67,7 @@ public class Uploadsessionsettings_delete extends SecurityDataServlet {
 
     private void delete_uploadsessionsettings(Uploadsessionsettings_usecases uploadsessionsettingsusecases) throws CustomException {
         IUploadsessionsettings uploadsessionsettings = (IUploadsessionsettings)parser.getJavaObject("uploadsessionsettings");
-        uploadsessionsettingsusecases.securedeleteUploadsessionsettings(uploadsessionsettings);
+        uploadsessionsettingsusecases.deleteUploadsessionsettings(uploadsessionsettings);
     }
     
     @Override

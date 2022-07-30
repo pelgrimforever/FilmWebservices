@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.securityuserprofile;
@@ -61,7 +61,7 @@ public class Securityuserprofile_delete extends SecurityDataServlet {
 
     private void delete_securityuserprofile(Securityuserprofile_usecases securityuserprofileusecases) throws CustomException {
         ISecurityuserprofile securityuserprofile = (ISecurityuserprofile)parser.getJavaObject("securityuserprofile");
-        securityuserprofileusecases.securedeleteSecurityuserprofile(securityuserprofile);
+        securityuserprofileusecases.deleteSecurityuserprofile(securityuserprofile);
     }
     
     @Override

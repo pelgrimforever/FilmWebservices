@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Subjectcat;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Subjectcat_usecases {
 
     private boolean loggedin = false;
-    private BLsubjectcat blsubjectcat = new BLsubjectcat();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLsubjectcat blsubjectcat = new BLsubjectcat(sqlreader);
     
     public Subjectcat_usecases() {
         this(false);
@@ -48,12 +54,15 @@ public class Subjectcat_usecases {
     }
 
     public ArrayList<Subjectcat> insert_subject_category_1_getSubjects_category_1(ISubjectcat subjectcat1) throws DBException, DataException {
-        blsubjectcat.insertSubjectcat(subjectcat1);
+        SQLTqueue tq = new SQLTqueue();
+        blsubjectcat.insertSubjectcat(tq, subjectcat1);
+        sqlwriter.Commit2DB(tq);
         return blsubjectcat.getSubjectcats1();
     }
 
     public ArrayList<Subjectcat> insert_subject_category_2_getSubjects_category_2(ISubjectcat subjectcat2) throws DBException, DataException {
-        blsubjectcat.insertSubjectcat(subjectcat2);
+        SQLTqueue tq = new SQLTqueue();
+        blsubjectcat.insertSubjectcat(tq, subjectcat2);
         return blsubjectcat.getSubjectcats2();
     }
 //Custom code, do not change this line   
@@ -67,7 +76,7 @@ public class Subjectcat_usecases {
     }
     
     public boolean getSubjectcatExists(ISubjectcatPK subjectcatPK) throws DBException {
-        return blsubjectcat.getEntityExists(subjectcatPK);
+        return blsubjectcat.getSubjectcatExists(subjectcatPK);
     }
     
     public Subjectcat get_subjectcat_by_primarykey(ISubjectcatPK subjectcatPK) throws DBException {
@@ -90,16 +99,23 @@ public class Subjectcat_usecases {
         return blsubjectcat.searchcount(subjectcatsearch);
     }
 
-    public void secureinsertSubjectcat(ISubjectcat subjectcat) throws DBException, DataException {
-        blsubjectcat.secureinsertSubjectcat(subjectcat);
+    public void insertSubjectcat(ISubjectcat subjectcat) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsubjectcat.insertSubjectcat(tq, subjectcat);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateSubjectcat(ISubjectcat subjectcat) throws DBException, DataException {
-        blsubjectcat.secureupdateSubjectcat(subjectcat);
+    public void updateSubjectcat(ISubjectcat subjectcat) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsubjectcat.updateSubjectcat(tq, subjectcat);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteSubjectcat(ISubjectcat subjectcat) throws DBException, DataException {
-        blsubjectcat.securedeleteSubjectcat(subjectcat);
+    public void deleteSubjectcat(ISubjectcat subjectcat) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blsubjectcat.deleteSubjectcat(tq, subjectcat);
+        sqlwriter.Commit2DB(tq);
     }
+
 }
 

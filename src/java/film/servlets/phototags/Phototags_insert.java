@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.phototags;
@@ -61,7 +61,7 @@ public class Phototags_insert extends SecurityDataServlet {
 
     private void insert_phototags(Phototags_usecases phototagsusecases) throws CustomException {
         IPhototags phototags = (IPhototags)parser.getJavaObject("phototags");
-        phototagsusecases.secureinsertPhototags(phototags);
+        phototagsusecases.insertPhototags(phototags);
     }
     
     @Override

@@ -2,23 +2,25 @@
  * WSArt_photo.java
  *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  *
  */
 
 package film.webservices;
 
+import base.restservices.RS_json_login;
 import film.BusinessObject.Logic.*;
 import film.conversion.json.*;
 import film.entity.pk.*;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
+import film.interfaces.searchentity.IArt_photosearch;
 import film.interfaces.webservice.WSIArt_photo;
 import film.logicentity.Art_photo;
 import film.searchentity.Art_photosearch;
-import general.exception.CustomException;
-import general.exception.DataException;
-import general.exception.DBException;
+import film.usecases.*;
+import general.exception.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.jws.WebMethod;
@@ -27,14 +29,17 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import film.usecases.custom.Security_usecases;
 
 /**
  *
  * @author Franky Laseure
  */
 @WebService(endpointInterface = "film.interfaces.webservice.WSIArt_photo")
-public class WSArt_photo implements WSIArt_photo {
+public class WSArt_photo extends RS_json_login implements WSIArt_photo {
 
+    private Security_usecases security_usecases = new Security_usecases();
+    
     private JSONArray toJSONArray(ArrayList art_photos) {
         JSONArray jsonart_photos = new JSONArray();
         Iterator art_photosI = art_photos.iterator();
@@ -44,263 +49,282 @@ public class WSArt_photo implements WSIArt_photo {
         return jsonart_photos;
     }
 
-    /**
-     * Web service operation
-     */
     //@WebMethod(operationName = "getArt_photos")
     @Override
     public String getArt_photos() {
         try {
-            BLart_photo blart_photo = new BLart_photo();
-            ArrayList art_photos = blart_photo.getAll();
-            JSONArray jsonart_photos = toJSONArray(art_photos);
-            return jsonart_photos.toJSONString();
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            return get_all_art_photo(art_photousecases);
         }
-        catch(DBException e) {
+        catch(CustomException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "search")
     @Override
-    public String search(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Art_photo art_photo;
+    public String search(String jsonstring) {
         try {
-            Art_photosearch art_photosearch = JSONArt_photo.toArt_photosearch((JSONObject)parser.parse(json));
-            ArrayList art_photos = blart_photo.search(art_photosearch);
-            JSONArray jsonart_photos = toJSONArray(art_photos);
-            result = jsonart_photos.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            return search_art_photo(art_photousecases, json);
         }
-        catch(ParseException e) {
-            result = "";
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-            result = "";
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "getArt_photo")
     @Override
-    public String getArt_photo(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        String result = "";
-        Art_photo art_photo;
+    public String getArt_photo(String jsonstring) {
         try {
-            Art_photoPK art_photoPK = JSONArt_photo.toArt_photoPK((JSONObject)parser.parse(json));
-            art_photo = blart_photo.getArt_photo(art_photoPK);
-            if(art_photo!=null) {
-                result = JSONArt_photo.toJSON(art_photo).toJSONString();
-            }
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            return get_art_photo_with_primarykey(art_photousecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
+            return null;
         }
-        catch(DBException e) {
-        }
-        return result;
     }
 
     //@WebMethod(operationName = "insertArt_photo")
     @Override
-    public void insertArt_photo(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
+    public void insertArt_photo(String jsonstring) {
         try {
-            IArt_photo art_photo = JSONArt_photo.toArt_photo((JSONObject)parser.parse(json));
-            blart_photo.insertArt_photo(art_photo);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            insert_art_photo(art_photousecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "updateArt_photo")
     @Override
-    public void updateArt_photo(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
+    public void updateArt_photo(String jsonstring) {
         try {
-            IArt_photo art_photo = JSONArt_photo.toArt_photo((JSONObject)parser.parse(json));
-            blart_photo.updateArt_photo(art_photo);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            update_art_photo(art_photousecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DataException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "deleteArt_photo")
     @Override
-    public void deleteArt_photo(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
+    public void deleteArt_photo(String jsonstring) {
         try {
-            IArt_photo art_photo = JSONArt_photo.toArt_photo((JSONObject)parser.parse(json));
-            blart_photo.deleteArt_photo(art_photo);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            delete_art_photo(art_photousecases, json);
         }
-        catch(ParseException e) {
-        }
-        catch(DBException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getArt_photos4photo")
     @Override
-    public String getArt_photos4photo(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        Art_photo art_photo;
+    public String getArt_photos4photo(String jsonstring) {
         try {
-            IPhotoPK photoPK = JSONPhoto.toPhotoPK((JSONObject)parser.parse(json));
-            ArrayList art_photos = blart_photo.getArt_photos4photo(photoPK);
-            JSONArray jsonart_photos = toJSONArray(art_photos);
-            return jsonart_photos.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            return get_art_photo_with_foreignkey_photo(art_photousecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4photo")
     @Override
-    public void delete4photo(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        Art_photo art_photo;
+    public void delete4photo(String jsonstring) {
         try {
-            IPhotoPK photoPK = JSONPhoto.toPhotoPK((JSONObject)parser.parse(json));
-            blart_photo.delete4photo(photoPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            delete_art_photo(art_photousecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getArt_photos4art_subgroup")
     @Override
-    public String getArt_photos4art_subgroup(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        Art_photo art_photo;
+    public String getArt_photos4art_subgroup(String jsonstring) {
         try {
-            IArt_subgroupPK art_subgroupPK = JSONArt_subgroup.toArt_subgroupPK((JSONObject)parser.parse(json));
-            ArrayList art_photos = blart_photo.getArt_photos4art_subgroup(art_subgroupPK);
-            JSONArray jsonart_photos = toJSONArray(art_photos);
-            return jsonart_photos.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            return get_art_photo_with_foreignkey_art_subgroup(art_photousecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4art_subgroup")
     @Override
-    public void delete4art_subgroup(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        Art_photo art_photo;
+    public void delete4art_subgroup(String jsonstring) {
         try {
-            IArt_subgroupPK art_subgroupPK = JSONArt_subgroup.toArt_subgroupPK((JSONObject)parser.parse(json));
-            blart_photo.delete4art_subgroup(art_subgroupPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            delete_art_photo(art_photousecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getArt_photos4art_academy")
     @Override
-    public String getArt_photos4art_academy(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        Art_photo art_photo;
+    public String getArt_photos4art_academy(String jsonstring) {
         try {
-            IArt_academyPK art_academyPK = JSONArt_academy.toArt_academyPK((JSONObject)parser.parse(json));
-            ArrayList art_photos = blart_photo.getArt_photos4art_academy(art_academyPK);
-            JSONArray jsonart_photos = toJSONArray(art_photos);
-            return jsonart_photos.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            return get_art_photo_with_foreignkey_art_academy(art_photousecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4art_academy")
     @Override
-    public void delete4art_academy(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        Art_photo art_photo;
+    public void delete4art_academy(String jsonstring) {
         try {
-            IArt_academyPK art_academyPK = JSONArt_academy.toArt_academyPK((JSONObject)parser.parse(json));
-            blart_photo.delete4art_academy(art_academyPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            delete_art_photo(art_photousecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
     //@WebMethod(operationName = "getArt_photos4art_group")
     @Override
-    public String getArt_photos4art_group(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        Art_photo art_photo;
+    public String getArt_photos4art_group(String jsonstring) {
         try {
-            IArt_groupPK art_groupPK = JSONArt_group.toArt_groupPK((JSONObject)parser.parse(json));
-            ArrayList art_photos = blart_photo.getArt_photos4art_group(art_groupPK);
-            JSONArray jsonart_photos = toJSONArray(art_photos);
-            return jsonart_photos.toJSONString();
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            return get_art_photo_with_foreignkey_art_group(art_photousecases, json);
         }
-        catch(ParseException e) {
-            return null;
-        }
-        catch(DBException e) {
-            return null;
-        }
-        catch(CustomException e) {
+        catch(CustomException | IOException | ParseException e) {
             return null;
         }
     }
 
     //@WebMethod(operationName = "delete4art_group")
     @Override
-    public void delete4art_group(String json) {
-        BLart_photo blart_photo = new BLart_photo();
-        JSONParser parser = new JSONParser();
-        Art_photo art_photo;
+    public void delete4art_group(String jsonstring) {
         try {
-            IArt_groupPK art_groupPK = JSONArt_group.toArt_groupPK((JSONObject)parser.parse(json));
-            blart_photo.delete4art_group(art_groupPK);
+            Consume_jsonstring(jsonstring);
+            setLoggedin(security_usecases.check_authorization(authorisationstring));
+            Art_photo_usecases art_photousecases = new Art_photo_usecases(loggedin);
+            delete_art_photo(art_photousecases, json);
         }
-        catch(ParseException e) {
+        catch(CustomException | IOException | ParseException e) {
         }
     }
 
+
+    private String count_records(Art_photo_usecases art_photousecases) throws ParseException, CustomException {
+        JSONObject jsoncount = new JSONObject();
+        jsoncount.put("recordcount", art_photousecases.count());
+        return jsoncount.toJSONString();
+    }
+    
+    private String get_all_art_photo(Art_photo_usecases art_photousecases) throws ParseException, CustomException {
+    	return JSONArt_photo.toJSONArray(art_photousecases.get_all()).toJSONString();
+    }
+    
+    private String get_art_photo_with_primarykey(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_photoPK art_photoPK = (IArt_photoPK)JSONArt_photo.toArt_photoPK((JSONObject)json.get("art_photopk"));
+	return JSONArt_photo.toJSON(art_photousecases.get_art_photo_by_primarykey(art_photoPK)).toJSONString();
+    }
+    
+    private String get_art_photo_with_foreignkey_photo(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IPhotoPK photoPK = (IPhotoPK)JSONPhoto.toPhotoPK((JSONObject)json.get("photopk"));
+        return JSONArt_photo.toJSONArray(art_photousecases.get_art_photo_with_foreignkey_photo(photoPK)).toJSONString();
+    }
+    
+    private String get_art_photo_with_foreignkey_art_subgroup(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_subgroupPK art_subgroupPK = (IArt_subgroupPK)JSONArt_subgroup.toArt_subgroupPK((JSONObject)json.get("art_subgrouppk"));
+        return JSONArt_photo.toJSONArray(art_photousecases.get_art_photo_with_foreignkey_art_subgroup(art_subgroupPK)).toJSONString();
+    }
+    
+    private String get_art_photo_with_foreignkey_art_academy(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_academyPK art_academyPK = (IArt_academyPK)JSONArt_academy.toArt_academyPK((JSONObject)json.get("art_academypk"));
+        return JSONArt_photo.toJSONArray(art_photousecases.get_art_photo_with_foreignkey_art_academy(art_academyPK)).toJSONString();
+    }
+    
+    private String get_art_photo_with_foreignkey_art_group(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_groupPK art_groupPK = (IArt_groupPK)JSONArt_group.toArt_groupPK((JSONObject)json.get("art_grouppk"));
+        return JSONArt_photo.toJSONArray(art_photousecases.get_art_photo_with_foreignkey_art_group(art_groupPK)).toJSONString();
+    }
+    
+    private String search_art_photo(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_photosearch search = (IArt_photosearch)JSONArt_photo.toArt_photosearch((JSONObject)json.get("search"));
+        return JSONArt_photo.toJSONArray(art_photousecases.search_art_photo(search)).toJSONString();
+    }
+    
+    private String search_art_photo_count(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_photosearch art_photosearch = (IArt_photosearch)JSONArt_photo.toArt_photosearch((JSONObject)json.get("search"));
+        JSONObject jsonsearchcount = new JSONObject();
+        jsonsearchcount.put("recordcount", art_photousecases.search_art_photo_count(art_photosearch));
+        return jsonsearchcount.toJSONString();
+    }
+
+    private void insert_art_photo(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_photo art_photo = (IArt_photo)JSONArt_photo.toArt_photo((JSONObject)json.get("art_photo"));
+        art_photousecases.insertArt_photo(art_photo);
+        setReturnstatus("OK");
+    }
+
+    private void update_art_photo(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_photo art_photo = (IArt_photo)JSONArt_photo.toArt_photo((JSONObject)json.get("art_photo"));
+        art_photousecases.updateArt_photo(art_photo);
+        setReturnstatus("OK");
+    }
+
+    private void delete_art_photo(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_photo art_photo = (IArt_photo)JSONArt_photo.toArt_photo((JSONObject)json.get("art_photo"));
+        art_photousecases.deleteArt_photo(art_photo);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Photo(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IPhotoPK photoPK = (IPhotoPK)JSONPhoto.toPhotoPK((JSONObject)json.get("photopk"));
+        art_photousecases.delete_all_containing_Photo(photoPK);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Art_subgroup(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_subgroupPK art_subgroupPK = (IArt_subgroupPK)JSONArt_subgroup.toArt_subgroupPK((JSONObject)json.get("art_subgrouppk"));
+        art_photousecases.delete_all_containing_Art_subgroup(art_subgroupPK);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Art_academy(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_academyPK art_academyPK = (IArt_academyPK)JSONArt_academy.toArt_academyPK((JSONObject)json.get("art_academypk"));
+        art_photousecases.delete_all_containing_Art_academy(art_academyPK);
+        setReturnstatus("OK");
+    }
+
+    private void delete_all_containing_Art_group(Art_photo_usecases art_photousecases, JSONObject json) throws ParseException, CustomException {
+        IArt_groupPK art_groupPK = (IArt_groupPK)JSONArt_group.toArt_groupPK((JSONObject)json.get("art_grouppk"));
+        art_photousecases.delete_all_containing_Art_group(art_groupPK);
+        setReturnstatus("OK");
+    }
 
 }
 

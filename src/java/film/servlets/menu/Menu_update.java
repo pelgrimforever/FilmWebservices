@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.menu;
@@ -61,7 +61,7 @@ public class Menu_update extends SecurityDataServlet {
 
     private void update_menu(Menu_usecases menuusecases) throws CustomException {
         IMenu menu = (IMenu)parser.getJavaObject("menu");
-        menuusecases.secureupdateMenu(menu);
+        menuusecases.updateMenu(menu);
     }
     
     @Override

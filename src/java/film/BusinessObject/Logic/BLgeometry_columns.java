@@ -1,32 +1,27 @@
 /*
- * BLgeometry_columns.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 18.2.2013 17:43
- *
+ * Generated on 28.6.2022 18:22
  */
 
 package film.BusinessObject.Logic;
 
+import general.exception.DBException;
+import data.interfaces.db.View;
+import db.*;
+import film.interfaces.logicview.IGeometry_columns;
+import film.logicview.Geometry_columns;
 import film.BusinessObject.view.Bgeometry_columns;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
- * Business Logic Entity class BLgeometry_columns
- *
- * Class for manipulating data- and database objects
- * for View Geometry_columns and direct related data
- * This class is only generated once
- * Implement here all additional business logic
- *
  * @author Franky Laseure
  */
 public class BLgeometry_columns extends Bgeometry_columns {
 //Metacoder: NO AUTHOMATIC UPDATE
 	
-    /**
-     * Constructor, sets Geometry_columns as default Entity
-     */
-    public BLgeometry_columns() {
+    public BLgeometry_columns(SQLreader sqlreader) {
+        super(sqlreader);
     }
 
 }

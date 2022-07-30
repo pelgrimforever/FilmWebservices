@@ -33,7 +33,6 @@ public class View_countryphotocount_select extends SecurityDataServlet {
         loadAuthorization(request);
 
         Object dataobject = null;
-        BLview_countryphotocount blview_countryphotocount = new BLview_countryphotocount();
         View_countryphotocount_usecases view_countryphotocountusecases = new View_countryphotocount_usecases(authenticated);
         try {
             switch(this.operation) {

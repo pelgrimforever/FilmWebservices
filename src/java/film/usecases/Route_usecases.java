@@ -1,9 +1,10 @@
 /*
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.usecases;
 
+import db.*;
 import data.conversion.JSONConversion;
 import data.interfaces.db.Filedata;
 import data.gis.shape.piPoint;
@@ -13,7 +14,10 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.*;
 import film.interfaces.searchentity.*;
 import film.interfaces.entity.pk.*;
+import film.logicentity.*;
 import film.logicentity.Route;
+import film.logicview.*;
+import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
 import java.util.*;
@@ -26,7 +30,9 @@ import org.json.simple.parser.ParseException;
 public class Route_usecases {
 
     private boolean loggedin = false;
-    private BLroute blroute = new BLroute();
+    private SQLreader sqlreader = new SQLreader();
+    private SQLTwriter sqlwriter = new SQLTwriter();
+    private BLroute blroute = new BLroute(sqlreader);
     
     public Route_usecases() {
         this(false);
@@ -53,7 +59,7 @@ public class Route_usecases {
     }
     
     public boolean getRouteExists(IRoutePK routePK) throws DBException {
-        return blroute.getEntityExists(routePK);
+        return blroute.getRouteExists(routePK);
     }
     
     public Route get_route_by_primarykey(IRoutePK routePK) throws DBException {
@@ -72,16 +78,29 @@ public class Route_usecases {
         return blroute.searchcount(routesearch);
     }
 
-    public void secureinsertRoute(IRoute route) throws DBException, DataException {
-        blroute.secureinsertRoute(route);
+    public void insertRoute(IRoute route) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blroute.insertRoute(tq, route);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void secureupdateRoute(IRoute route) throws DBException, DataException {
-        blroute.secureupdateRoute(route);
+    public void updateRoute(IRoute route) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blroute.updateRoute(tq, route);
+        sqlwriter.Commit2DB(tq);
     }
 
-    public void securedeleteRoute(IRoute route) throws DBException, DataException {
-        blroute.securedeleteRoute(route);
+    public void deleteRoute(IRoute route) throws DBException, DataException {
+        SQLTqueue tq = new SQLTqueue();
+        blroute.deleteRoute(tq, route);
+        sqlwriter.Commit2DB(tq);
     }
+
+    public void delete_all_containing_Sublocality(ISublocalityPK sublocalityPK) throws CustomException {
+        SQLTqueue tq = new SQLTqueue();
+        blroute.delete4sublocality(tq, sublocalityPK);
+        sqlwriter.Commit2DB(tq);
+    }
+    
 }
 

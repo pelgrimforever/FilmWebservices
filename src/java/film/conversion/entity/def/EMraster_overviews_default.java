@@ -1,16 +1,14 @@
 /*
- * EMalliance_default.java
- *
  * Created on Okt 8, 2021
- * Generated on 1.5.2022 20:24
- *
+ * Generated on 27.6.2022 16:45
  */
 package film.conversion.entity.def;
 
 import data.gis.shape.*;
-import data.interfaces.db.View;
+import data.interfaces.db.*;
 import data.json.piJson;
 import db.ViewMapper;
+import film.filmDatabaseproperties;
 import film.logicview.Raster_overviews;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -20,27 +18,26 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * EMraster_overviews_default
- * Maps SQL ResultSet to film.logicentity objects
  * @author Franky Laseure
  */
-public class EMraster_overviews_default implements ViewMapper {
+public class EMraster_overviews_default implements filmDatabaseproperties, ViewMapper {
     
     public static final String SQLSelectAll = "select raster_overviews.* from raster_overviews";
 	  
-    /**
-     * 
-     * @return SQL select statement for all Raster_overviewss
-     */
+    @Override
+    public String getDbtool() { return databasetool; }
+    
+    @Override
+    public String getConnectionpool() { return connectionpool; }
+    
+    @Override
+    public String getTable() { return "raster_overviews"; }
+
     @Override
     public String getSQLSelectAll() { return SQLSelectAll; };
 
-    /**
-     * Map ResultSet Field values to Raster_overviews
-     * @param dbresult: Database ResultSet
-     */
     @Override
-    public Object mapResultSet2Entity(ResultSet dbresult) throws SQLException {
+    public View mapResultSet2Entity(ResultSet dbresult) throws SQLException {
         Raster_overviews raster_overviews = new Raster_overviews();
         if(dbresult!=null) {
             try {

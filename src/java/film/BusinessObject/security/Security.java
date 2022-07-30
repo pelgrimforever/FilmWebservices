@@ -9,6 +9,7 @@
 package film.BusinessObject.security;
 
 import base.servlets.Servlethandler;
+import db.SQLreader;
 import film.BusinessObject.Logic.BLsecurityprofile;
 import film.interfaces.logicentity.ISecurityprofile;
 import general.exception.CustomException;
@@ -27,7 +28,8 @@ import sitesecurity.interfaces.servlet.ISitegroupOperation;
 public class Security {
 //Metacoder: NO AUTHOMATIC UPDATE
 
-    private BLsecurityprofile blsecurityprofile = new BLsecurityprofile();
+    private SQLreader sqlreader = new SQLreader();
+    private BLsecurityprofile blsecurityprofile = new BLsecurityprofile(sqlreader);
     
     private static final String SERVER = "http://localhost:8080/";
     private static final String SITEGROUP = "SitesecurityWebservices/sitesecurity.Sitegroup_select";

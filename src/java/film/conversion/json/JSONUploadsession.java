@@ -1,9 +1,6 @@
 /*
- * JSONUploadsession.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONUploadsession {
@@ -41,10 +37,6 @@ public class JSONUploadsession {
         return jsonuploadsessions;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IUploadsessionPK uploadsessionPK) {
         JSONObject json = null;
         if(uploadsessionPK!=null) {
@@ -54,10 +46,6 @@ public class JSONUploadsession {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IUploadsession uploadsession) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(uploadsession.getPrimaryKey()));
@@ -72,10 +60,6 @@ public class JSONUploadsession {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Uploadsessionsearch uploadsessionsearch) {
         JSONObject json = new JSONObject();
         if(uploadsessionsearch.used()) {
@@ -114,11 +98,6 @@ public class JSONUploadsession {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Uploadsessionsearch toUploadsessionsearch(JSONObject json) {
         Uploadsessionsearch uploadsessionsearch = new Uploadsessionsearch();
         uploadsessionsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

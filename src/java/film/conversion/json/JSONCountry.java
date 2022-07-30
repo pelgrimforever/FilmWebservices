@@ -1,9 +1,6 @@
 /*
- * JSONCountry.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -27,7 +24,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- * JSON fields are by default ignored
  * @author Franky Laseure
  */
 public class JSONCountry {
@@ -41,10 +37,6 @@ public class JSONCountry {
         return jsoncountrys;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ICountryPK countryPK) {
         JSONObject json = null;
         if(countryPK!=null) {
@@ -54,10 +46,6 @@ public class JSONCountry {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(ICountry country) {
         JSONObject json = new JSONObject();
         json.put("PK", toJSON(country.getPrimaryKey()));
@@ -80,10 +68,6 @@ public class JSONCountry {
         return json;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(Countrysearch countrysearch) {
         JSONObject json = new JSONObject();
         if(countrysearch.used()) {
@@ -122,11 +106,6 @@ public class JSONCountry {
         return json;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the Filmsearch parameters
-     * @return 
-     */
     public static Countrysearch toCountrysearch(JSONObject json) {
         Countrysearch countrysearch = new Countrysearch();
         countrysearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

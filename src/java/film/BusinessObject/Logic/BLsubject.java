@@ -1,15 +1,15 @@
 /*
- * BLsubject.java
- *
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
- *
  */
 
 package film.BusinessObject.Logic;
 
 import BusinessObject.BLtable;
+import db.SQLTqueue;
 import db.SQLparameters;
+import db.SQLreader;
+import db.TableBusinessrules;
 import film.interfaces.logicentity.ISubject;
 import film.logicentity.Subject;
 import film.BusinessObject.table.Bsubject;
@@ -23,44 +23,22 @@ import general.exception.DataException;
 import java.util.ArrayList;
 
 /**
- * Business Logic Entity class BLsubject
- *
- * Class for manipulating data- and database objects
- * for Entity Subject and direct related data
- * This class is only generated once
- * Implement here all additional business logic
- *
  * @author Franky Laseure
  */
 public class BLsubject extends Bsubject {
 //Metacoder: NO AUTHOMATIC UPDATE
-    private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
+    private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data
 	
-    /**
-     * Constructor, sets Subject as default Entity
-     */
-    public BLsubject() {
-        this.setLogginrequired(isprivatetable);
+    public BLsubject(SQLreader sqlreader) {
+        super(sqlreader);
+        setLogginrequired(isprivatetable);
     }
 
-    /**
-     * Constructor, sets Subject as default Entity
-     * sets transaction queue from given GeneralObject implementation
-     * all transactions will commit at same time
-     * @param transactionobject: GeneralObjects that holds the transaction queue
-     */
-    public BLsubject(BLtable transactionobject) {
-        super(transactionobject);
-        this.setLogginrequired(isprivatetable);
+    public BLsubject(TableBusinessrules businessrules) {
+        super(businessrules);
+        tableio.setLogginrequired(isprivatetable);
     }
 
-    /**
-     * Get Subjects for subjectcat1PK, subjectcat2PK
-     * @param subjectcat1PK: Subjectcat Primary Key
-     * @param subjectcat2PK: Subjectcat Primary Key
-     * @return ArrayList with Subjects
-     * @throws DBException
-     */
     public ArrayList getSubjects(ISubjectcatPK subjectcat1PK, ISubjectcatPK subjectcat2PK) throws DBException {
         Object[][] parameter = { { "cat1", subjectcat1PK.getCat() }, { "cat2", subjectcat2PK.getCat() } };
         SQLparameters parameters = new SQLparameters(parameter);
@@ -75,22 +53,10 @@ public class BLsubject extends Bsubject {
         return subjects;
     }
 
-    /**
-     * Get Subjects for photoPK
-     * @param photoPK: Photo Primary Key
-     * @return ArrayList with Subjects linked by photo in photosubjects
-     * @throws DBException
-     */
     public ArrayList getSubjects(IPhotoPK photoPK) throws DBException {
         return this.getEntities(EMsubject.SQLSelect4photo, photoPK.getSQLprimarykey());
     }
 
-    /**
-     * Get Subjects for photoPK
-     * @param filmPK: Film Primary Key
-     * @return ArrayList with Subjects linked by photo in filmsubjects
-     * @throws DBException
-     */
     public ArrayList getSubjects(IFilmPK filmPK) throws DBException {
         return this.getEntities(EMsubject.SQLSelect4film, filmPK.getSQLprimarykey());
     }
@@ -99,112 +65,9 @@ public class BLsubject extends Bsubject {
         return ((Subject)this.getEntity(EMsubject.getMaxsubjectid)).getPrimaryKey().getId();
     }
 
-    /**
-     * try to insert Subject object in database
-     * commit transaction
-     * @param subject: Subject Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
     @Override
-    public void insertSubject(ISubject subject) throws DBException, DataException {
+    public void insertSubject(SQLTqueue transactionqueue, ISubject subject) throws DBException, DataException {
         subject.getPrimaryKey().setId(getMaxSubjectid() + 1);
-        trans_insertSubject(subject);
-        super.Commit2DB();
-    }
-    
-    /**
-     * try to insert Subject object in database
-     * commit transaction
-     * @param subject: Subject Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void secureinsertSubject(ISubject subject) throws DBException, DataException {
-        subject.getPrimaryKey().setId(getMaxSubjectid() + 1);
-        trans_insertSubject(subject);
-        super.Commit2DB();
-    }
-    
-    /**
-     * try to update Subject object in database
-     * commit transaction
-     * @param subject: Subject Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    @Override
-    public void updateSubject(ISubject subject) throws DBException, DataException {
-        trans_updateSubject(subject);
-        super.Commit2DB();
-    }
-    
-    /**
-     * try to update Subject object in database
-     * commit transaction
-     * @param subject: Subject Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void secureupdateSubject(ISubject subject) throws DBException, DataException {
-        trans_updateSubject(subject);
-        super.Commit2DB();
-    }
-    
-    /**
-     * try to delete Subject object in database
-     * commit transaction
-     * @param subject: Subject Entity Object
-     * @throws general.exception.DBException
-     */
-    @Override
-    public void deleteSubject(ISubject subject) throws DBException {
-        trans_deleteSubject(subject);
-        super.Commit2DB();
-    }
-
-    /**
-     * try to delete Subject object in database
-     * commit transaction
-     * @param subject: Subject Entity Object
-     * @throws general.exception.DBException
-     */
-    public void securedeleteSubject(ISubject subject) throws DBException {
-        trans_deleteSubject(subject);
-        super.Commit2DB();
-    }
-
-    /**
-     * try to insert Subject object in database
-     * do not commit transaction
-     * @param subject: Subject Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void trans_insertSubject(ISubject subject) throws DBException, DataException {
-        super.checkDATA(subject);
-        super.insertSubject((Subject)subject);
-    }
-    
-    /**
-     * try to update Subject object in database
-     * do not commit transaction
-     * @param subject: Subject Entity Object
-     * @throws general.exception.DBException
-     * @throws general.exception.DataException
-     */
-    public void trans_updateSubject(ISubject subject) throws DBException, DataException {
-        super.checkDATA(subject);
-        super.updateSubject((Subject)subject);
-    }
-    
-    /**
-     * try to delete Subject object in database
-     * do not commit transaction
-     * @param subject: Subject Entity Object
-     * @throws general.exception.DBException
-     */
-    public void trans_deleteSubject(ISubject subject) throws DBException {
-        super.deleteSubject((Subject)subject);
+        super.insertSubject(transactionqueue, subject);
     }
 }

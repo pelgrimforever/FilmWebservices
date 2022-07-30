@@ -1,12 +1,10 @@
 /*
- * EMlocality.java
- *
  * Created on Okt 8, 2021
  * Generated on 20.9.2021 18:6
- *
  */
 package film.conversion.entity;
 
+import data.interfaces.db.Entity;
 import data.interfaces.db.LogicEntity;
 import film.conversion.entity.def.EMlocality_default;
 import film.logicentity.Locality;
@@ -36,14 +34,8 @@ public static final String SQLSelect4arealevel3PK = "select * from locality "
         + "where postalcode.countrycode = :arealevel3.countrycode: and postalcode.al1code = :arealevel3.al1code: "
         + "and postalcode.al2code = :arealevel3.al2code: and postalcode.al3code = :arealevel3.al3code: " + OrderBy;
 
-    /**
-     * Map ResultSet Field values to Locality
-     * @param dbresult: Database ResultSet
-     * @return Locality
-     * @throws java.sql.SQLException
-     */
     @Override
-    public Object mapResultSet2Entity(ResultSet dbresult) throws SQLException {
+    public Entity mapResultSet2Entity(ResultSet dbresult) throws SQLException {
         Locality locality = (Locality)super.mapResultSet2Entity(dbresult);
         return locality;
     }    

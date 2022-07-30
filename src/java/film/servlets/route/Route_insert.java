@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.route;
@@ -61,7 +61,7 @@ public class Route_insert extends SecurityDataServlet {
 
     private void insert_route(Route_usecases routeusecases) throws CustomException {
         IRoute route = (IRoute)parser.getJavaObject("route");
-        routeusecases.secureinsertRoute(route);
+        routeusecases.insertRoute(route);
     }
     
     @Override

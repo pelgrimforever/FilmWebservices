@@ -1,9 +1,6 @@
 /*
- * JSONView_subjects_for_film.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 24.9.2021 14:50
- *
+ * Generated on 27.6.2022 16:45
  */
  
 package film.conversion.json;
@@ -22,7 +19,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
- *
  * @author Franky Laseure
  */
 public class JSONView_subjects_for_film {
@@ -36,10 +32,6 @@ public class JSONView_subjects_for_film {
         return jsonview_subjects_for_films;
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static JSONObject toJSON(IView_subjects_for_film view_subjects_for_film) {
         JSONObject json = new JSONObject();
         json.put("film", view_subjects_for_film.getFilm());
@@ -64,11 +56,6 @@ public class JSONView_subjects_for_film {
         return view_subjects_for_film;
     }
 
-    /**
-     * 
-     * @param json: JSONObject with the View_subjects_for_filmsearch parameters
-     * @return 
-     */
     public static View_subjects_for_filmsearch toView_subjects_for_filmsearch(JSONObject json) {
         View_subjects_for_filmsearch view_subjects_for_filmsearch = new View_subjects_for_filmsearch();
         view_subjects_for_filmsearch.setANDORoperator(JSONConversion.getbyte(json, "andor"));

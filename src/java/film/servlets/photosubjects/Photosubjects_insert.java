@@ -1,6 +1,6 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 1.5.2022 20:24
+ * Generated on 27.6.2022 16:45
  */
 
 package film.servlets.photosubjects;
@@ -68,7 +68,7 @@ public class Photosubjects_insert extends SecurityDataServlet {
 
     private void insert_photosubjects(Photosubjects_usecases photosubjectsusecases) throws CustomException {
         IPhotosubjects photosubjects = (IPhotosubjects)parser.getJavaObject("photosubjects");
-        photosubjectsusecases.secureinsertPhotosubjects(photosubjects);
+        photosubjectsusecases.insertPhotosubjects(photosubjects);
     }
     
     @Override
