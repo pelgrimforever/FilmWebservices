@@ -1,9 +1,6 @@
 /*
- * Security.java
- *
  * Created on Dec 23, 2012, 6:11 PM
  * Generated on 24.11.2012 14:11
- *
  */
 
 package film.BusinessObject.security;
@@ -22,8 +19,7 @@ import sitesecurity.interfaces.logicentity.ISitegroup;
 import sitesecurity.interfaces.servlet.ISitegroupOperation;
 
 /**
- *
- * @author pelgrim
+ * @author Franky Laseure
  */
 public class Security {
 //Metacoder: NO AUTHOMATIC UPDATE

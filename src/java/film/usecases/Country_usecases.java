@@ -1,5 +1,6 @@
 /*
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.usecases;
@@ -20,13 +21,11 @@ import film.logicview.*;
 import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
+import java.io.*;
 import java.util.*;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
-/**
- * @author Franky Laseure
- */
 public class Country_usecases {
 
     private boolean loggedin = false;
@@ -47,7 +46,7 @@ public class Country_usecases {
 //add here custom operations
     public void insert_country_with_check(ICountry country) throws DBException, DataException {
         SQLTqueue tq = new SQLTqueue();
-        blcountry.insertcheckCountry(tq, country);
+        blcountry.insertupdateCountry(tq, country);
         sqlwriter.Commit2DB(tq);
     }
 //Custom code, do not change this line   

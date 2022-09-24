@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 6.4.2013 16:14
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -22,9 +23,6 @@ import film.interfaces.entity.pk.ICountryPK;
 import general.exception.CustomException;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLlocality extends Blocality {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data
@@ -56,8 +54,7 @@ public class BLlocality extends Blocality {
     }    
 
     public void insertcheckLocality(SQLTqueue transactionqueue, ILocality locality) throws DBException, DataException {
-        if(this.getLocality(locality.getPrimaryKey())==null) {
+        if(!this.getLocalityExists(locality.getPrimaryKey()))
             insertLocality(transactionqueue, locality);
-        }
     }
 }

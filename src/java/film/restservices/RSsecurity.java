@@ -1,8 +1,5 @@
 /*
- * RSsecurity.java
- *
  * Generated on 15.3.2022 18:7
- *
  */
 
 package film.restservices;

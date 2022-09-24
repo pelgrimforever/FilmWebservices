@@ -1,5 +1,6 @@
 /*
- * Generated on 29.6.2022 11:37
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.usecases;
@@ -20,13 +21,11 @@ import film.logicview.*;
 import film.usecases.custom.*;
 import general.exception.*;
 import java.sql.Date;
+import java.io.*;
 import java.util.*;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
-/**
- * @author Franky Laseure
- */
 public class Photo_usecases {
 
     private boolean loggedin = false;
@@ -45,6 +44,9 @@ public class Photo_usecases {
     
 //Custom code, do not change this line
 //add here custom operations
+    private PhotoImagefile photoimagefile = new PhotoImagefile();    
+    private Photogeolocator photogeolocator = new Photogeolocator();
+    
     public ArrayList<Photo> get_publicprivate_photo_with_foreignkey_film_with_ThumbnailImages(IFilmPK filmPK) throws CustomException {
         boolean loadthumbnails = true;
         return blphoto.getPhotos4photo_film(loggedin, filmPK, loadthumbnails);
@@ -55,16 +57,16 @@ public class Photo_usecases {
         return blphoto.getPhotos4photo_film_edit(userprofile, filmPK, loadthumbnails);
     }
     
-    public Filedata get_smallimage_from_photo(film.logic.Userprofile userprofile, IPhotoPK photoPK) throws CustomException {
+    public Filedata get_smallimage_from_photo(film.logic.Userprofile userprofile, IPhotoPK photoPK) throws DBException, IOException {
         if(blphoto.hasAccess(userprofile, photoPK))
-            return blphoto.getSmallfiledata(photoPK);
+            return photoimagefile.getSmallfiledata(photoPK);
         else
             return null;
     }
     
-    public data.interfaces.db.Filedata get_croppedimage_from_photo(film.logic.Userprofile userprofile, IPhotoPK photoPK) throws CustomException {
+    public Filedata get_croppedimage_from_photo(film.logic.Userprofile userprofile, IPhotoPK photoPK) throws DBException, IOException {
         if(blphoto.hasAccess(userprofile, photoPK))
-            return blphoto.getCroppedfiledata(photoPK);
+            return photoimagefile.getCroppedfiledata(photoPK);
         else
             return null;
     }
@@ -117,10 +119,20 @@ public class Photo_usecases {
 
     public void updateGeolocation(IPhoto photo) throws DBException, DataException {
         SQLTqueue tq = new SQLTqueue();
-        blphoto.updateGeolocation(tq, photo);
+        Photo dbphoto = null;
+        if(photo.getReversegeocode()!=null && 
+                photo.getReversegeocode().length()>0 && 
+                (photo.isReversegeocodeUpdated() || photo.isLocationUpdated())) {   
+            dbphoto = blphoto.getPhoto(photo.getPrimaryKey());
+            dbphoto.setLocation(photo.getLocation());
+            dbphoto.setReversegeocode(photo.getReversegeocode());
+            dbphoto.setExactlocation(photo.getExactlocation());
+            photogeolocator.google_processreversegeocode(tq, dbphoto);
+            blphoto.updatePhoto(tq, dbphoto);
+        }
         sqlwriter.Commit2DB(tq);
     }
-
+    
     public boolean copyPreviousGeolocation(IPhoto photo) throws DBException, CustomException {
         SQLTqueue tq = new SQLTqueue();
         boolean updated = blphoto.updateCopyPrevGeolocation(tq, photo);
@@ -135,32 +147,32 @@ public class Photo_usecases {
         return updated;
     }
     
-    public void uploadPhotoImage_Root(Filedata rootphotofile) throws DBException, DataException {
+    public void uploadPhotoImage_Root(Filedata rootphotofile) throws DBException, DataException, IOException {
         SQLTqueue tq = new SQLTqueue();
         blphoto.uploadPhotoImage_Root(tq, rootphotofile);
         sqlwriter.Commit2DB(tq);
     }
 
-    public void uploadPhotoImage_Cropped(Filedata croppedphotofile) throws DBException, DataException {
+    public void uploadPhotoImage_Cropped(Filedata croppedphotofile) throws DBException, DataException, IOException {
         SQLTqueue tq = new SQLTqueue();
         blphoto.uploadPhotoImage_Cropped(tq, croppedphotofile);
     }
 
-    public String uploadPhotoImage_Manual_return_filename(Filedata photofile, HashMap photoproperties) throws DBException, DataException {
+    public String uploadPhotoImage_Manual_return_filename(Filedata photofile, HashMap photoproperties) throws DBException, DataException, IOException {
         SQLTqueue tq = new SQLTqueue();
-        String filename = blphoto.uploadPhotoImage(tq, "Photo_usecases.uploadPhotoImage_Manual", photofile, photoproperties);
+        String filename = blphoto.uploadPhotoImage(tq, photofile, photoproperties);
         sqlwriter.Commit2DB(tq);
         return filename;
     }
 
-    public String uploadPhotoImage_CONroot(Filedata conrootphotofile, HashMap conhotoproperties) throws DBException, DataException {
+    public String uploadPhotoImage_CONroot(Filedata conrootphotofile, HashMap conhotoproperties) throws DBException, DataException, IOException {
         SQLTqueue tq = new SQLTqueue();
         String filename = blphoto.uploadPhotoImage_CONRoot(tq, conrootphotofile, conhotoproperties);
         sqlwriter.Commit2DB(tq);
         return filename;
     }
 
-    public void uploadPhotoImage_CONcropped(Filedata concroppedphotofile, HashMap concroppedphotoproperties) throws DBException, DataException {
+    public void uploadPhotoImage_CONcropped(Filedata concroppedphotofile, HashMap concroppedphotoproperties) throws DBException, DataException, IOException {
         SQLTqueue tq = new SQLTqueue();
         blphoto.uploadPhotoImage_CONCropped(tq, concroppedphotofile, concroppedphotoproperties);
         sqlwriter.Commit2DB(tq);
@@ -168,7 +180,11 @@ public class Photo_usecases {
 
     public void uploadPhoto_properties(film.logic.Userprofile userprofile, IPhoto photo, ArrayList tree7subjects) throws DBException, DataException {
         SQLTqueue tq = new SQLTqueue();
-        blphoto.updatePhoto(tq, "Photo_usecases.uploadPhoto_properties", userprofile, photo, tree7subjects);
+        boolean location_has_changed = photo.getReversegeocode()!=null && photo.getReversegeocode().length()>0 && 
+                (photo.isReversegeocodeUpdated() || photo.isLocationUpdated());
+        if(location_has_changed)
+            photogeolocator.processreversegeocode(tq, photo);
+        blphoto.updatePhoto(tq, userprofile, photo, tree7subjects);
         sqlwriter.Commit2DB(tq);
     }
     
@@ -179,6 +195,10 @@ public class Photo_usecases {
     public java.io.File getSmall(IPhotoPK photoPK) throws DBException {
         return blphoto.getSmall(photoPK);
     }
+    
+    public Filedata getRootfiledata(IPhotoPK photoPK) throws DBException, IOException {
+        return photoimagefile.getRootfiledata(photoPK);
+    }    
 
     public Photo getLastPhotoinGroup(String filmgroupid) throws DBException {
         return blphoto.getLastPhotoinGroup(filmgroupid);
@@ -189,7 +209,7 @@ public class Photo_usecases {
     }
     
     public String getImagePath(IPhotoPK photoPK, String subpath) {
-        return blphoto.getImagePath(photoPK, subpath);
+        return photoimagefile.getImagePath(photoPK, subpath);
     }
     
     public ArrayList getPhotos4photo_film(boolean hasprivateaccess, IFilmPK filmPK, boolean loadthumbnails) throws CustomException {

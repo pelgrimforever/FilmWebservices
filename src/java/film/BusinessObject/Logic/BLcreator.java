@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 9.10.2015 16:22
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -14,9 +15,6 @@ import db.TableBusinessrules;
 import film.BusinessObject.table.Bcreator;
 import general.exception.DataException;
 
-/**
- * @author Franky Laseure
- */
 public class BLcreator extends Bcreator {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data

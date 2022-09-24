@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 14.5.2016 12:24
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -12,9 +13,6 @@ import film.conversion.entity.EMview_photodates;
 import film.conversion.entity.EMview_photodatespublic;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLview_photodates extends Bview_photodates {
 //Metacoder: NO AUTHOMATIC UPDATE
 	

@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -24,9 +25,6 @@ import graphic.jpeg.Tag;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * @author Franky Laseure
- */
 public class BLphototags extends Bphototags {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
@@ -42,18 +40,16 @@ public class BLphototags extends Bphototags {
     }
 
     @Override
-    public ArrayList getPhototagss4photo(IPhotoPK photoPK) throws CustomException {
+    public ArrayList getPhototagss4photo(IPhotoPK photoPK) throws DBException {
         return this.getEntities(EMphototags.SQLSelect4phototags_photo_sorted, photoPK.getSQLprimarykey());
     }
 
     public void insertGraphicfileMetatags(SQLTqueue transactionqueue, Graphicfile graphicfile, IPhoto photo) throws DataException, DBException {
-        ArrayList tags = graphicfile.getMetadataTaglist();
-        Tag tag;
+        ArrayList<Tag> tags = graphicfile.getMetadataTaglist();
         PhototagsPK phototagPK;
         Phototags phototag;
         HashMap tagnames = new HashMap();
-        for(int i=0; i<tags.size(); i++) {
-            tag = (Tag)tags.get(i);
+        for(Tag tag: tags) {
             if(!tagnames.containsKey(tag.getName())) {
                 tagnames.put(tag.getName(), tag.getName());
                 phototagPK = new PhototagsPK();

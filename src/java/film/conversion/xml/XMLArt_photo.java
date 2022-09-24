@@ -1,9 +1,7 @@
 /*
- * XMLArt_photo.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 5.5.2022 10:45
- *
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
  
 package film.conversion.xml;
@@ -24,25 +22,13 @@ import java.sql.Time;
 import java.util.Iterator;
 import org.jdom2.Element;
 
-/**
- *
- * @author Franky Laseure
- */
 public class XMLArt_photo {
     
-    /**
-     * 
-     * @return all keys and fields as XML
-     */
     public static void addXML(Element PK, IArt_photoPK art_photoPK) {
         PK.addContent(XMLElement.newContent("film", art_photoPK.getFilm()));
         PK.addContent(XMLElement.newContent("photo", art_photoPK.getPhoto()));
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static void addXML(Element Art_photoXML, Art_photo art_photo) {
         Element PK = XMLElement.newContent("PK", "");
         addXML(PK, art_photo.getPrimaryKey());

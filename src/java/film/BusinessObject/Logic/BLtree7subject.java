@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -27,9 +28,6 @@ import general.exception.DBException;
 import general.exception.DataException;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLtree7subject extends Btree7subject {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
@@ -78,23 +76,19 @@ public class BLtree7subject extends Btree7subject {
 
     public ArrayList getTree7subjects(ArrayList tree7subjectpks) throws DBException {
         ArrayList tree7subjects = new ArrayList();
-        for(int i=0; i<tree7subjectpks.size(); i++) {
+        for(int i=0; i<tree7subjectpks.size(); i++)
             tree7subjects.add(getTree7subject((Tree7subjectPK)tree7subjectpks.get(i)));
-        }
         return tree7subjects;
     }
 
-    private ArrayList addParents2Tree7subjects(ArrayList tree7subjects) throws DBException {
-        Tree7subject subject;
-        for(int i=0; i<tree7subjects.size(); i++) {
-            subject = (Tree7subject)tree7subjects.get(i);
-            subject.setParents(getParentlist((ITree7subject)subject));
-        }
+    private ArrayList addParents2Tree7subjects(ArrayList<Tree7subject> tree7subjects) throws DBException {
+        for(Tree7subject subject: tree7subjects)
+            subject.setParents(getParentlist((Tree7subject)subject));
         return tree7subjects;
     }
 
     @Override
-    public ArrayList getTree7subjects4tree7subjectParentsubjectid(ITree7subjectPK tree7subjectPK) throws CustomException {
+    public ArrayList getTree7subjects4tree7subjectParentsubjectid(ITree7subjectPK tree7subjectPK) throws DBException {
         return addParents2Tree7subjects(this.getEntities(EMtree7subject.SQLSelect4parent, tree7subjectPK.getSQLprimarykey()));
     }
     
@@ -116,50 +110,52 @@ public class BLtree7subject extends Btree7subject {
     public ArrayList getParentlist(ITree7subject tree7subject) throws DBException {
         Tree7subjectsearch search = new Tree7subjectsearch();
         String[] values = new String[tree7subject.getTreestep() - 1];
-        for(int i=0; i<tree7subject.getTreestep() - 1; i++) {
+        for(int i=0; i<tree7subject.getTreestep() - 1; i++)
             values[i] = tree7subject.getTree7id().substring(0, i+1);
-        }
         search.tree7id(values, search.EQUAL, search.OR);
         String orderby = ITree7subject.fieldnames[ITree7subject.TREE7ID-1];
         return this.searchtree7subjects(search, orderby);
     }
 
-    @Override
-    public void insertTree7subject(SQLTqueue transactionqueue, ITree7subject tree7subject) throws DBException, DataException {
+    public void insertTree7subject(
+            SQLTqueue transactionqueue, 
+            Userprofile userprofile, 
+            ITree7subject tree7subject) 
+            throws DBException, DataException {
+        if(userprofile.isEditor()) {
+            insertTree7subject_authorised(tree7subject, transactionqueue);
+        }
     }
 
-    public void insertTree7subject(SQLTqueue transactionqueue, Userprofile userprofile, ITree7subject tree7subject) throws DBException, DataException, CustomException {
-        if(userprofile.isEditor()) {
-            tree7subject.getPrimaryKey().setSubjectid(super.ConstructUID());
-            if(tree7subject.getTree7subjectparentsubjectidPK()==null) {
-                //Put on top of the tree
-                tree7subject.setTree7subjectparentsubjectidPK((Tree7subjectPK)tree7subject.getPrimaryKey());
-                tree7subject.setTreestep(1);
-                ArrayList steps1 = getAllStep1();
-                //only 7 items are allowed on 1 treelevel
-                if(steps1.size()<7) {
-                    tree7subject.setTree7id(String.valueOf(getFreeTree7id(steps1)));
-                } else {
-                    throw new DataException("Tree 7 rule, not allowed");
-                }
-            } else {
-                //put into tree
-                updateTreeparameters(tree7subject);
-            }
-            super.insertTree7subject(transactionqueue, tree7subject);
-        }
+    private void insertTree7subject_authorised(
+            ITree7subject tree7subject, 
+            SQLTqueue transactionqueue) 
+            throws DBException, DataException {
+        tree7subject.getPrimaryKey().setSubjectid(super.ConstructUID());
+        if(tree7subject.getTree7subjectparentsubjectidPK()==null)
+            insert_Tree7subject_toplevel(tree7subject);
+        else
+            updateTreeparameters(tree7subject);
+       insertTree7subject(transactionqueue, tree7subject);
+    }
+
+    private void insert_Tree7subject_toplevel(ITree7subject tree7subject) throws DBException, DataException {
+        //Put on top of the tree
+        tree7subject.setTree7subjectparentsubjectidPK((Tree7subjectPK)tree7subject.getPrimaryKey());
+        tree7subject.setTreestep(1);
+        ArrayList steps1 = getAllStep1();
+        //only 7 items are allowed on 1 treelevel
+        if(steps1.size()<7)
+            tree7subject.setTree7id(String.valueOf(getFreeTree7id(steps1)));
+        else
+            throw new DataException("Tree 7 rule, not allowed");
     }
     
-    private int getFreeTree7id(ArrayList children) {
-        Tree7subject subject;
+    private int getFreeTree7id(ArrayList<Tree7subject> children) {
         int freestep = 1;
         boolean[] stepnumbers = { true, true, true, true, true, true, true };
-        for(int i=0; i<children.size(); i++) {
-            subject = (Tree7subject)children.get(i);
-            String treeid = subject.getTree7id();
-            String subid = treeid.substring(treeid.length()-1);
-            stepnumbers[Integer.valueOf(subid)-1] = false;
-        }
+        for(Tree7subject subject: children)
+            mark_used_stepnumber(subject, stepnumbers);
         for(int step=0; step<7; step++) {
             if(stepnumbers[step]) {
                 freestep = step+1;
@@ -169,7 +165,13 @@ public class BLtree7subject extends Btree7subject {
         return freestep;
     }
 
-    private boolean updateTreeparameters(ITree7subject tree7subject) throws DBException, DataException, CustomException {
+    private void mark_used_stepnumber(Tree7subject subject, boolean[] stepnumbers) throws NumberFormatException {
+        String treeid = subject.getTree7id();
+        String subid = treeid.substring(treeid.length()-1);
+        stepnumbers[Integer.valueOf(subid)-1] = false;
+    }
+
+    private boolean updateTreeparameters(ITree7subject tree7subject) throws DBException, DataException {
         //get parent
         Tree7subject parent = this.getTree7subject(tree7subject.getTree7subjectparentsubjectidPK());
         //check if an unvalid parent is choosen, raise DateException if that is the case
@@ -216,7 +218,7 @@ public class BLtree7subject extends Btree7subject {
     public void updateTree7subject(SQLTqueue transactionqueue, Userprofile userprofile, ITree7subject tree7subject) throws DBException, DataException, CustomException {
         if(userprofile.isEditor()) {
             boolean tree7idchanged = updateTreeparameters(tree7subject);
-            updateTree7subject(transactionqueue, tree7subject);
+            super.updateTree7subject(transactionqueue, tree7subject);
             //update children tree7 parameters if subject has moved in the tree
             if(tree7idchanged) {
                 //get original subject
@@ -232,7 +234,7 @@ public class BLtree7subject extends Btree7subject {
                     subject = (Tree7subject)subtree.get(s);
                     newtree7id = parenttree7id + subject.getTree7id().substring(idlength);
                     subject.setTree7id(newtree7id);
-                    updateTree7subject(transactionqueue, subject);
+                    super.updateTree7subject(transactionqueue, subject);
                 }
             }
         }
@@ -244,7 +246,7 @@ public class BLtree7subject extends Btree7subject {
 
     public void deleteTree7subject(SQLTqueue transactionqueue, Userprofile userprofile, ITree7subject tree7subject) throws DBException {
         if(userprofile.isEditor()) {
-            deleteTree7subject(transactionqueue, tree7subject);
+            super.deleteTree7subject(transactionqueue, tree7subject);
         }
     }
 

@@ -1,9 +1,7 @@
 /*
- * XMLFilm.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 5.5.2022 10:45
- *
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
  
 package film.conversion.xml;
@@ -24,24 +22,12 @@ import java.sql.Time;
 import java.util.Iterator;
 import org.jdom2.Element;
 
-/**
- *
- * @author Franky Laseure
- */
 public class XMLFilm {
     
-    /**
-     * 
-     * @return all keys and fields as XML
-     */
     public static void addXML(Element PK, IFilmPK filmPK) {
         PK.addContent(XMLElement.newContent("id", filmPK.getId()));
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static void addXML(Element FilmXML, Film film) {
         Element PK = XMLElement.newContent("PK", "");
         addXML(PK, film.getPrimaryKey());

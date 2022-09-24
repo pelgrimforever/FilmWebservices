@@ -1,11 +1,12 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.servlets.photo;
 
-import general.exception.CustomException;
+import general.exception.*;
 import data.interfaces.db.Filedata;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.IPhoto;
@@ -22,9 +23,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * @author Franky Laseure
- */
 @WebServlet(name="Photo_insert", urlPatterns={"/film.Photo_insert"})
 public class Photo_insert extends SecurityDataServlet {
    
@@ -72,29 +70,29 @@ public class Photo_insert extends SecurityDataServlet {
 
 //Custom code, do not change this line
 //add here custom operations
-    private void insert_rootphoto(Photo_usecases photousecases) throws CustomException {
+    private void insert_rootphoto(Photo_usecases photousecases) throws DBException, DataException, IOException {
         Filedata rootphotofile = parser.getFiledata("rootphoto");
         photousecases.uploadPhotoImage_Root(rootphotofile);
     }
     
-    private void uploadPhotoImage_Cropped(Photo_usecases photousecases) throws CustomException {
+    private void uploadPhotoImage_Cropped(Photo_usecases photousecases) throws DBException, DataException, IOException {
         Filedata croppedphotofile = parser.getFiledata("croppedphoto");
         photousecases.uploadPhotoImage_Cropped(croppedphotofile);
     }
     
-    private String uploadPhotoImage_Manual_return_filename(Photo_usecases photousecases) throws CustomException {
+    private String uploadPhotoImage_Manual_return_filename(Photo_usecases photousecases) throws DBException, DataException, IOException {
         Filedata photofile = parser.getFiledata("photo");
         HashMap photoproperties = (HashMap)parser.getJavaObject("photoproperties");
         return photousecases.uploadPhotoImage_Manual_return_filename(photofile, photoproperties);
     }
 
-    private String uploadPhotoImage_CONroot(Photo_usecases photousecases) throws CustomException {
+    private String uploadPhotoImage_CONroot(Photo_usecases photousecases) throws DBException, DataException, IOException {
         Filedata conrootphotofile = parser.getFiledata("rootphoto");
         HashMap conhotoproperties = (HashMap)parser.getJavaObject("photoproperties");
         return photousecases.uploadPhotoImage_CONroot(conrootphotofile, conhotoproperties);
     }
 
-    private void uploadPhotoImage_CONcropped(Photo_usecases photousecases) throws CustomException {
+    private void uploadPhotoImage_CONcropped(Photo_usecases photousecases) throws DBException, DataException, IOException {
         Filedata concroppedphotofile = parser.getFiledata("croppedphoto");
         HashMap concroppedphotoproperties = (HashMap)parser.getJavaObject("photoproperties");
         photousecases.uploadPhotoImage_CONcropped(concroppedphotofile, concroppedphotoproperties);

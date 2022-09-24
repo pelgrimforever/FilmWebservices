@@ -1,17 +1,14 @@
 package film.servlets.film;
 
 import general.exception.CustomException;
-import data.interfaces.db.Filedata;
 import film.interfaces.entity.pk.*;
-import film.interfaces.logicentity.IFilm;
 import film.interfaces.servlet.IFilmOperation;
-import film.interfaces.searchentity.IFilmsearch;
-import film.servlets.DataServlet;
 import film.servlets.SecurityDataServlet;
 import film.usecases.Film_usecases;
+import general.exception.DBException;
+import general.exception.DataException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +41,7 @@ public class Film_backup extends SecurityDataServlet {
         this.sendData(response, dataobject);
     } 
 
-    private void backup(Film_usecases filmusecases) throws CustomException {
+    private void backup(Film_usecases filmusecases) throws DBException, DataException, FileNotFoundException, IOException {
         IFilmPK filmPK = (IFilmPK)parser.getJavaObject("filmpk");
         filmusecases.backupPhotos(filmPK);
     }

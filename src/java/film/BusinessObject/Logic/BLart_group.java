@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -14,9 +15,6 @@ import film.BusinessObject.table.Bart_group;
 import general.exception.DBException;
 import general.exception.DataException;
 
-/**
- * @author Franky Laseure
- */
 public class BLart_group extends Bart_group {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data

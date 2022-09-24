@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 6.4.2013 12:3
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -15,9 +16,6 @@ import db.TableBusinessrules;
 import film.BusinessObject.table.Bpostalcode;
 import general.exception.DataException;
 
-/**
- * @author Franky Laseure
- */
 public class BLpostalcode extends Bpostalcode {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data

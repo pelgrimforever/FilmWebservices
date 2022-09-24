@@ -1,11 +1,12 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.servlets.film;
 
-import general.exception.CustomException;
+import general.exception.*;
 import data.interfaces.db.Filedata;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.IFilm;
@@ -22,9 +23,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * @author Franky Laseure
- */
 @WebServlet(name="Film_update", urlPatterns={"/film.Film_update"})
 public class Film_update extends SecurityDataServlet {
    
@@ -71,7 +69,7 @@ public class Film_update extends SecurityDataServlet {
         filmusecases.update_properties(userprofile, film);
     }
 
-    private void updateFilm_LoadJPGproperties(Film_usecases filmusecases) throws CustomException {
+    private void updateFilm_LoadJPGproperties(Film_usecases filmusecases) throws IOException, DBException, DataException {
         IFilm film = (IFilm)parser.getJavaObject("film");
         filmusecases.updateFilm_LoadJPGproperties(userprofile, film);
     }

@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 27.6.2022 18:48
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -14,9 +15,6 @@ import film.BusinessObject.view.Braster_columns;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * @author Franky Laseure
- */
 public class BLraster_columns extends Braster_columns {
 //Metacoder: NO AUTHOMATIC UPDATE
 	

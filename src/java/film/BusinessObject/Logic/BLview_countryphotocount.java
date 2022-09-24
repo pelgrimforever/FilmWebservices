@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 9.3.2016 11:11
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -12,9 +13,6 @@ import film.conversion.entity.EMview_countryphotocount;
 import film.conversion.entity.EMview_publiccountryphotocount;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLview_countryphotocount extends Bview_countryphotocount {
 //Metacoder: NO AUTHOMATIC UPDATE
 	

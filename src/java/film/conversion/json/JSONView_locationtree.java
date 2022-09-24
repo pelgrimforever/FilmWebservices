@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
  
 package film.conversion.json;
@@ -18,9 +19,6 @@ import java.util.Iterator;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-/**
- * @author Franky Laseure
- */
 public class JSONView_locationtree {
     
     public static JSONArray toJSONArray(ArrayList view_locationtrees) {

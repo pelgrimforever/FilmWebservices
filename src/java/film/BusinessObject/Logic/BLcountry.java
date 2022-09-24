@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 4.4.2013 11:31
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -15,9 +16,6 @@ import db.TableBusinessrules;
 import film.BusinessObject.table.Bcountry;
 import general.exception.DataException;
 
-/**
- * @author Franky Laseure
- */
 public class BLcountry extends Bcountry {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
@@ -32,9 +30,4 @@ public class BLcountry extends Bcountry {
         tableio.setLogginrequired(isprivatetable);
     }
 
-    public void insertcheckCountry(SQLTqueue transactionqueue, ICountry country) throws DBException, DataException {
-        if(this.getCountry(country.getPrimaryKey())==null) {
-            insertCountry(transactionqueue, country);
-        }
-    }    
 }

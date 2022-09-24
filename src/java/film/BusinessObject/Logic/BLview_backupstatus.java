@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 31.11.2012 13:49
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -11,9 +12,6 @@ import film.conversion.entity.EMview_backupstatus;
 import general.exception.DBException;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLview_backupstatus extends Bview_backupstatus {
 //Metacoder: NO AUTHOMATIC UPDATE
 	

@@ -1,11 +1,12 @@
 /*
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.servlets.photo;
 
-import general.exception.CustomException;
+import general.exception.*;
 import data.interfaces.db.Filedata;
 import film.interfaces.entity.pk.*;
 import film.interfaces.logicentity.IPhoto;
@@ -22,9 +23,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * @author Franky Laseure
- */
 @WebServlet(name="Photo_update", urlPatterns={"/film.Photo_update"})
 public class Photo_update extends SecurityDataServlet {
    

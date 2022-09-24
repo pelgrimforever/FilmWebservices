@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -19,9 +20,6 @@ import general.exception.DBException;
 import general.exception.DataException;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLphotosubjects extends Bphotosubjects {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
@@ -36,13 +34,11 @@ public class BLphotosubjects extends Bphotosubjects {
         tableio.setLogginrequired(isprivatetable);
     }
 
-    public void linkPhoto_with_Subjects(SQLTqueue transactionqueue, String senderobject, IPhotoPK photoPK, ArrayList subjects) throws DataException, DBException {
+    public void linkPhoto_with_Subjects(SQLTqueue transactionqueue, String senderobject, IPhotoPK photoPK, ArrayList<ISubject> subjects) throws DataException, DBException {
         delete4photo(transactionqueue, photoPK);
-        ISubject subject;
         Photosubjects photosubject;
         PhotosubjectsPK photosubjectPK;
-        for(int i=0; i<subjects.size(); i++) {
-            subject = (ISubject)subjects.get(i);
+        for(ISubject subject: subjects) {
             photosubjectPK = new PhotosubjectsPK();
             photosubjectPK.setPhotoPK(photoPK);
             photosubjectPK.setSubjectPK(subject.getPrimaryKey());

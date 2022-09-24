@@ -1,5 +1,6 @@
 /*
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.usecases;
@@ -20,9 +21,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import org.json.simple.parser.ParseException;
 
-/**
- * @author Franky Laseure
- */
 public class View_localityphotocount_usecases {
 
     private boolean loggedin = false;

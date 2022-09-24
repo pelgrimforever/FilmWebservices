@@ -1,9 +1,7 @@
 /*
- * FilmContextListener.java
- *
  * Created on Dec 23, 2012, 6:22 PM
- * Generated on 5.5.2022 10:45
- *
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.listeners;
@@ -15,10 +13,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-/**
- *
- * @author Laseure Franky
- */
 @WebListener()
 public class FilmContextListener implements ServletContextListener, Contextparameters {
    

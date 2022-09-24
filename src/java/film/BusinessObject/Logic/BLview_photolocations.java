@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 16.8.2014 14:49
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -15,9 +16,6 @@ import film.conversion.entity.EMview_publicphotolocations;
 import film.logicview.View_publicphotolocations;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLview_photolocations extends Bview_photolocations {
 //Metacoder: NO AUTHOMATIC UPDATE
 	

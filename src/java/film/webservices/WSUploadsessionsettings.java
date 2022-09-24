@@ -1,9 +1,7 @@
 /*
- * WSUploadsessionsettings.java
- *
  * Created on Dec 23, 2012, 7:24 PM
- * Generated on 27.6.2022 16:45
- *
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.webservices;
@@ -31,10 +29,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import film.usecases.custom.Security_usecases;
 
-/**
- *
- * @author Franky Laseure
- */
 @WebService(endpointInterface = "film.interfaces.webservice.WSIUploadsessionsettings")
 public class WSUploadsessionsettings extends RS_json_login implements WSIUploadsessionsettings {
 

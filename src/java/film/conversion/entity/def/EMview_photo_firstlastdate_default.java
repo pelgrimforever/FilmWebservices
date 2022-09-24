@@ -1,6 +1,7 @@
 /*
  * Created on Okt 8, 2021
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 package film.conversion.entity.def;
 
@@ -17,9 +18,6 @@ import java.sql.Time;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-/**
- * @author Franky Laseure
- */
 public class EMview_photo_firstlastdate_default implements filmDatabaseproperties, ViewMapper {
     
     public static final String SQLSelectAll = "select view_photo_firstlastdate.* from view_photo_firstlastdate";

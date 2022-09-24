@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 5.4.2013 10:18
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -19,9 +20,6 @@ import film.interfaces.entity.pk.ICountryPK;
 import general.exception.CustomException;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLarealevel1 extends Barealevel1 {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
@@ -45,11 +43,5 @@ public class BLarealevel1 extends Barealevel1 {
     public void insertArealevel1(SQLTqueue transactionqueue, IArealevel1 arealevel1) throws DBException, DataException {
         if(arealevel1.getName()==null) arealevel1.setName(arealevel1.getPrimaryKey().getAl1code());
         super.insertArealevel1(transactionqueue, arealevel1);
-    }
-    
-    public void insertcheckArealevel1(SQLTqueue transactionqueue, IArealevel1 arealevel1) throws DBException, DataException {
-        if(this.getArealevel1(arealevel1.getPrimaryKey())==null) {
-            insertArealevel1(transactionqueue, arealevel1);
-        }
     }
 }

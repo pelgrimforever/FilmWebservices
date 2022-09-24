@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -19,9 +20,6 @@ import general.exception.DBException;
 import general.exception.DataException;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLphototree7subject extends Bphototree7subject {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data
@@ -36,13 +34,11 @@ public class BLphototree7subject extends Bphototree7subject {
         tableio.setLogginrequired(isprivatetable);
     }
 
-    public void linkPhoto_with_Subjects(SQLTqueue transactionqueue, String senderobject, IPhotoPK photoPK, ArrayList tree7subjects) throws DataException, DBException {
+    public void linkPhoto_with_Subjects(SQLTqueue transactionqueue, IPhotoPK photoPK, ArrayList<ITree7subject> tree7subjects) throws DataException, DBException {
         delete4photo(transactionqueue, photoPK);
-        ITree7subject tree7subject;
         Phototree7subject phototree7subject;
         Phototree7subjectPK phototree7subjectPK;
-        for(int i=0; i<tree7subjects.size(); i++) {
-            tree7subject = (ITree7subject)tree7subjects.get(i);
+        for(ITree7subject tree7subject: tree7subjects) {
             phototree7subjectPK = new Phototree7subjectPK();
             phototree7subjectPK.setPhotoPK(photoPK);
             phototree7subjectPK.setTree7subjectPK(tree7subject.getPrimaryKey());

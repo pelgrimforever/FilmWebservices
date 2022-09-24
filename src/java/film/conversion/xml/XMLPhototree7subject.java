@@ -1,9 +1,7 @@
 /*
- * XMLPhototree7subject.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 5.5.2022 10:45
- *
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
  
 package film.conversion.xml;
@@ -24,26 +22,14 @@ import java.sql.Time;
 import java.util.Iterator;
 import org.jdom2.Element;
 
-/**
- *
- * @author Franky Laseure
- */
 public class XMLPhototree7subject {
     
-    /**
-     * 
-     * @return all keys and fields as XML
-     */
     public static void addXML(Element PK, IPhototree7subjectPK phototree7subjectPK) {
         PK.addContent(XMLElement.newContent("film", phototree7subjectPK.getFilm()));
         PK.addContent(XMLElement.newContent("id", phototree7subjectPK.getId()));
         PK.addContent(XMLElement.newContent("subjectid", phototree7subjectPK.getSubjectid()));
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static void addXML(Element Phototree7subjectXML, Phototree7subject phototree7subject) {
         Element PK = XMLElement.newContent("PK", "");
         addXML(PK, phototree7subject.getPrimaryKey());

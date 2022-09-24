@@ -1,5 +1,6 @@
 /*
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.restservices.view_countryphotocount;
@@ -38,9 +39,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-/**
- * @author Franky Laseure
- */
 @Path("rsview_countryphotocount_select")
 public class RSView_countryphotocount_select extends RS_json_login {
 
@@ -63,7 +61,7 @@ public class RSView_countryphotocount_select extends RS_json_login {
                     break;
 //Custom code, do not change this line
 //add here custom operations
-                case IView_countryphotocountOperation.SELECT_ALLSECURE:
+                case IView_countryphotocountOperation.SELECT_ALLPRIVATE:
                     result = get_private_photocount_per_country(view_countryphotocountusecases);
                     break;
 //Custom code, do not change this line   

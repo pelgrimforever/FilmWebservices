@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 6.4.2013 16:14
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -19,9 +20,6 @@ import film.interfaces.entity.pk.ILocalityPK;
 import general.exception.CustomException;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLroute extends Broute {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data

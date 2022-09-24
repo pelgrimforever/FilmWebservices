@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.table;
@@ -17,9 +18,6 @@ import film.interfaces.entity.pk.*;
 import film.interfaces.searchentity.IArealevel1search;
 import film.logicentity.Arealevel1;
 
-/**
- * @author Franky Laseure
- */
 public abstract class Barealevel1 extends TableBusinessrules {
 
     public Barealevel1(SQLreader sqlreader) {

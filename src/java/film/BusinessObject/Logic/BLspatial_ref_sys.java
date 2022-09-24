@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on 27.6.2022 18:50
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -16,9 +17,6 @@ import general.exception.DataException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * @author Franky Laseure
- */
 public class BLspatial_ref_sys extends Bspatial_ref_sys {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data

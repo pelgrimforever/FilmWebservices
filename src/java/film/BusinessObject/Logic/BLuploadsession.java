@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -17,9 +18,6 @@ import general.exception.DBException;
 import general.exception.DataException;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLuploadsession extends Buploadsession {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = true; //set this to true if only a loggin account has access to this data
@@ -39,28 +37,31 @@ public class BLuploadsession extends Buploadsession {
         return this.getEntities(EMuploadsession.SQLSelectAllsorded);
     }
 
-    public void insertCompletesession(SQLTqueue transactionqueue, ArrayList uploadsessions) throws DBException, DataException {
+    public void insertCompletesession(SQLTqueue transactionqueue, ArrayList<IUploadsession> uploadsessions) throws DBException, DataException {
         //if Uploadsession table is empty, insert records
         //else only update
         String sql = "select count(distinct tablecount.*) as count from uploadsession as tablecount";
         long count = this.count(sql, null);
-        if(count==0) {
-            Uploadsession uploadsession;
-            for(int i=0; i<uploadsessions.size(); i++) {
-                uploadsession = (Uploadsession)uploadsessions.get(i);
-                //allways force update of filmgroupid
-                uploadsession.setFilmgroupid(uploadsession.getFilmgroupid());
-                insertUploadsession(transactionqueue, uploadsession);
-            }
-        } else {
-            //Delete all lines first
-            Uploadsession uploadsession;
-            for(int i=0; i<uploadsessions.size(); i++) {
-                uploadsession = (Uploadsession)uploadsessions.get(i);
-                //allways force update of filmgroupid
-                uploadsession.setFilmgroupid(uploadsession.getFilmgroupid());
-                updateUploadsession(transactionqueue, uploadsession);
-            }
+        if(count==0)
+            insertUploadsessions(uploadsessions, transactionqueue);
+        else {
+            updateUploadsessions(uploadsessions, transactionqueue);
+        }
+    }
+
+    private void insertUploadsessions(ArrayList<IUploadsession> uploadsessions, SQLTqueue transactionqueue) throws DataException, DBException {
+        for(IUploadsession uploadsession: uploadsessions) {
+            //allways force update of filmgroupid
+            uploadsession.setFilmgroupid(uploadsession.getFilmgroupid());
+            insertUploadsession(transactionqueue, uploadsession);
+        }
+    }
+
+    private void updateUploadsessions(ArrayList<IUploadsession> uploadsessions, SQLTqueue transactionqueue) throws DBException, DataException {
+        for(IUploadsession uploadsession: uploadsessions) {
+            //allways force update of filmgroupid
+            uploadsession.setFilmgroupid(uploadsession.getFilmgroupid());
+            updateUploadsession(transactionqueue, uploadsession);
         }
     }
 

@@ -1,9 +1,7 @@
 /*
- * XMLArealevel3.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 5.5.2022 10:45
- *
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
  
 package film.conversion.xml;
@@ -24,16 +22,8 @@ import java.sql.Time;
 import java.util.Iterator;
 import org.jdom2.Element;
 
-/**
- *
- * @author Franky Laseure
- */
 public class XMLArealevel3 {
     
-    /**
-     * 
-     * @return all keys and fields as XML
-     */
     public static void addXML(Element PK, IArealevel3PK arealevel3PK) {
         PK.addContent(XMLElement.newContent("countrycode", arealevel3PK.getCountrycode()));
         PK.addContent(XMLElement.newContent("al1code", arealevel3PK.getAl1code()));
@@ -41,10 +31,6 @@ public class XMLArealevel3 {
         PK.addContent(XMLElement.newContent("al3code", arealevel3PK.getAl3code()));
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static void addXML(Element Arealevel3XML, Arealevel3 arealevel3) {
         Element PK = XMLElement.newContent("PK", "");
         addXML(PK, arealevel3.getPrimaryKey());

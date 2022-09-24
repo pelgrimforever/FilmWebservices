@@ -1,9 +1,7 @@
 /*
- * XMLSecurityuserprofile.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 5.5.2022 10:45
- *
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
  
 package film.conversion.xml;
@@ -24,25 +22,13 @@ import java.sql.Time;
 import java.util.Iterator;
 import org.jdom2.Element;
 
-/**
- *
- * @author Franky Laseure
- */
 public class XMLSecurityuserprofile {
     
-    /**
-     * 
-     * @return all keys and fields as XML
-     */
     public static void addXML(Element PK, ISecurityuserprofilePK securityuserprofilePK) {
         PK.addContent(XMLElement.newContent("siteusername", securityuserprofilePK.getSiteusername()));
         PK.addContent(XMLElement.newContent("userprofile", securityuserprofilePK.getUserprofile()));
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static void addXML(Element SecurityuserprofileXML, Securityuserprofile securityuserprofile) {
         Element PK = XMLElement.newContent("PK", "");
         addXML(PK, securityuserprofile.getPrimaryKey());

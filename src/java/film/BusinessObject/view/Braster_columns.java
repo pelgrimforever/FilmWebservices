@@ -1,7 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
- * Generated on 27.6.2022 16:45
- *
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.view;
@@ -14,9 +14,6 @@ import java.util.ArrayList;
 import film.logicview.Raster_columns;
 import java.sql.Time;
 
-/**
- * @author Franky Laseure
- */
 public abstract class Braster_columns extends ViewBusinessrules {
 
     public Braster_columns(SQLreader sqlreader) {

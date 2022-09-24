@@ -1,9 +1,7 @@
 /*
- * XMLMenuitem.java
- *
  * Created on March 26, 2007, 5:44 PM
- * Generated on 5.5.2022 10:45
- *
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
  
 package film.conversion.xml;
@@ -24,26 +22,14 @@ import java.sql.Time;
 import java.util.Iterator;
 import org.jdom2.Element;
 
-/**
- *
- * @author Franky Laseure
- */
 public class XMLMenuitem {
     
-    /**
-     * 
-     * @return all keys and fields as XML
-     */
     public static void addXML(Element PK, IMenuitemPK menuitemPK) {
         PK.addContent(XMLElement.newContent("mainmenu", menuitemPK.getMainmenu()));
         PK.addContent(XMLElement.newContent("menu", menuitemPK.getMenu()));
         PK.addContent(XMLElement.newContent("menuitem", menuitemPK.getMenuitem()));
     }
 
-    /**
-     * 
-     * @return all keys and fields in a JSONObject
-     */
     public static void addXML(Element MenuitemXML, Menuitem menuitem) {
         Element PK = XMLElement.newContent("PK", "");
         addXML(PK, menuitem.getPrimaryKey());

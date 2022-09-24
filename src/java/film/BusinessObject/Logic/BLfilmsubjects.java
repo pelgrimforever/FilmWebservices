@@ -1,6 +1,7 @@
 /*
  * Created on March 26, 2007, 5:44 PM
  * Generated on :codegenerator_date:
+ * @author Franky Laseure
  */
 
 package film.BusinessObject.Logic;
@@ -19,9 +20,6 @@ import general.exception.DBException;
 import general.exception.DataException;
 import java.util.ArrayList;
 
-/**
- * @author Franky Laseure
- */
 public class BLfilmsubjects extends Bfilmsubjects {
 //Metacoder: NO AUTHOMATIC UPDATE
     private boolean isprivatetable = false; //set this to true if only a loggin account has access to this data
@@ -36,18 +34,17 @@ public class BLfilmsubjects extends Bfilmsubjects {
         tableio.setLogginrequired(isprivatetable);
     }
 
-    public void linkFilm_with_Subjects(SQLTqueue transactionqueue, IFilmPK filmPK, ArrayList subjects) throws DataException, DBException {
+    public void linkFilm_with_Subjects(SQLTqueue transactionqueue, IFilmPK filmPK, ArrayList<ISubject> subjects) throws DataException, DBException {
         delete4film(transactionqueue, filmPK);
-        ISubject subject;
-        Filmsubjects filmsubject;
-        FilmsubjectsPK filmsubjectPK;
-        for(int i=0; i<subjects.size(); i++) {
-            subject = (ISubject)subjects.get(i);
-            filmsubjectPK = new FilmsubjectsPK();
-            filmsubjectPK.setFilmPK(filmPK);
-            filmsubjectPK.setSubjectPK(subject.getPrimaryKey());
-            filmsubject = new Filmsubjects(filmsubjectPK);
-            insertFilmsubjects(transactionqueue, filmsubject);
-        }
+        for(ISubject subject: subjects)
+            linkFilm_with_Subject(filmPK, subject, transactionqueue);
+    }
+
+    private void linkFilm_with_Subject(IFilmPK filmPK, ISubject subject, SQLTqueue transactionqueue) throws DBException, DataException {
+        FilmsubjectsPK filmsubjectPK = new FilmsubjectsPK();
+        filmsubjectPK.setFilmPK(filmPK);
+        filmsubjectPK.setSubjectPK(subject.getPrimaryKey());
+        Filmsubjects filmsubject = new Filmsubjects(filmsubjectPK);
+        insertFilmsubjects(transactionqueue, filmsubject);
     }
 }

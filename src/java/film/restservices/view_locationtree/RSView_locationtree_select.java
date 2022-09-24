@@ -1,5 +1,6 @@
 /*
- * Generated on 27.6.2022 16:45
+ * Generated on 23.8.2022 14:35
+ * @author Franky Laseure
  */
 
 package film.restservices.view_locationtree;
@@ -38,9 +39,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-/**
- * @author Franky Laseure
- */
 @Path("rsview_locationtree_select")
 public class RSView_locationtree_select extends RS_json_login {
 
